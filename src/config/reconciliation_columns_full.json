@@ -1,0 +1,1397 @@
+[
+  {
+    "kode_rekening": "5.1.02.01.01.0001",
+    "nama_rekening": "Belanja Bahan-Bahan Bangunan dan Konstruksi",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.01.01.0002",
+    "nama_rekening": "Belanja Bahan-Bahan Kimia",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.01.01.0004",
+    "nama_rekening": "Belanja Bahan-Bahan Bakar dan Pelumas",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.01.01.0005",
+    "nama_rekening": "Belanja Bahan-Bahan Baku Praktek KBM",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.01.01.0008",
+    "nama_rekening": "Belanja Bahan-Bahan/Bibit Tanaman",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.01.01.0009",
+    "nama_rekening": "Belanja Bahan-Isi Tabung Pemadam Kebakaran",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.01.01.0010",
+    "nama_rekening": "Belanja Bahan-Isi Tabung Gas",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.01.01.0011",
+    "nama_rekening": "Belanja Bahan-Bahan/Bibit Ternak/Bibit Ikan",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.01.01.0012",
+    "nama_rekening": "Belanja Bahan-Bahan Lainnya",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.01.01.0013",
+    "nama_rekening": "Belanja Suku Cadang-Suku Cadang Alat Angkutan",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.01.01.0016",
+    "nama_rekening": "Belanja Suku Cadang-Suku Cadang Alat Laboratorium",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.01.01.0017",
+    "nama_rekening": "Belanja Suku Cadang-Suku Cadang Alat Pemancar",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.01.01.0018",
+    "nama_rekening": "Belanja Suku Cadang-Suku Cadang Alat Studio dan Komunikasi",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.01.01.0019",
+    "nama_rekening": "Belanja Suku Cadang-Suku Cadang Alat Pertanian",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.01.01.0020",
+    "nama_rekening": "Belanja Suku Cadang-Suku Cadang Alat Bengkel",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.01.01.0024",
+    "nama_rekening": "Belanja Alat/Bahan untuk Kegiatan Kantor-Alat Tulis Kantor",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.01.01.0025",
+    "nama_rekening": "Belanja Alat/Bahan untuk Kegiatan Kantor- Kertas dan Cover",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.01.01.0026",
+    "nama_rekening": "Belanja Alat/Bahan untuk Kegiatan Kantor- Bahan Cetak dan Penggandaan",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.01.01.0027",
+    "nama_rekening": "Belanja Alat/Bahan untuk Kegiatan Kantor-Benda Pos",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.01.01.0029",
+    "nama_rekening": "Belanja Alat/Bahan untuk Kegiatan Kantor-Bahan Komputer",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.01.01.0030",
+    "nama_rekening": "Belanja Alat/Bahan untuk Kegiatan Kantor-Perabot Kantor",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.01.01.0031",
+    "nama_rekening": "Belanja Alat/Bahan untuk Kegiatan Kantor-Alat Listrik",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.01.01.0032",
+    "nama_rekening": "Belanja Alat/Bahan untuk Kegiatan Kantor-Perlengkapan Dinas",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.01.01.0034",
+    "nama_rekening": "Belanja Alat/Bahan untuk Kegiatan Kantor- Perlengkapan Pendukung Olahraga",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.01.01.0035",
+    "nama_rekening": "Belanja Alat/Bahan untuk Kegiatan Kantor- Suvenir/Cendera Mata",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.01.01.0036",
+    "nama_rekening": "Belanja Alat/Bahan untuk Kegiatan Kantor-Alat/Bahan untuk Kegiatan Kantor Lainnya",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.01.01.0037",
+    "nama_rekening": "Belanja Obat-Obat-Obatan",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.01.01.0043",
+    "nama_rekening": "Belanja Natura dan Pakan-Natura",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.01.01.0045",
+    "nama_rekening": "Belanja Natura dan Pakan-Natura dan Pakan Lainnya",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.01.01.0052",
+    "nama_rekening": "Belanja Makanan dan Minuman Rapat",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.01.01.0053",
+    "nama_rekening": "Belanja Makanan dan Minuman Jamuan Tamu",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.01.01.0055",
+    "nama_rekening": "Belanja Makanan dan Minuman pada Fasilitas Pelayanan Urusan Pendidikan",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.01.01.0064",
+    "nama_rekening": "Belanja Pakaian Dinas Lapangan (PDL)",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.01.01.0066",
+    "nama_rekening": "Belanja Pakaian Dinas Upacara (PDU)",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.01.01.0067",
+    "nama_rekening": "Belanja Pakaian Penyelamatan",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.01.01.0069",
+    "nama_rekening": "Belanja Pakaian Teknik",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.01.01.0071",
+    "nama_rekening": "Belanja Pakaian Kerja Laboratorium",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.01.01.0072",
+    "nama_rekening": "Belanja Pakaian Kerja Bengkel",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.01.01.0074",
+    "nama_rekening": "Belanja Pakaian Adat Daerah",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.01.01.0075",
+    "nama_rekening": "Belanja Pakaian Batik Tradisional",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.01.01.0076",
+    "nama_rekening": "Belanja Pakaian Olahraga",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.01.01.0077",
+    "nama_rekening": "Belanja Pakaian Paskibraka",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.01.02.0003",
+    "nama_rekening": "Belanja Komponen-Komponen Peralatan",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.01.0003",
+    "nama_rekening": "Honorarium Narasumber atau Pembahas, Moderator, Pembawa Acara, dan Panitia",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.01.0004",
+    "nama_rekening": "Honorarium Tim Pelaksana Kegiatan dan Sekretariat Tim Pelaksana Kegiatan",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.01.0006",
+    "nama_rekening": "Honorarium Penyuluhan atau Pendampingan",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.01.0007",
+    "nama_rekening": "Honorarium Rohaniwan",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.01.0008",
+    "nama_rekening": "Honorarium Tim Penyusunan Jurnal, Buletin, Majalah, Pengelola Teknologi Informasi dan Pengelola Website",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.01.0009",
+    "nama_rekening": "Honorarium Penyelenggara Ujian",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.01.0011",
+    "nama_rekening": "Honorarium Penyelenggaraan Kegiatan Pendidikan dan Pelatihan",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.01.0013",
+    "nama_rekening": "Belanja Jasa Tenaga Pendidikan / Honorarium Guru",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.01.0015",
+    "nama_rekening": "Belanja Jasa Tenaga Laboratorium",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.01.0016",
+    "nama_rekening": "Belanja Jasa Tenaga Penanganan Prasarana dan Sarana Umum / Upah Tukang",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.01.0025",
+    "nama_rekening": "Belanja Jasa Tenaga Kesenian dan Kebudayaan",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.01.0026",
+    "nama_rekening": "Belanja Jasa Tenaga Administrasi",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.01.0027",
+    "nama_rekening": "Belanja Jasa Tenaga Operator Komputer",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.01.0029",
+    "nama_rekening": "Belanja Jasa Tenaga Ahli",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.01.0030",
+    "nama_rekening": "Belanja Jasa Tenaga Kebersihan",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.01.0031",
+    "nama_rekening": "Belanja Jasa Tenaga Keamanan",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.01.0035",
+    "nama_rekening": "Belanja Jasa Tenaga Teknisi Mekanik dan Listrik",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.01.0036",
+    "nama_rekening": "Belanja Jasa Audit/Surveillance ISO",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.01.0037",
+    "nama_rekening": "Belanja Jasa Juri Perlombaan/Pertandingan",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.01.0038",
+    "nama_rekening": "Belanja Jasa Tata Rias",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.01.0041",
+    "nama_rekening": "Belanja Jasa Pemasangan Instalasi Telepon, Air, dan Listrik",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.01.0042",
+    "nama_rekening": "Belanja Jasa Pelaksanaan Transaksi Keuangan",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.01.0049",
+    "nama_rekening": "Belanja Jasa Pencucian Pakaian, Alat Kesenian dan Kebudayaan, serta Alat Rumah Tangga",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.01.0050",
+    "nama_rekening": "Belanja Jasa Kalibrasi",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.01.0051",
+    "nama_rekening": "Belanja Jasa Pengolahan Sampah",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.01.0052",
+    "nama_rekening": "Belanja Jasa Pembersihan, Pengendalian Hama, dan Fumigasi",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.01.0057",
+    "nama_rekening": "Belanja Jasa Operator Kapal",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.01.0059",
+    "nama_rekening": "Belanja Tagihan Telepon",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.01.0060",
+    "nama_rekening": "Belanja Tagihan Air",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.01.0061",
+    "nama_rekening": "Belanja Tagihan Listrik",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.01.0062",
+    "nama_rekening": "Belanja Langganan Jurnal/Surat Kabar/Majalah",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.01.0063",
+    "nama_rekening": "Belanja Kawat/Faksimili/Internet/TV Berlangganan",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.01.0064",
+    "nama_rekening": "Belanja Paket/Pengiriman",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.01.0065",
+    "nama_rekening": "Belanja Penambahan Daya",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.01.0066",
+    "nama_rekening": "Belanja Registrasi/Keanggotaan",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.01.0067",
+    "nama_rekening": "Belanja Pembayaran Bea, dan Perizinan",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.01.0071",
+    "nama_rekening": "Belanja Lembur",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.02.0008",
+    "nama_rekening": "Belanja Asuransi Barang Milik Daerah",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.03.0002",
+    "nama_rekening": "Belanja Sewa Tanah untuk Bangunan Gedung Perdagangan/Perusahaan/Pendidikan",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.04.0001",
+    "nama_rekening": "Belanja Sewa Tractor",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.04.0010",
+    "nama_rekening": "Belanja Sewa Alat Pengangkat",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.04.0012",
+    "nama_rekening": "Belanja Sewa Alat Besar Darat Lainnya",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.04.0022",
+    "nama_rekening": "Belanja Sewa Electric Generating Set",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.04.0023",
+    "nama_rekening": "Belanja Sewa Pompa",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.04.0031",
+    "nama_rekening": "Belanja Sewa Peralatan Selam",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.04.0036",
+    "nama_rekening": "Belanja Sewa Kendaraan Bermotor Penumpang",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.04.0037",
+    "nama_rekening": "Belanja Sewa Kendaraan Bermotor Angkutan Barang",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.04.0038",
+    "nama_rekening": "Belanja Sewa Kendaraan Bermotor Beroda Dua",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.04.0039",
+    "nama_rekening": "Belanja Sewa Kendaraan Bermotor Beroda Tiga",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.04.0117",
+    "nama_rekening": "Belanja Sewa Alat Kantor Lainnya",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.04.0118",
+    "nama_rekening": "Belanja Sewa Mebel",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.04.0123",
+    "nama_rekening": "Belanja Sewa Alat Rumah Tangga Lainnya (Home Use)",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.04.0132",
+    "nama_rekening": "Belanja Sewa Peralatan Studio Audio",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.04.0133",
+    "nama_rekening": "Belanja Sewa Peralatan Studio Video dan Film",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.04.0134",
+    "nama_rekening": "Belanja Sewa Peralatan Studio Gambar",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.04.0137",
+    "nama_rekening": "Belanja Sewa Alat Studio Lainnya",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.04.0140",
+    "nama_rekening": "Belanja Sewa Alat Komunikasi Radio HF/FM",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.04.0308",
+    "nama_rekening": "Belanja Sewa Alat Peraga Praktik Sekolah Bidang Studi:Bahasa Indonesia",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.04.0309",
+    "nama_rekening": "Belanja Sewa Alat Peraga Praktik Sekolah Bidang Studi:Matematika",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.04.0310",
+    "nama_rekening": "Belanja Sewa Alat Peraga Praktik Sekolah Bidang Studi:IPA Dasar",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.04.0311",
+    "nama_rekening": "Belanja Sewa Alat Peraga Praktik Sekolah Bidang Studi:IPA Lanjutan",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.04.0312",
+    "nama_rekening": "Belanja Sewa Alat Peraga Praktik Sekolah Bidang Studi:IPA Menengah",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.04.0313",
+    "nama_rekening": "Belanja Sewa Alat Peraga Praktik Sekolah Bidang Studi:IPA Atas",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.04.0314",
+    "nama_rekening": "Belanja Sewa Alat Peraga Praktik Sekolah Bidang Studi:IPS",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.04.0315",
+    "nama_rekening": "Belanja Sewa Alat Peraga Praktik Sekolah Bidang Studi:Agama",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.04.0316",
+    "nama_rekening": "Belanja Sewa Alat Peraga Praktik Sekolah Bidang Studi:Keterampilan",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.04.0317",
+    "nama_rekening": "Belanja Sewa Alat Peraga Praktik Sekolah Bidang Studi:Kesenian",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.04.0318",
+    "nama_rekening": "Belanja Sewa Alat Peraga Praktik Sekolah Bidang Studi:Olahraga",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.04.0319",
+    "nama_rekening": "Belanja Sewa Alat Peraga Praktik Sekolah Bidang Studi:PKN",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.04.0320",
+    "nama_rekening": "Belanja Sewa Alat Peraga Luar Biasa (Tuna Netra, Terapi Fisik, Tuna Daksa, dan Tuna Rungu)",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.04.0321",
+    "nama_rekening": "Belanja Sewa Alat Peraga Kejuruan",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.04.0322",
+    "nama_rekening": "Belanja Sewa Alat Peraga PAUD/TK",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.04.0355",
+    "nama_rekening": "Belanja Sewa Peralatan Umum",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.04.0406",
+    "nama_rekening": "Belanja Sewa Komputer Unit Lainnya",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.04.0411",
+    "nama_rekening": "Belanja Sewa Peralatan Komputer Lainnya",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.05.0009",
+    "nama_rekening": "Belanja Sewa Bangunan Gedung Tempat Pertemuan",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.05.0011",
+    "nama_rekening": "Belanja Sewa Bangunan Gedung Tempat Olahraga",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.05.0030",
+    "nama_rekening": "Belanja Sewa Bangunan Gedung Tempat Kerja Lainnya",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.02.12.0001",
+    "nama_rekening": "Belanja Kursus Singkat/Pelatihan",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.03.02.0036",
+    "nama_rekening": "Belanja Pemeliharaan Alat Angkutan-Alat Angkutan Darat Bermotor-Kendaraan Bermotor Penumpang",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.03.02.0113",
+    "nama_rekening": "Belanja Pemeliharaan Alat Kantor dan Rumah Tangga-Alat Kantor-Mesin Ketik",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.03.02.0115",
+    "nama_rekening": "Belanja Pemeliharaan Alat Kantor dan Rumah Tangga-Alat Kantor-Alat Reproduksi (Penggandaan) / Pemeliaharaan Printer",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.03.02.0116",
+    "nama_rekening": "Belanja Pemeliharaan Alat Kantor dan Rumah Tangga-Alat Kantor-Alat Penyimpan Perlengkapan Kantor",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.03.02.0117",
+    "nama_rekening": "Belanja Pemeliharaan Alat Kantor dan Rumah Tangga-Alat Kantor-Alat Kantor Lainnya",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.03.02.0118",
+    "nama_rekening": "Belanja Pemeliharaan Alat Kantor dan Rumah Tangga-Alat Rumah Tangga-Mebel",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.03.02.0120",
+    "nama_rekening": "Belanja Pemeliharaan Alat Kantor dan Rumah Tangga-Alat Rumah Tangga-Alat Pembersih",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.03.02.0121",
+    "nama_rekening": "Belanja Pemeliharaan Alat Kantor dan Rumah Tangga-Alat Rumah Tangga-Alat Pendingin",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.03.02.0123",
+    "nama_rekening": "Belanja Pemeliharaan Alat Kantor dan Rumah Tangga-Alat Rumah Tangga-Alat Rumah Tangga Lainnya (Home Use)",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.03.02.0124",
+    "nama_rekening": "Belanja Pemeliharaan Alat Kantor dan Rumah Tangga-Alat Rumah Tangga-Alat Pemadam Kebakaran",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.03.02.0308",
+    "nama_rekening": "Belanja Pemeliharaan Alat Laboratorium-Alat Peraga Praktik Sekolah-Alat Peraga Praktik Sekolah Bidang Studi:Bahasa Indonesia",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.03.02.0309",
+    "nama_rekening": "Belanja Pemeliharaan Alat Laboratorium-Alat Peraga Praktik Sekolah-Alat Peraga Praktik Sekolah Bidang Studi:Matematika",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.03.02.0310",
+    "nama_rekening": "Belanja Pemeliharaan Alat Laboratorium-Alat Peraga Praktik Sekolah-Alat Peraga Praktik Sekolah Bidang Studi:IPA Dasar",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.03.02.0311",
+    "nama_rekening": "Belanja Pemeliharaan Alat Laboratorium-Alat Peraga Praktik Sekolah-Alat Peraga Praktik Sekolah Bidang Studi:IPA Lanjutan",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.03.02.0312",
+    "nama_rekening": "Belanja Pemeliharaan Alat Laboratorium-Alat Peraga Praktik Sekolah-Alat Peraga Praktik Sekolah Bidang Studi:IPA Menengah",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.03.02.0313",
+    "nama_rekening": "Belanja Pemeliharaan Alat Laboratorium-Alat Peraga Praktik Sekolah-Alat Peraga Praktik Sekolah Bidang Studi:IPA Atas",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.03.02.0314",
+    "nama_rekening": "Belanja Pemeliharaan Alat Laboratorium-Alat Peraga Praktik Sekolah-Alat Peraga Praktik Sekolah Bidang Studi:IPS",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.03.02.0315",
+    "nama_rekening": "Belanja Pemeliharaan Alat Laboratorium-Alat Peraga Praktik Sekolah-Alat Peraga Praktik Sekolah Bidang Studi:Agama",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.03.02.0316",
+    "nama_rekening": "Belanja Pemeliharaan Alat Laboratorium-Alat Peraga Praktik Sekolah-Alat Peraga Praktik Sekolah Bidang Studi:Keterampilan",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.03.02.0317",
+    "nama_rekening": "Belanja Pemeliharaan Alat Laboratorium-Alat Peraga Praktik Sekolah-Alat Peraga Praktik Sekolah Bidang Studi:Kesenian",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.03.02.0318",
+    "nama_rekening": "Belanja Pemeliharaan Alat Laboratorium-Alat Peraga Praktik Sekolah-Alat Peraga Praktik Sekolah Bidang Studi:Olahraga",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.03.02.0319",
+    "nama_rekening": "Belanja Pemeliharaan Alat Laboratorium-Alat Peraga Praktik Sekolah-Alat Peraga Praktik Sekolah Bidang Studi:PKN",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.03.02.0320",
+    "nama_rekening": "Belanja Pemeliharaan Alat Laboratorium-Alat Peraga Praktik Sekolah-Alat Peraga Luar Biasa (Tuna Netra, Terapi Fisik, Tuna Daksa, dan Tuna Rungu)",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.03.02.0321",
+    "nama_rekening": "Belanja Pemeliharaan Alat Laboratorium-Alat Peraga Praktik Sekolah-Alat Peraga Kejuruan",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.03.02.0322",
+    "nama_rekening": "Belanja Pemeliharaan Alat Laboratorium-Alat Peraga Praktik Sekolah-Alat Peraga PAUD/TK",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.03.02.0404",
+    "nama_rekening": "Belanja Pemeliharaan Komputer-Komputer Unit-Komputer Jaringan",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.03.02.0405",
+    "nama_rekening": "Belanja Pemeliharaan Komputer-Komputer Unit-Personal Computer",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.03.02.0407",
+    "nama_rekening": "Belanja Pemeliharaan Komputer-Peralatan Komputer-Peralatan Mainframe",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.03.02.0408",
+    "nama_rekening": "Belanja Pemeliharaan Komputer-Peralatan Komputer-Peralatan Mini Computer",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.03.02.0409",
+    "nama_rekening": "Belanja Pemeliharaan Komputer-Peralatan Komputer-Peralatan Personal Computer",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.03.02.0410",
+    "nama_rekening": "Belanja Pemeliharaan Komputer-Peralatan Komputer-Peralatan Jaringan",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.03.02.0411",
+    "nama_rekening": "Belanja Pemeliharaan Komputer-Peralatan Komputer-Peralatan Komputer Lainnya",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.03.02.0463",
+    "nama_rekening": "Belanja Pemeliharaan Alat Peraga-Alat Peraga Pelatihan dan Percontohan-Alat Peraga Pelatihan",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.03.02.0504",
+    "nama_rekening": "Belanja Pemeliharaan Peralatan Olahraga-Peralatan Olahraga-Peralatan Olahraga Atletik",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.03.02.0505",
+    "nama_rekening": "Belanja Pemeliharaan Peralatan Olahraga-Peralatan Olahraga-Peralatan Permainan",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.03.02.0506",
+    "nama_rekening": "Belanja Pemeliharaan Peralatan Olahraga-Peralatan Olahraga-Peralatan Senam",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.03.02.0507",
+    "nama_rekening": "Belanja Pemeliharaan Peralatan Olahraga-Peralatan Olahraga-Peralatan Olahraga Air",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.03.02.0508",
+    "nama_rekening": "Belanja Pemeliharaan Peralatan Olahraga-Peralatan Olahraga-Peralatan Olahraga Udara",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.03.03.0001",
+    "nama_rekening": "Belanja Pemeliharaan Bangunan Gedung-Bangunan Gedung Tempat Kerja-Bangunan Gedung Kantor",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.03.03.0002",
+    "nama_rekening": "Belanja Pemeliharaan Bangunan Gedung-Bangunan Gedung Tempat Kerja-Bangunan Gudang",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.03.03.0005",
+    "nama_rekening": "Belanja Pemeliharaan Bangunan Gedung-Bangunan Gedung Tempat Kerja-Bangunan Gedung Laboratorium",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.03.03.0006",
+    "nama_rekening": "Belanja Pemeliharaan Bangunan Gedung-Bangunan Gedung Tempat Kerja-Bangunan Kesehatan",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.03.03.0008",
+    "nama_rekening": "Belanja Pemeliharaan Bangunan Gedung-Bangunan Gedung Tempat Kerja-Bangunan Gedung Tempat Ibadah",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.03.03.0009",
+    "nama_rekening": "Belanja Pemeliharaan Bangunan Gedung-Bangunan Gedung Tempat Kerja-Bangunan Gedung Tempat Pertemuan",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.03.03.0010",
+    "nama_rekening": "Belanja Pemeliharaan Bangunan Gedung-Bangunan Gedung Tempat Kerja-Bangunan Gedung Tempat Pendidikan",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.03.03.0011",
+    "nama_rekening": "Belanja Pemeliharaan Bangunan Gedung-Bangunan Gedung Tempat Kerja-Bangunan Gedung Tempat Olahraga",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.03.03.0013",
+    "nama_rekening": "Belanja Pemeliharaan Bangunan Gedung-Bangunan Gedung Tempat Kerja-Bangunan Gedung untuk Pos Jaga",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.03.03.0016",
+    "nama_rekening": "Belanja Pemeliharaan Bangunan Gedung-Bangunan Gedung Tempat Kerja-Bangunan Gedung Perpustakaan",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.03.03.0030",
+    "nama_rekening": "Belanja Pemeliharaan Bangunan Gedung-Bangunan Gedung Tempat Kerja-Bangunan Gedung Tempat Kerja Lainnya",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.03.03.0033",
+    "nama_rekening": "Belanja Pemeliharaan Bangunan Gedung-Bangunan Gedung Tempat Kerja-Bangunan Parkir",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.03.03.0036",
+    "nama_rekening": "Belanja Pemeliharaan Bangunan Gedung-Bangunan Gedung Tempat Kerja-Taman",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.03.04.0075",
+    "nama_rekening": "Belanja Pemeliharaan Instalasi-Instalasi Air Bersih/Air Baku-Instalasi Air Permukaan",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.03.04.0076",
+    "nama_rekening": "Belanja Pemeliharaan Instalasi-Instalasi Air Bersih/Air Baku-Instalasi Air Sumber/Mata Air",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.03.05.0001",
+    "nama_rekening": "Belanja Pemeliharaan Bahan Perpustakaan-Bahan Perpustakaan Tercetak-Buku Umum",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.03.05.0021",
+    "nama_rekening": "Belanja Pemeliharaan Bahan Perpustakaan-Musik-Musik Lainnya",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.03.05.0028",
+    "nama_rekening": "Belanja Pemeliharaan Barang Bercorak Kesenian/Kebudayaan/Olahraga-Barang Bercorak Kesenian-Alat Musik",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.03.05.0030",
+    "nama_rekening": "Belanja Pemeliharaan Barang Bercorak Kesenian/Kebudayaan/Olahraga-Barang Bercorak Kesenian-Alat Peraga Kesenian",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.04.01.0001",
+    "nama_rekening": "Belanja Perjalanan Dinas Biasa / Luar Daerah",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.04.01.0003",
+    "nama_rekening": "Belanja Perjalanan Dinas Dalam Kota / Dalam Daerah",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.04.01.0004",
+    "nama_rekening": "Belanja Perjalanan Dinas Paket Meeting Dalam Kota",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.1.02.04.01.0005",
+    "nama_rekening": "Belanja Perjalanan Dinas Paket Meeting Luar Kota",
+    "group": "BARANG_JASA"
+  },
+  {
+    "kode_rekening": "5.2.02.01.03.0003",
+    "nama_rekening": "Belanja Modal Compressor",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.01.03.0004",
+    "nama_rekening": "Belanja Modal Electric Generating Set",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.01.03.0005",
+    "nama_rekening": "Belanja Modal Pompa",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.03.03.0010",
+    "nama_rekening": "Belanja Modal Alat Timbangan/Biara",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.05.01.0001",
+    "nama_rekening": "Belanja Modal Mesin Ketik",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.05.01.0002",
+    "nama_rekening": "Belanja Modal Mesin Hitung/Mesin Jumlah",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.05.01.0003",
+    "nama_rekening": "Belanja Modal Alat Reproduksi (Penggandaan)",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.05.01.0004",
+    "nama_rekening": "Belanja Modal Alat Penyimpan Perlengkapan Kantor",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.05.01.0005",
+    "nama_rekening": "Belanja Modal Alat Kantor Lainnya",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.05.02.0001",
+    "nama_rekening": "Belanja Modal Mebel",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.05.02.0002",
+    "nama_rekening": "Belanja Modal Alat Pengukur Waktu",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.05.02.0003",
+    "nama_rekening": "Belanja Modal Alat Pembersih",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.05.02.0004",
+    "nama_rekening": "Belanja Modal Alat Pendingin",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.05.02.0005",
+    "nama_rekening": "Belanja Modal Alat Dapur",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.05.02.0006",
+    "nama_rekening": "Belanja Modal Alat Rumah Tangga Lainnya (Home Use)",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.05.02.0007",
+    "nama_rekening": "Belanja Modal Alat Pemadam Kebakaran",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.06.01.0001",
+    "nama_rekening": "Belanja Modal Peralatan Studio Audio",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.06.01.0002",
+    "nama_rekening": "Belanja Modal Peralatan Studio Video dan Film",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.06.01.0003",
+    "nama_rekening": "Belanja Modal Peralatan Studio Gambar",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.06.01.0004",
+    "nama_rekening": "Belanja Modal Peralatan Cetak",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.06.02.0001",
+    "nama_rekening": "Belanja Modal Alat Komunikasi Telephone",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.06.02.0002",
+    "nama_rekening": "Belanja Modal Alat Komunikasi Radio SSB",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.06.02.0003",
+    "nama_rekening": "Belanja Modal Alat Komunikasi Radio HF/FM",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.06.03.0003",
+    "nama_rekening": "Belanja Modal Peralatan Pemancar VHF/FM",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.06.03.0008",
+    "nama_rekening": "Belanja Modal Peralatan Antena VHF/FM",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.06.03.0010",
+    "nama_rekening": "Belanja Modal Peralatan Antena SHF/Parabola",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.06.03.0019",
+    "nama_rekening": "Belanja Modal Switcher Antena",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.08.01.0006",
+    "nama_rekening": "Belanja Modal Alat Laboratorium Bahan Bangunan Konstruksi",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.08.01.0011",
+    "nama_rekening": "Belanja Modal Alat Laboratorium Umum",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.08.01.0012",
+    "nama_rekening": "Belanja Modal Alat Laboratorium Mikrobiologi",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.08.01.0013",
+    "nama_rekening": "Belanja Modal Alat Laboratorium Kimia",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.08.01.0020",
+    "nama_rekening": "Belanja Modal Alat Laboratorium Fisika",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.08.01.0041",
+    "nama_rekening": "Belanja Modal Alat Laboratorium Pertanian",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.08.01.0042",
+    "nama_rekening": "Belanja Modal Alat Laboratorium Elektronika dan Daya",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.08.01.0048",
+    "nama_rekening": "Belanja Modal Alat Laboratorium Biologi",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.08.03.0001",
+    "nama_rekening": "Alat Peraga Praktek Sekolah Bidang Studi:Bahasa Indonesia",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.08.03.0002",
+    "nama_rekening": "Belanja Modal Alat Peraga Praktek Sekolah Bidang Studi:Matematika",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.08.03.0003",
+    "nama_rekening": "Belanja Modal Alat Peraga Praktek Sekolah Bidang Studi:IPA Dasar",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.08.03.0004",
+    "nama_rekening": "Belanja Modal Alat Peraga Praktek Sekolah Bidang Studi:IPA Lanjutan",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.08.03.0005",
+    "nama_rekening": "Belanja Modal Alat Peraga Praktek Sekolah Bidang Studi:IPA Menengah",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.08.03.0006",
+    "nama_rekening": "Belanja Modal Alat Peraga Praktek Sekolah Bidang Studi:IPA Atas",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.08.03.0007",
+    "nama_rekening": "Belanja Modal Alat Peraga Praktek Sekolah Bidang Studi:IPS",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.08.03.0008",
+    "nama_rekening": "Alat Peraga Praktek Sekolah Bidang Studi:Agama",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.08.03.0009",
+    "nama_rekening": "Belanja Modal Alat Peraga Praktek Sekolah Bidang Studi:Keterampilan",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.08.03.0010",
+    "nama_rekening": "Belanja Modal Alat Peraga Praktek Sekolah Bidang Studi:Kesenian",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.08.03.0011",
+    "nama_rekening": "Belanja Modal Alat Peraga Praktek Sekolah Bidang Studi:Olahraga",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.08.03.0012",
+    "nama_rekening": "Belanja Modal Alat Peraga Praktek Sekolah Bidang Studi:PKN",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.08.03.0013",
+    "nama_rekening": "Belanja Modal Alat Peraga Luar Biasa (Tuna Netra, Terapi Fisik, Tuna Daksa, dan Tuna Rungu)",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.08.03.0014",
+    "nama_rekening": "Belanja Modal Alat Peraga Kejuruan",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.08.03.0015",
+    "nama_rekening": "Belanja Modal Alat Peraga PAUD/TK",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.08.03.0016",
+    "nama_rekening": "Belanja Modal Alat Peraga Praktik Sekolah Lainnya",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.10.01.0001",
+    "nama_rekening": "Belanja Modal Komputer Jaringan",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.10.01.0002",
+    "nama_rekening": "Belanja Modal Personal Computer",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.10.02.0001",
+    "nama_rekening": "Belanja Modal Peralatan Mainframe",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.10.02.0002",
+    "nama_rekening": "Belanja Modal Peralatan Mini Computer",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.10.02.0003",
+    "nama_rekening": "Belanja Modal Peralatan Personal Computer",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.10.02.0004",
+    "nama_rekening": "Belanja Modal Peralatan Jaringan",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.10.02.0005",
+    "nama_rekening": "Belanja Modal Peralatan Komputer Lainnya",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.16.01.0001",
+    "nama_rekening": "Belanja Modal Alat Peraga Pelatihan",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.16.01.0002",
+    "nama_rekening": "Belanja Modal Alat Peraga Percontohan",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.18.01.0001",
+    "nama_rekening": "Belanja Modal Rambu Bersuar",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.18.01.0002",
+    "nama_rekening": "Belanja Modal Rambu Tidak Bersuar",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.19.01.0001",
+    "nama_rekening": "Belanja Modal Peralatan Olahraga Atletik",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.19.01.0002",
+    "nama_rekening": "Belanja Modal Peralatan Permainan",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.19.01.0003",
+    "nama_rekening": "Belanja Modal Peralatan Senam",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.19.01.0004",
+    "nama_rekening": "Belanja Modal Peralatan Olahraga Air",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.02.19.01.0005",
+    "nama_rekening": "Belanja Modal Peralatan Olahraga Udara",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.04.02.06.0005",
+    "nama_rekening": "Belanja Modal Bangunan Pelengkap Air Bersih/Air Baku",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.04.03.01.0005",
+    "nama_rekening": "Belanja Modal Instalasi Air Bersih/Air Baku Lainnya",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.04.03.05.0002",
+    "nama_rekening": "Belanja Modal Instalasi Pembangkit Listrik Tenaga Diesel (PLTD)",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.04.04.02.0002",
+    "nama_rekening": "Belanja Modal Jaringan Distribusi",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.04.04.02.0003",
+    "nama_rekening": "Belanja Modal Jaringan Listrik Lainnya",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.04.04.03.0005",
+    "nama_rekening": "Belanja Modal Jaringan Telepon Lainnya",
+    "group": "MODAL_MESIN"
+  },
+  {
+    "kode_rekening": "5.2.05.01.01.0001",
+    "nama_rekening": "Belanja Modal Buku Umum",
+    "group": "MODAL_LAINNYA"
+  },
+  {
+    "kode_rekening": "5.2.05.01.01.0002",
+    "nama_rekening": "Belanja Modal Buku Filsafat",
+    "group": "MODAL_LAINNYA"
+  },
+  {
+    "kode_rekening": "5.2.05.01.01.0003",
+    "nama_rekening": "Belanja Modal Buku Agama",
+    "group": "MODAL_LAINNYA"
+  },
+  {
+    "kode_rekening": "5.2.05.01.01.0004",
+    "nama_rekening": "Belanja Modal Buku Ilmu Sosial",
+    "group": "MODAL_LAINNYA"
+  },
+  {
+    "kode_rekening": "5.2.05.01.01.0005",
+    "nama_rekening": "Belanja Modal Buku Ilmu Bahasa",
+    "group": "MODAL_LAINNYA"
+  },
+  {
+    "kode_rekening": "5.2.05.01.01.0006",
+    "nama_rekening": "Belanja Modal Buku Matematika dan Pengetahuan Alam",
+    "group": "MODAL_LAINNYA"
+  },
+  {
+    "kode_rekening": "5.2.05.01.01.0007",
+    "nama_rekening": "Belanja Modal Buku Ilmu Pengetahuan Praktis",
+    "group": "MODAL_LAINNYA"
+  },
+  {
+    "kode_rekening": "5.2.05.01.01.0008",
+    "nama_rekening": "Belanja Modal Buku Arsitektur, Kesenian, dan Olahraga",
+    "group": "MODAL_LAINNYA"
+  },
+  {
+    "kode_rekening": "5.2.05.01.01.0009",
+    "nama_rekening": "Belanja Modal Buku Geografi, Biografi, dan Sejarah",
+    "group": "MODAL_LAINNYA"
+  },
+  {
+    "kode_rekening": "5.2.05.01.01.0010",
+    "nama_rekening": "Belanja Modal Serial",
+    "group": "MODAL_LAINNYA"
+  },
+  {
+    "kode_rekening": "5.2.05.01.02.0001",
+    "nama_rekening": "Belanja Modal Audio Visual",
+    "group": "MODAL_LAINNYA"
+  },
+  {
+    "kode_rekening": "5.2.05.01.02.0002",
+    "nama_rekening": "Belanja Modal Bentuk Mikro (Microform)",
+    "group": "MODAL_LAINNYA"
+  },
+  {
+    "kode_rekening": "5.2.05.01.03.0001",
+    "nama_rekening": "Belanja Modal Bahan Kartografi",
+    "group": "MODAL_LAINNYA"
+  },
+  {
+    "kode_rekening": "5.2.05.01.03.0002",
+    "nama_rekening": "Belanja Modal Naskah (Manuskrip)/Asli",
+    "group": "MODAL_LAINNYA"
+  },
+  {
+    "kode_rekening": "5.2.05.01.03.0003",
+    "nama_rekening": "Belanja Modal Lukisan dan Ukiran",
+    "group": "MODAL_LAINNYA"
+  },
+  {
+    "kode_rekening": "5.2.05.01.04.0001",
+    "nama_rekening": "Belanja Modal Karya Musik",
+    "group": "MODAL_LAINNYA"
+  },
+  {
+    "kode_rekening": "5.2.05.02.01.0001",
+    "nama_rekening": "Belanja Modal Alat Musik",
+    "group": "MODAL_LAINNYA"
+  },
+  {
+    "kode_rekening": "5.2.05.02.01.0002",
+    "nama_rekening": "Belanja Modal Lukisan",
+    "group": "MODAL_LAINNYA"
+  },
+  {
+    "kode_rekening": "5.2.05.02.01.0003",
+    "nama_rekening": "Belanja Modal Alat Peraga Kesenian",
+    "group": "MODAL_LAINNYA"
+  },
+  {
+    "kode_rekening": "5.2.05.02.02.0001",
+    "nama_rekening": "Belanja Modal Pahatan",
+    "group": "MODAL_LAINNYA"
+  },
+  {
+    "kode_rekening": "5.2.05.02.02.0002",
+    "nama_rekening": "Belanja Modal Maket, Miniatur, Replika, Foto Dokumen, dan Benda Bersejarah",
+    "group": "MODAL_LAINNYA"
+  },
+  {
+    "kode_rekening": "5.2.05.02.02.0003",
+    "nama_rekening": "Belanja Modal Barang Kerajinan",
+    "group": "MODAL_LAINNYA"
+  },
+  {
+    "kode_rekening": "5.2.05.08.01.0005",
+    "nama_rekening": "Belanja Modal Software",
+    "group": "MODAL_LAINNYA"
+  }
+]

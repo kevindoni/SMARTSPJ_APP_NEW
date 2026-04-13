@@ -1,0 +1,96 @@
+{
+  "name": "smart-spj",
+  "version": "1.5.0",
+  "description": "Aplikasi Pendamping ARKAS untuk Pengelolaan SPJ",
+  "main": "electron/main-loader.js",
+  "scripts": {
+    "dev": "concurrently \"vite\" \"wait-on tcp:3847 && electron .\"",
+    "build": "vite build",
+    "preview": "vite preview",
+    "compile:bytecode": "node scripts/compile-bytecode.js",
+    "build:electron": "npm run build && npm run compile:bytecode && electron-builder"
+  },
+  "keywords": [
+    "arkas",
+    "spj",
+    "electron",
+    "react"
+  ],
+  "author": "KevinDoni",
+  "license": "ISC",
+  "dependencies": {
+    "@dotlottie/player-component": "^2.7.12",
+    "@lottiefiles/dotlottie-react": "^0.17.13",
+    "better-sqlite3-multiple-ciphers": "^11.10.0",
+    "bytenode": "^1.5.7",
+    "chart.js": "^4.4.1",
+    "chartjs-plugin-datalabels": "^2.2.0",
+    "dotenv": "^17.4.1",
+    "electron-updater": "^6.8.3",
+    "exceljs": "^4.4.0",
+    "fs-extra": "^11.2.0",
+    "jspdf": "^4.0.0",
+    "jspdf-autotable": "^5.0.7",
+    "lottie-web": "^5.13.0",
+    "lucide-react": "^0.309.0",
+    "pdfkit": "^0.17.2",
+    "pdfkit-table": "^0.1.99",
+    "pdfmake": "^0.3.2",
+    "react": "^18.2.0",
+    "react-chartjs-2": "^5.2.0",
+    "react-dom": "^18.2.0",
+    "react-toastify": "^11.0.5",
+    "tar": "^7.5.6",
+    "unzipper": "^0.12.3",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@electron/rebuild": "^4.0.2",
+    "@vitejs/plugin-react": "^4.2.1",
+    "autoprefixer": "^10.4.16",
+    "concurrently": "^8.2.2",
+    "electron": "^28.1.0",
+    "electron-builder": "^26.4.0",
+    "eslint": "^8.56.0",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.5",
+    "eslint-plugin-unused-imports": "^4.3.0",
+    "postcss": "^8.4.33",
+    "prettier": "^3.2.5",
+    "tailwindcss": "^3.4.1",
+    "vite": "^5.0.11",
+    "wait-on": "^7.2.0"
+  },
+  "build": {
+    "appId": "com.kevindoni.smartspj",
+    "productName": "SmartSPJ",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*.jsc",
+      "electron/main-loader.js",
+      "electron/preload.js",
+      "electron/logo.png",
+      "node_modules/**/*"
+    ],
+    "asar": true,
+    "win": {
+      "icon": "electron/logo.png",
+      "target": "nsis",
+      "forceCodeSigning": false
+    },
+    "nsis": {
+      "oneClick": true,
+      "allowToChangeInstallationDirectory": false
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "KevinDoni",
+      "repo": "SMARTSPJ_APP_NEW",
+      "private": true
+    }
+  }
+}

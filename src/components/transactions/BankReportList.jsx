@@ -1,0 +1,269 @@
+import { useState, useMemo } from 'react';
+import { useFilter } from '../../context/FilterContext';
+import { MONTHS, isPenerimaan } from '../../utils/transactionHelpers';
+import TransactionSummary from './TransactionSummary';
+import TransactionFilters from './TransactionFilters';
+import TransactionTable from './TransactionTable';
+import useTransactions from './hooks/useTransactions';
+import { Landmark } from 'lucide-react';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+/**
+ * BankReportList - Buku Pembantu Bank
+ * Displays BANK transactions only (Non-Tunai, Tarik Tunai, Setor Tunai)
+ * Uses standard isPenerimaan because Bank perspective matches BKU perspective
+ */
+export default function BankReportList({ stats }) {
+  const { year, fundSource } = useFilter();
+  const [selectedMonth, setSelectedMonth] = useState('01');
+  const [selectedFilters, setSelectedFilters] = useState([]);
+  const [search, setSearch] = useState('');
+  const [showFilterMenu, setShowFilterMenu] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+
+  // Use transactions hook with BANK payment type filter
+  const { data, loading, hasMore, handleLoadMore } = useTransactions({
+    year,
+    fundSource,
+    search,
+    selectedMonth,
+    selectedFilters,
+    paymentType: 'BANK', // Filter for bank transactions
+  });
+
+  const isMonthView = selectedMonth !== 'SEMUA';
+
+  // Calculate opening balance for Bank only
+  let openingBalance = 0;
+  if (isMonthView && stats?.chart) {
+    const monthIndex = MONTHS.findIndex((m) => m.id === selectedMonth);
+    if (monthIndex > 0) {
+      // Use bank-specific opening balance
+      openingBalance = stats.chart[monthIndex - 1].saldo_bank || 0;
+    }
+  }
+
+  const sortedData = isMonthView
+    ? [...data].sort((a, b) => {
+        const dateA = new Date(a.tanggal_transaksi);
+        const dateB = new Date(b.tanggal_transaksi);
+        return dateA - dateB;
+      })
+    : data;
+
+  const hasExistingOpeningBalance =
+    isMonthView &&
+    sortedData.some((tx) => {
+      const isFirstDate =
+        tx.tanggal_transaksi.includes(`-${selectedMonth}-01`) ||
+        tx.tanggal_transaksi.startsWith(`${year}-${selectedMonth}-01`);
+      const isSaldoKw =
+        (tx.uraian || '').toLowerCase().includes('saldo') ||
+        (tx.uraian || '').toLowerCase().includes('penerimaan pindahan');
+      return isFirstDate && isSaldoKw;
+    });
+
+  const calculatedBalances = useMemo(() => {
+    let rb = hasExistingOpeningBalance ? 0 : openingBalance;
+    return sortedData.map((tx) => {
+      const isDebit = isPenerimaan(tx);
+      if (isDebit) { rb += tx.nominal; } else { rb -= tx.nominal; }
+      return rb;
+    });
+  }, [sortedData, hasExistingOpeningBalance, openingBalance]);
+
+  // Calculate totals for Bank transactions
+  const tablePenerimaan =
+    sortedData.reduce((acc, tx) => acc + (isPenerimaan(tx) ? tx.nominal : 0), 0) +
+    (isMonthView && selectedMonth !== '01' && !hasExistingOpeningBalance ? openingBalance : 0);
+  const tablePengeluaran = sortedData.reduce(
+    (acc, tx) => acc + (!isPenerimaan(tx) ? tx.nominal : 0),
+    0
+  );
+  const tableSaldo =
+    calculatedBalances.length > 0
+      ? calculatedBalances[calculatedBalances.length - 1]
+      : stats?.saldo_bank || 0;
+
+  // Display stats focused on Bank
+  const getDisplayStats = () => {
+    if (selectedMonth === 'SEMUA') {
+      return {
+        saldo: stats?.saldo_bank || 0,
+        saldo_bank: stats?.saldo_bank || 0,
+        saldo_tunai: 0,
+        penerimaan: tablePenerimaan,
+        pengeluaran: tablePengeluaran,
+      };
+    }
+
+    const monthData = stats?.chart?.find((d) => d.bulan === selectedMonth);
+    return {
+      saldo: monthData?.saldo_bank || 0,
+      saldo_bank: monthData?.saldo_bank || 0,
+      saldo_tunai: 0,
+      penerimaan: tablePenerimaan,
+      pengeluaran: tablePengeluaran,
+    };
+  };
+
+  const displayStats = getDisplayStats();
+
+  // Export handler for Bank
+  const handleExport = async (mode = 'single_xlsx') => {
+    setIsExporting(true);
+    try {
+      let scope = 'single';
+      let format = 'xlsx';
+
+      if (mode === 'bulk_xlsx') {
+        scope = 'bulk';
+        format = 'xlsx';
+      }
+      if (mode === 'single_pdf') {
+        scope = 'single';
+        format = 'pdf';
+      }
+      if (mode === 'bulk_pdf') {
+        scope = 'bulk';
+        format = 'pdf';
+      }
+
+      let exportData = [];
+      if (scope === 'single') {
+        if (
+          isMonthView &&
+          selectedMonth !== '01' &&
+          !hasExistingOpeningBalance &&
+          openingBalance > 0
+        ) {
+          exportData.push({
+            tanggal_transaksi: `${year}-${selectedMonth}-01`,
+            no_bukti: '',
+            kode_kegiatan: '',
+            kode_rekening: '',
+            uraian: 'Saldo Bank Bulan Lalu',
+            penerimaan: openingBalance,
+            pengeluaran: 0,
+            saldo_berjalan: openingBalance,
+          });
+        }
+
+        sortedData.forEach((tx, idx) => {
+          exportData.push({
+            tanggal_transaksi: tx.tanggal_transaksi,
+            no_bukti: tx.no_bukti || '',
+            kode_kegiatan: tx.activity_code || tx.kode_kegiatan || '',
+            kode_rekening: tx.kode_rekening || '',
+            uraian: tx.uraian,
+            penerimaan: isPenerimaan(tx) ? tx.nominal : 0,
+            pengeluaran: !isPenerimaan(tx) ? tx.nominal : 0,
+            saldo_berjalan: calculatedBalances[idx],
+          });
+        });
+      }
+
+      const result = await window.arkas.exportBku(exportData, {
+        year,
+        month: selectedMonth === 'SEMUA' ? 1 : selectedMonth,
+        fundSource,
+        stats: displayStats,
+        tablePenerimaan: tablePenerimaan,
+        tablePengeluaran: tablePengeluaran,
+        calculatedSaldo: tableSaldo,
+        scope,
+        format,
+        reportType: 'BANK', // Mark as Bank report
+      });
+
+      if (result.success) {
+        toast.success(`Buku Pembantu Bank berhasil di-export ke: ${result.filePath}`, {
+          position: 'top-right',
+          autoClose: 4000,
+        });
+      } else if (!result.canceled) {
+        toast.error('Gagal export: ' + (result.error || 'Unknown error'));
+      }
+    } catch (err) {
+      console.error('Export error:', err);
+      toast.error('Gagal export: ' + err.message);
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  return (
+    <div className="flex flex-col gap-6 font-sans">
+      <ToastContainer />
+
+      {/* Page Header */}
+      <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white shadow-lg shadow-blue-200">
+            <Landmark size={20} />
+          </div>
+          <div>
+            <span className="text-[10px] uppercase tracking-wider font-bold text-slate-400">
+              PENATAUSAHAAN
+            </span>
+            <h2 className="text-lg font-bold text-slate-800 leading-tight">BUKU PEMBANTU BANK</h2>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-600 uppercase tracking-wide">
+            TA {year}
+          </span>
+          {isMonthView && (
+            <span className="text-sm font-medium text-slate-500">
+              Bulan {MONTHS.find((m) => m.id === selectedMonth)?.name}
+            </span>
+          )}
+        </div>
+      </div>
+
+      <TransactionSummary
+        tableSaldo={tableSaldo}
+        tablePenerimaan={tablePenerimaan}
+        tablePengeluaran={tablePengeluaran}
+        selectedMonth={selectedMonth}
+        isCashOnly={true} // Reusing this prop to hide irrelevant stats, effectively "Specific Book View"
+      />
+
+      <div className="bg-white rounded-xl shadow-sm border border-slate-100">
+        <TransactionFilters
+          year={year}
+          selectedMonth={selectedMonth}
+          setSelectedMonth={setSelectedMonth}
+          search={search}
+          setSearch={setSearch}
+          showFilterMenu={showFilterMenu}
+          setShowFilterMenu={setShowFilterMenu}
+          selectedFilters={selectedFilters}
+          setSelectedFilters={setSelectedFilters}
+          onResetFilters={() => setSelectedFilters([])}
+          onExport={handleExport}
+          isExporting={isExporting}
+        />
+
+        <TransactionTable
+          data={sortedData}
+          loading={loading}
+          hasMore={hasMore}
+          onLoadMore={handleLoadMore}
+          year={year}
+          selectedMonth={selectedMonth}
+          openingBalance={openingBalance}
+          calculatedBalances={calculatedBalances}
+          hasExistingOpeningBalance={hasExistingOpeningBalance}
+          stats={displayStats}
+          calculatedSaldo={tableSaldo}
+          totalPenerimaan={tablePenerimaan}
+          totalPengeluaran={tablePengeluaran}
+          reportType="BANK" // Pass report type for custom footer
+        />
+      </div>
+    </div>
+  );
+}
