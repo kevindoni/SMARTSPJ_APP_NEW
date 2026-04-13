@@ -4,51 +4,6 @@ Semua perubahan penting pada proyek ini akan didokumentasikan dalam file ini.
 
 ---
 
-## [1.5.0] — 2026-04-13
-
-### Fitur Baru
-
-#### ✅ Auto-Updater (electron-updater + GitHub Releases)
-
-**File:** `electron/main.js`, `electron/preload.js`, `src/components/layout/Header.jsx`
-
-Implementasi sistem pembaruan otomatis menggunakan `electron-updater` dengan GitHub Releases (private repo). Alur: user klik "Cek Update" di Header → jika tersedia, klik "Update vX.Y.Z" → download → klik "Install & Restart". Menggunakan `autoUpdater.autoDownload = false` (manual trigger).
-
-**IPC Channels:** `arkas:check-update`, `arkas:download-update`, `arkas:install-update`
-**Events:** `update-available`, `update-progress`, `update-downloaded`, `update-not-available`, `update-error`
-
----
-
-#### ✅ Peningkatan Splash Screen
-
-**File:** `src/components/SplashScreen.jsx`
-
-Splash screen ditingkatkan dengan progress bar halus (`requestAnimationFrame`), persentase loading, 6 langkah pemuatan, badge versi dinamis dari Electron, dan transisi fade-out.
-
----
-
-### UI / UX
-
-#### ✅ Update Badge di Header
-
-**File:** `src/components/layout/Header.jsx`
-
-Badge pembaruan ditambahkan di sebelah status koneksi "Terhubung Dengan Arkas". State machine: idle → checking → available → downloading → downloaded → not-available. Termasuk progress bar mini saat mengunduh.
-
----
-
-### Arsitektur & Kode
-
-#### ✅ Cleanup File Tidak Terpakai
-
-7 file dihapus (~152KB): `BaAuditPanel.jsx`, `SpendingAnalysis.jsx`, `ActivityFeed.jsx`, `StatCardPro.jsx`, `reconciliation_columns.js`, `reconciliation_columns.json`, `Pengaturan.jsx.bak-v144`.
-
-#### ✅ Hapus Update Card Duplikat dari About.jsx
-
-Update card di halaman About dihapus karena fungsionalitas sudah ada di Header.jsx sebagai badge yang lebih ringkas dan selalu terlihat.
-
----
-
 ## [1.4.0] — 2026-04-12
 
 ### Bug Fix — Kritis

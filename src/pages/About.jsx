@@ -17,29 +17,6 @@ import {
 
 const CHANGELOG = [
   {
-    version: '1.5.0',
-    date: '13 April 2026',
-    title: 'Auto-Updater, Splash Screen & Cleanup',
-    changes: [
-      {
-        type: 'feature',
-        text: 'Sistem auto-update via electron-updater + GitHub Releases — cek, download, dan install pembaruan langsung dari aplikasi',
-      },
-      {
-        type: 'feature',
-        text: 'Update badge di Header — indikator pembaruan yang selalu terlihat dengan progress bar mini',
-      },
-      {
-        type: 'improvement',
-        text: 'Peningkatan Splash Screen — progress bar halus, persentase, langkah pemuatan, dan badge versi dinamis',
-      },
-      {
-        type: 'improvement',
-        text: 'Cleanup 7 file tidak terpakai (~152KB) dan dead code dari codebase',
-      },
-    ],
-  },
-  {
     version: '1.4.0',
     date: '12 April 2026',
     title: 'BA Rekonsiliasi Overhaul & Bug Fix Kritis',
