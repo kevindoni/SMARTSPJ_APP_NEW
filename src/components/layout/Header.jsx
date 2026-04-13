@@ -17,9 +17,14 @@ export default function Header({ dbStatus, availableSources, availableYears }) {
   const [updateStatus, setUpdateStatus] = useState('idle');
   const [updateInfo, setUpdateInfo] = useState(null);
   const [downloadProgress, setDownloadProgress] = useState(0);
+  const [appVersion, setAppVersion] = useState(null);
 
   useEffect(() => {
     if (!window.arkas) return;
+    window.arkas
+      .getAppVersion?.()
+      .then((v) => setAppVersion(v.appVersion))
+      .catch(() => {});
     window.arkas.onUpdateAvailable?.((info) => {
       setUpdateInfo(info);
       setUpdateStatus('available');
@@ -139,19 +144,19 @@ export default function Header({ dbStatus, availableSources, availableYears }) {
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-sm bg-slate-50 border-slate-200 text-slate-500 hover:bg-slate-100 hover:text-slate-700 transition-colors"
               >
                 <RefreshCw size={14} />
-                <span className="font-medium">Cek Update</span>
+                <span className="font-medium">v{appVersion || '...'}</span>
               </button>
             )}
             {updateStatus === 'checking' && (
               <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-sm bg-slate-50 border-slate-200 text-slate-400">
                 <RefreshCw size={14} className="animate-spin" />
-                <span className="font-medium">Memeriksa...</span>
+                <span className="font-medium">v{appVersion || '...'}</span>
               </div>
             )}
             {updateStatus === 'not-available' && (
               <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-sm bg-emerald-50 border-emerald-200 text-emerald-600">
                 <CheckCircle size={14} />
-                <span className="font-medium">Versi Terbaru</span>
+                <span className="font-semibold">v{appVersion || '...'}</span>
               </div>
             )}
             {updateStatus === 'available' && updateInfo && (
