@@ -117,7 +117,9 @@ function getPenerimaanMurni(db, yearStr, fundSource, anggaranScope, fundFilterRe
         AND LOWER(uraian) NOT LIKE '%silpa%'
     )`;
   } else if (fundSource === 'BOS Kinerja') {
-    whereClause = `(id_ref_bku = 2 AND kode_rekening LIKE '4.%')`;
+    // Use anggaranScope to filter: only penerimaan linked to Kinerja anggaran
+    // anggaranScope = id_anggaran IN (SELECT ... WHERE nama_sumber_dana LIKE '%Kinerja%')
+    whereClause = `((id_ref_bku = 2 OR kode_rekening LIKE '4.%') AND ${anggaranScope})`;
   } else if (fundSource === 'Lainnya') {
     return 0;
   } else {

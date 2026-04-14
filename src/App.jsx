@@ -97,15 +97,17 @@ function App() {
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
               {/* Kiri: Grafik Arus Kas */}
               <div className="min-h-[350px]">
-                <RevenueChart data={stats?.chart || []} year={year} title={chartTitle} onNavigateToBku={(month) => setActiveTab('transactions')} />
+                <RevenueChart
+                  data={stats?.chart || []}
+                  year={year}
+                  title={chartTitle}
+                  onNavigateToBku={(month) => setActiveTab('transactions')}
+                />
               </div>
 
               {/* Kanan: Pergerakan Kas Bulanan */}
               <div className="h-full min-h-[350px]">
-                <PergerakanKasBulanan
-                  data={stats?.kas_bulanan}
-                  totalPenerimaan={stats?.penerimaan || 0}
-                />
+                <PergerakanKasBulanan data={stats?.kas_bulanan} />
               </div>
             </div>
           </div>

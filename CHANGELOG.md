@@ -4,6 +4,69 @@ Semua perubahan penting pada proyek ini akan didokumentasikan dalam file ini.
 
 ---
 
+## [1.4.0] — 2026-04-14
+
+### Bug Fix — Kritis
+
+#### ✅ Fix Pergerakan Kas Bulanan: Saldo Selalu Rp 0
+
+**File:** `electron/handlers/dashboard/advancedQueries.js` (`getKasBulanan`)
+
+**Masalah:** Kolom SALDO KAS selalu menampilkan Rp 0 di setiap bulan. Penyebab:
+1. Saldo dihitung di frontend dengan `currentSaldo = currentSaldo + row.masuk - row.keluar`, tapi pengeluaran jauh melebihi pemasukan sehingga saldo selalu negatif
+2. `Math.max(row.saldo, 0)` di frontend memaksa saldo minimum 0
+3. Klasifikasi debit/kredit salah — transaksi penerimaan (BBU) salah diklasifikasikan sebagai pengeluaran karena pengecekan `no_bukti LIKE 'BPU%'` dilakukan sebelum `id_ref_bku`
+4. Tidak ada saldo awal yang dihitung
+
+**Perbaikan:**
+- Saldo awal dihitung dari `id_ref_bku IN (2, 8, 9)` di bulan Januari (mengikuti `getOpeningBalance` di reconciliation handler)
+- Klasifikasi debit/kredit menggunakan query terpisah yang mengikuti reconciliation handler:
+  - **Masuk**: BBU + bunga bank (ref 6) + pajak pungut (ref 5,10,33) + dana lainnya
+  - **Keluar**: BNU/BPU kode 5.% + biaya admin (ref 7) + setor pajak (ref 11)
+- Running saldo dihitung di backend
+- Frontend menampilkan saldo negatif dengan warna merah
+
+---
+
+#### ✅ Fix Filter Sumber Dana di Dashboard V3 Analytics
+
+**File:** `electron/handlers/dashboard/advancedQueries.js`, `electron/handlers/dashboard/statsQueries.js`
+
+**Masalah:** Semua komponen dashboard (Belanja Kategori, Top 5, Belanja per Kegiatan, Pengeluaran Terbaru, Penerimaan Dana) tidak terfilter per sumber dana — BOS Kinerja menampilkan data BOS Reguler dan sebaliknya.
+
+**Perbaikan:**
+1. `getBelanjaKategori` — realisasi difilter via `ku.id_anggaran` langsung (bukan LEFT JOIN rapbs_periode yang bisa NULL)
+2. `getTop5Belanja` — dihapus JOIN yang tidak perlu, filter via `ku.id_anggaran`
+3. `getBelanjaKegiatan` — realisasi per kegiatan difilter via `ku.id_anggaran`
+4. `getPengeluaranTerbaru` — filter via `ku.id_anggaran`
+5. `getPenerimaanDana` — difilter per sumber dana (BBU Tahap untuk Reguler, BBU Kinerja, dana lainnya + bunga)
+6. `getPenerimaanMurni` (statsQueries.js) — fix BOS Kinerja dari `id_ref_bku = 2 AND kode_rekening LIKE '4.%'` menjadi `(id_ref_bku = 2 OR kode_rekening LIKE '4.%') AND anggaranScope`
+
+---
+
+#### ✅ Fix PENERIMAAN Rp 0 untuk BOS Kinerja
+
+**File:** `electron/handlers/dashboard/statsQueries.js` (`getPenerimaanMurni`)
+
+**Masalah:** Header PENERIMAAN menampilkan Rp 0 untuk BOS Kinerja karena filter `id_ref_bku = 2 AND kode_rekening LIKE '4.%'` tidak cocok — transaksi Kinerja dicatat dengan `id_ref_bku = 2` dan `no_bukti = 'BBU%'` tanpa `kode_rekening LIKE '4.%'`.
+
+**Perbaikan:** Gunakan `anggaranScope` (subquery `id_anggaran IN (SELECT ... WHERE nama_sumber_dana LIKE '%Kinerja%')`) untuk memfilter penerimaan Kinerja secara akurat.
+
+---
+
+### UI / UX
+
+#### ✅ Perbaikan Tampilan Pergerakan Kas Bulanan
+
+**File:** `src/components/dashboard/v3/PergerakanKasBulanan.jsx`, `src/App.jsx`
+
+- Saldo negatif ditampilkan dengan warna merah + tanda minus
+- Hapus prop `totalPenerimaan` yang tidak diperlukan
+- Saldo dihitung di backend, frontend hanya menampilkan
+- Formatting kode yang lebih rapi
+
+---
+
 ## [1.4.0] — 2026-04-12
 
 ### Bug Fix — Kritis
