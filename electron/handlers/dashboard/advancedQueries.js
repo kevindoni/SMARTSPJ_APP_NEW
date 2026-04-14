@@ -7,9 +7,15 @@
  */
 function getRapbsAndKegiatanCount(db, yearStr, fundSource, anggaranScope) {
   try {
+    let fundJoin = '';
     let fundWhere = '';
     if (fundSource && fundSource !== 'SEMUA') {
-      fundWhere = `AND r.${anggaranScope}`;
+      fundJoin = 'JOIN ref_sumber_dana sd ON a.id_ref_sumber_dana = sd.id_ref_sumber_dana';
+      if (fundSource === 'BOS Reguler') {
+        fundWhere = `AND (sd.nama_sumber_dana NOT LIKE '%Kinerja%' OR sd.nama_sumber_dana IS NULL)`;
+      } else {
+        fundWhere = `AND sd.nama_sumber_dana LIKE '%${fundSource}%'`;
+      }
     }
 
     const query = `
@@ -19,6 +25,7 @@ function getRapbsAndKegiatanCount(db, yearStr, fundSource, anggaranScope) {
       FROM rapbs r
       JOIN anggaran a ON r.id_anggaran = a.id_anggaran
       LEFT JOIN ref_kode k ON r.id_ref_kode = k.id_ref_kode AND k.tahun = a.tahun_anggaran
+      ${fundJoin}
       WHERE a.tahun_anggaran = ?
         AND r.soft_delete = 0
         AND a.soft_delete = 0 
@@ -38,11 +45,14 @@ function getRapbsAndKegiatanCount(db, yearStr, fundSource, anggaranScope) {
 
 /**
  * 2. Kategori Belanja (Barang Jasa, Modal Alat, Modal Aset Lain)
+ * 
+ * Realisasi: filtered via ku.id_anggaran (anggaranScope) - works for kas_umum
+ * Anggaran/Pagu: filtered via direct JOIN ref_sumber_dana - proven approach from statsQueries
  */
 function getBelanjaKategori(db, yearStr, fundSource, anggaranScope) {
   try {
+    // --- Realisasi from kas_umum (anggaranScope works here) ---
     let fundWhereBelanja = '';
-
     if (fundSource && fundSource !== 'SEMUA') {
       fundWhereBelanja = `AND ku.${anggaranScope}`;
     }
@@ -60,9 +70,16 @@ function getBelanjaKategori(db, yearStr, fundSource, anggaranScope) {
     `;
     const realisasi = db.prepare(realisasiQuery).get(yearStr) || {};
 
+    // --- Anggaran/Pagu from rapbs (direct JOIN ref_sumber_dana) ---
+    let fundJoinAnggaran = '';
     let fundWhereAnggaran = '';
     if (fundSource && fundSource !== 'SEMUA') {
-      fundWhereAnggaran = `AND r.${anggaranScope}`;
+      fundJoinAnggaran = 'JOIN ref_sumber_dana sd ON a.id_ref_sumber_dana = sd.id_ref_sumber_dana';
+      if (fundSource === 'BOS Reguler') {
+        fundWhereAnggaran = `AND (sd.nama_sumber_dana NOT LIKE '%Kinerja%' OR sd.nama_sumber_dana IS NULL)`;
+      } else {
+        fundWhereAnggaran = `AND sd.nama_sumber_dana LIKE '%${fundSource}%'`;
+      }
     }
 
     const anggaranQuery = `
@@ -72,6 +89,7 @@ function getBelanjaKategori(db, yearStr, fundSource, anggaranScope) {
         SUM(CASE WHEN r.kode_rekening LIKE '5.2.05%' THEN r.jumlah ELSE 0 END) as pagu_al
       FROM rapbs r
       JOIN anggaran a ON r.id_anggaran = a.id_anggaran
+      ${fundJoinAnggaran}
       WHERE a.tahun_anggaran = ?
         AND r.soft_delete = 0
         AND a.soft_delete = 0
@@ -267,13 +285,18 @@ function getTop5Belanja(db, yearStr, fundSource, anggaranScope) {
  */
 function getBelanjaKegiatan(db, yearStr, fundSource, anggaranScope) {
   try {
-    let fundWhereAnggaran = '';
+    let fundJoinKeg = '';
+    let fundWhereKeg = '';
     if (fundSource && fundSource !== 'SEMUA') {
-      fundWhereAnggaran = `AND r.${anggaranScope}`;
+      fundJoinKeg = 'JOIN ref_sumber_dana sd ON a.id_ref_sumber_dana = sd.id_ref_sumber_dana';
+      if (fundSource === 'BOS Reguler') {
+        fundWhereKeg = `AND (sd.nama_sumber_dana NOT LIKE '%Kinerja%' OR sd.nama_sumber_dana IS NULL)`;
+      } else {
+        fundWhereKeg = `AND sd.nama_sumber_dana LIKE '%${fundSource}%'`;
+      }
     }
 
     // Group RAPBS by kegiatan (ref_kode)
-    // Use subquery to avoid row duplication from LEFT JOIN
     const kegiatanQuery = `
       SELECT 
         r.id_ref_kode as id_kode,
@@ -281,11 +304,12 @@ function getBelanjaKegiatan(db, yearStr, fundSource, anggaranScope) {
         SUM(r.jumlah) as pagu_kegiatan
       FROM rapbs r
       JOIN anggaran a ON r.id_anggaran = a.id_anggaran
+      ${fundJoinKeg}
       WHERE a.tahun_anggaran = ?
         AND r.soft_delete = 0
         AND a.soft_delete = 0
         AND a.is_approve = 1
-        ${fundWhereAnggaran}
+        ${fundWhereKeg}
       GROUP BY r.id_ref_kode
       ORDER BY pagu_kegiatan DESC
       LIMIT 10
