@@ -18,8 +18,8 @@ import {
 const CHANGELOG = [
   {
     version: '1.4.0',
-    date: '12 April 2026',
-    title: 'BA Rekonsiliasi Overhaul & Bug Fix Kritis',
+    date: '14 April 2026',
+    title: 'BA Rekonsiliasi Overhaul & Dashboard Filter Fix',
     changes: [
       {
         type: 'fix',
@@ -83,6 +83,34 @@ const CHANGELOG = [
       {
         type: 'improvement',
         text: 'Hapus kolom placeholder di Rekap Saldo Bulanan — semua kolom kini menampilkan data nyata',
+      },
+      {
+        type: 'fix',
+        text: 'Fix Pergerakan Kas Bulanan — saldo tidak lagi selalu Rp 0, kini dihitung dengan saldo awal + running balance di backend',
+      },
+      {
+        type: 'fix',
+        text: 'Fix klasifikasi debit/kredit di Pergerakan Kas — mengikuti reconciliation handler (BBU = masuk, BNU/BPU = keluar)',
+      },
+      {
+        type: 'fix',
+        text: 'Fix filter sumber dana di Dashboard — Belanja Kategori, Top 5, Kegiatan, Penerimaan, Pengeluaran kini terfilter per sumber dana',
+      },
+      {
+        type: 'fix',
+        text: 'Fix Pagu Belanja Kategori terhitung berulang — filter revisi terakhir per sumber dana agar tidak double count',
+      },
+      {
+        type: 'fix',
+        text: 'Fix ITEM RAPBS dan Kegiatan count — kini menampilkan jumlah yang benar per sumber dana',
+      },
+      {
+        type: 'fix',
+        text: 'Fix Penerimaan BOS Kinerja Rp 0 di header dashboard — gunakan anggaranScope untuk filter akurat',
+      },
+      {
+        type: 'feature',
+        text: 'Saldo kas negatif ditampilkan dengan warna merah di Pergerakan Kas Bulanan',
       },
     ],
   },
