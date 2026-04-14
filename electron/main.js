@@ -38,7 +38,7 @@ function formatNoBuktiList(list) {
 const isDev = !app.isPackaged;
 let DATA_DIR = isDev
   ? path.join(__dirname, '../data')
-  : path.join(path.dirname(app.getPath('exe')), 'data');
+  : path.join(app.getPath('userData'), 'data');
 
 function getDbPath() {
   return path.join(

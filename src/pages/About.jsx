@@ -306,7 +306,7 @@ export default function About() {
               </div>
               <div className="relative z-10 flex items-center gap-8">
                 <div className="w-28 h-28 bg-white rounded-3xl flex items-center justify-center shadow-2xl shadow-black/20 flex-shrink-0">
-                  <img src="/logo.png" alt="SmartSPJ" className="w-24 h-24 object-contain" />
+                  <img src={new URL('../assets/logo.png', import.meta.url).href} alt="SmartSPJ" className="w-24 h-24 object-contain" />
                 </div>
                 <div>
                   <h1 className="text-4xl font-black tracking-tight">SmartSPJ</h1>
