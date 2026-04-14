@@ -4,7 +4,7 @@ Semua perubahan penting pada proyek ini akan didokumentasikan dalam file ini.
 
 ---
 
-## [1.4.0] — 2026-04-14
+## [1.4.0] — 2026-04-12
 
 ### Bug Fix — Kritis
 
@@ -66,10 +66,6 @@ Semua perubahan penting pada proyek ini akan didokumentasikan dalam file ini.
 - Formatting kode yang lebih rapi
 
 ---
-
-## [1.4.0] — 2026-04-12
-
-### Bug Fix — Kritis
 
 #### ✅ Fix Saldo Akhir BA Rekonsiliasi Semester 2 (Rp 711.093 → Rp 960.000)
 
