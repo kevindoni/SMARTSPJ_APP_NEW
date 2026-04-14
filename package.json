@@ -74,7 +74,8 @@
       "electron/main-loader.js",
       "electron/preload.js",
       "electron/logo.png",
-      "node_modules/**/*"
+      "node_modules/**/*",
+      ".env"
     ],
     "asar": true,
     "win": {
