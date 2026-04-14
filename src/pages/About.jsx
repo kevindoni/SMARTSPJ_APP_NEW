@@ -17,7 +17,7 @@ import {
 
 const CHANGELOG = [
   {
-    version: '1.4.0-beta',
+    version: '1.4.1',
     date: '14 April 2026',
     title: 'BA Rekonsiliasi Overhaul & Dashboard Filter Fix',
     changes: [
@@ -314,8 +314,8 @@ export default function About() {
                     <span className="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-lg text-sm font-bold">
                       v{appVersion}
                     </span>
-                    <span className="bg-amber-400/20 backdrop-blur-sm text-amber-100 px-3 py-1 rounded-lg text-xs font-bold border border-amber-300/30">
-                      Beta
+                    <span className="bg-emerald-400/20 backdrop-blur-sm text-emerald-100 px-3 py-1 rounded-lg text-xs font-bold border border-emerald-300/30">
+                      Stable
                     </span>
                   </div>
                   <p className="text-blue-100 mt-3 text-base leading-relaxed max-w-md">
