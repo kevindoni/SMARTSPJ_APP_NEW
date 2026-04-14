@@ -54,6 +54,29 @@ Semua perubahan penting pada proyek ini akan didokumentasikan dalam file ini.
 
 ---
 
+#### ✅ Fix Pagu Belanja Kategori Terhitung Berulang (4x Lipat)
+
+**File:** `electron/handlers/dashboard/advancedQueries.js` (`getBelanjaKategori`, `getRapbsAndKegiatanCount`, `getBelanjaKegiatan`)
+
+**Masalah:** Pagu belanja kategori untuk BOS Kinerja menampilkan Rp 115.852.000 (total semua sumber dana) padahal seharusnya Rp 35.000.000. Penyebabnya adalah query `rapbs` menjumlahkan semua revisi anggaran (4 revisi × Rp 35.000.000 = Rp 140.000.000 untuk Kinerja, plus sumber dana lain).
+
+**Perbaikan:**
+- Tambahkan filter `is_revisi = MAX(is_revisi)` agar hanya revisi terakhir per sumber dana yang dihitung
+- Untuk query `rapbs`, gunakan direct JOIN ke `ref_sumber_dana` karena `anggaranScope` (subquery `id_anggaran IN ...`) tidak membedakan sumber dana di tabel `rapbs`
+- Diterapkan ke 3 fungsi: `getBelanjaKategori`, `getRapbsAndKegiatanCount`, `getBelanjaKegiatan`
+
+---
+
+#### ✅ Fix ITEM RAPBS dan Kegiatan Count Tidak Terfilter per Sumber Dana
+
+**File:** `electron/handlers/dashboard/advancedQueries.js` (`getRapbsAndKegiatanCount`)
+
+**Masalah:** ITEM RAPBS selalu menampilkan 76 (total) untuk semua sumber dana, termasuk BOS Kinerja yang seharusnya hanya 19.
+
+**Perbaikan:** Gunakan direct JOIN `ref_sumber_dana` + filter `is_revisi = MAX` untuk menghitung RAPBS dan kegiatan per sumber dana.
+
+---
+
 ### UI / UX
 
 #### ✅ Perbaikan Tampilan Pergerakan Kas Bulanan
