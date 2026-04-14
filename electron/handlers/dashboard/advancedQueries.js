@@ -30,6 +30,13 @@ function getRapbsAndKegiatanCount(db, yearStr, fundSource, anggaranScope) {
         AND r.soft_delete = 0
         AND a.soft_delete = 0 
         AND a.is_approve = 1
+        AND a.is_revisi = (
+          SELECT MAX(a2.is_revisi) FROM anggaran a2
+          WHERE a2.id_ref_sumber_dana = a.id_ref_sumber_dana
+            AND a2.tahun_anggaran = a.tahun_anggaran
+            AND a2.soft_delete = 0
+            AND a2.is_approve = 1
+        )
         ${fundWhere}
     `;
     const result = db.prepare(query).get(yearStr);
@@ -94,6 +101,13 @@ function getBelanjaKategori(db, yearStr, fundSource, anggaranScope) {
         AND r.soft_delete = 0
         AND a.soft_delete = 0
         AND a.is_approve = 1
+        AND a.is_revisi = (
+          SELECT MAX(a2.is_revisi) FROM anggaran a2
+          WHERE a2.id_ref_sumber_dana = a.id_ref_sumber_dana
+            AND a2.tahun_anggaran = a.tahun_anggaran
+            AND a2.soft_delete = 0
+            AND a2.is_approve = 1
+        )
         ${fundWhereAnggaran}
     `;
     const anggaran = db.prepare(anggaranQuery).get(yearStr) || {};
@@ -309,6 +323,13 @@ function getBelanjaKegiatan(db, yearStr, fundSource, anggaranScope) {
         AND r.soft_delete = 0
         AND a.soft_delete = 0
         AND a.is_approve = 1
+        AND a.is_revisi = (
+          SELECT MAX(a2.is_revisi) FROM anggaran a2
+          WHERE a2.id_ref_sumber_dana = a.id_ref_sumber_dana
+            AND a2.tahun_anggaran = a.tahun_anggaran
+            AND a2.soft_delete = 0
+            AND a2.is_approve = 1
+        )
         ${fundWhereKeg}
       GROUP BY r.id_ref_kode
       ORDER BY pagu_kegiatan DESC
