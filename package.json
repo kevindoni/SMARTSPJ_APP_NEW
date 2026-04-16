@@ -1,6 +1,6 @@
 {
   "name": "smart-spj",
-  "version": "1.5.0",
+  "version": "1.5.2",
   "description": "Aplikasi Pendamping ARKAS untuk Pengelolaan SPJ",
   "main": "electron/main-loader.js",
   "scripts": {
@@ -75,9 +75,13 @@
       "electron/preload.js",
       "electron/logo.png",
       "node_modules/**/*",
-      ".env"
+      ".env",
+      "src/config/reconciliation_columns_full.json"
     ],
     "asar": true,
+    "asarUnpack": [
+      "src/config/reconciliation_columns_full.json"
+    ],
     "win": {
       "icon": "electron/logo.png",
       "target": "nsis",

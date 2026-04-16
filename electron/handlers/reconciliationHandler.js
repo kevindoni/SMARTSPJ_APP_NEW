@@ -1144,11 +1144,23 @@ function getFundSourceDetail(db, year, fundSourceId) {
             )
             `;
 
-  const configPath = path.join(process.cwd(), 'src/config/reconciliation_columns_full.json');
   let columns = [];
   try {
-    const rawConfig = fs.readFileSync(configPath, 'utf8');
-    columns = JSON.parse(rawConfig);
+    let configPath = path.join(__dirname, '../../src/config/reconciliation_columns_full.json');
+    if (!fs.existsSync(configPath)) {
+      configPath = configPath.replace('.asar', '.asar.unpacked');
+    }
+    if (!fs.existsSync(configPath)) {
+      configPath = path.join(
+        process.resourcesPath || '',
+        'src/config/reconciliation_columns_full.json'
+      );
+    }
+    if (fs.existsSync(configPath)) {
+      columns = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+    } else {
+      console.error('reconciliation_columns_full.json not found');
+    }
   } catch (err) {
     console.error('Failed to load reconciliation columns:', err);
   }
