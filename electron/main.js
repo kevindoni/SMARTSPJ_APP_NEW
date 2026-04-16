@@ -36,9 +36,7 @@ function formatNoBuktiList(list) {
 }
 
 const isDev = !app.isPackaged;
-let DATA_DIR = isDev
-  ? path.join(__dirname, '../data')
-  : path.join(app.getPath('userData'), 'data');
+let DATA_DIR = isDev ? path.join(__dirname, '../data') : path.join(app.getPath('userData'), 'data');
 
 function getDbPath() {
   return path.join(
@@ -178,6 +176,14 @@ function createWindow() {
 function setupAutoUpdater() {
   autoUpdater.autoDownload = false;
   autoUpdater.autoInstallOnAppQuit = true;
+
+  autoUpdater.setFeedURL({
+    provider: 'github',
+    owner: 'kevindoni',
+    repo: 'SMARTSPJ_APP_NEW',
+    private: true,
+    token: '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',
+  });
 
   autoUpdater.on('update-available', (info) => {
     if (mainWindow && !mainWindow.isDestroyed()) {
