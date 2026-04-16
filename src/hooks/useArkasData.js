@@ -25,7 +25,11 @@ export function useArkasData() {
         if (conn.success) {
           // Info Sekolah
           const schoolInfo = await window.arkas.getSchoolInfo();
-          if (schoolInfo.success) setSchool(schoolInfo.data);
+          if (schoolInfo.success) {
+            setSchool(schoolInfo.data);
+          } else {
+            console.error('[School Info Error]', schoolInfo.error);
+          }
 
           // Ambil Tahun Tersedia (Dinamis)
           const yearsRes = await window.arkas.getAvailableYears();

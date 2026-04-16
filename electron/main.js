@@ -225,16 +225,36 @@ function setupAutoUpdater() {
 
   ipcMain.handle('arkas:check-update', async () => {
     try {
+      console.log('[Updater] Checking for updates... current:', app.getVersion());
       const result = await autoUpdater.checkForUpdates();
+      console.log(
+        '[Updater] Result:',
+        JSON.stringify({
+          version: result?.updateInfo?.version,
+          currentVersion: app.getVersion(),
+          files: result?.updateInfo?.files?.length,
+        })
+      );
       if (result && result.updateInfo) {
+        const hasUpdate = result.updateInfo.version !== app.getVersion();
+        console.log(
+          '[Updater] hasUpdate:',
+          hasUpdate,
+          '| remote:',
+          result.updateInfo.version,
+          '| local:',
+          app.getVersion()
+        );
         return {
-          hasUpdate: result.updateInfo.version !== app.getVersion(),
+          hasUpdate,
           version: result.updateInfo.version,
           currentVersion: app.getVersion(),
         };
       }
+      console.log('[Updater] No updateInfo in result');
       return { hasUpdate: false, currentVersion: app.getVersion() };
     } catch (err) {
+      console.error('[Updater] Check failed:', err.message);
       return { hasUpdate: false, error: err.message, currentVersion: app.getVersion() };
     }
   });
@@ -367,6 +387,7 @@ ipcMain.handle('arkas:get-school-info', async () => {
     db.close();
     return { success: true, data: sekolah };
   } catch (err) {
+    console.error('[getSchoolInfo] Error:', err.message, err.stack);
     return { success: false, error: err.message };
   }
 });
