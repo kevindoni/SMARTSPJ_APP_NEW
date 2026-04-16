@@ -39,7 +39,11 @@ export function useArkasData() {
 
           // Dashboard Stats (Filtered)
           const dashStats = await window.arkas.getDashboardStats(year, fundSource);
-          if (dashStats.success) setStats(dashStats.data);
+          if (dashStats.success) {
+            setStats(dashStats.data);
+          } else {
+            console.error('[Dashboard Stats Error]', dashStats.error);
+          }
         }
       } catch (err) {
         setDbStatus({ loading: false, success: false, message: err.message });

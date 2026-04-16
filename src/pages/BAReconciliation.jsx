@@ -60,7 +60,6 @@ export default function BAReconciliation() {
     headerLaman: '',
   });
 
-
   // Fetch school info
   useEffect(() => {
     if (window.arkas?.getSchoolInfo) {
@@ -201,85 +200,85 @@ export default function BAReconciliation() {
         </div>
 
         <div className="flex gap-2">
-{/* PDF Export - hidden for Fund Source tabs */}
-{!reconSources.some((s) => s.id === activeTab) && (
-          <button
-            onClick={async () => {
-              try {
-                // Logic Switch based on Tab
-                if (activeTab === 'lembar-ba') {
-                  if (!data) {
-                    toast.warning('Data belum siap. Mohon tunggu.');
-                    return;
-                  }
-                  exportBaRekonsToPdf(
-                    data,
-                    signatoryData,
-                    schoolInfo,
-                    year,
-                    selectedPeriod,
-                    pajakData
-                  );
-                } else if (activeTab === 'ba-rekons') {
-                  // NEW: Export detailed table for Main Tab
-                  if (!smartTableData || smartTableData.length === 0)
-                    throw new Error('Data Tabel belum dimuat');
-
-                  // Use Shared Config for consistent export
-                  exportTableToPdf(
-                    'smart-table',
-                    { rows: smartTableData, columns: RECONCILIATION_COLUMNS },
-                    signatoryData,
-                    schoolInfo,
-                    year,
-                    'Rincian BA Rekonsiliasi'
-                  );
-                } else if (activeTab === 'rekap-bunga') {
-                  if (!bungaData) throw new Error('Data Bunga belum dimuat');
-                  exportTableToPdf(
-                    'rekap-bunga',
-                    bungaData,
-                    signatoryData,
-                    schoolInfo,
-                    year,
-                    'Rekap Bunga Bank'
-                  );
-                } else if (activeTab === 'rekap-pajak') {
-                  if (!pajakData) throw new Error('Data Pajak belum dimuat');
-                  exportTableToPdf(
-                    'rekap-pajak',
-                    pajakData,
-                    signatoryData,
-                    schoolInfo,
-                    year,
-                    'Rekap Pajak'
-                  );
-                } else {
-                  // Fund Source Tabs
-                  const source = reconSources.find((s) => s.id === activeTab);
-                  if (source) {
-                    if (!fundDetailData) throw new Error('Data Sumber Dana belum dimuat');
-                    exportTableToPdf(
-                      'fund-source',
-                      fundDetailData,
+          {/* PDF Export - hidden for Fund Source tabs */}
+          {!reconSources.some((s) => s.id === activeTab) && (
+            <button
+              onClick={async () => {
+                try {
+                  // Logic Switch based on Tab
+                  if (activeTab === 'lembar-ba') {
+                    if (!data) {
+                      toast.warning('Data belum siap. Mohon tunggu.');
+                      return;
+                    }
+                    exportBaRekonsToPdf(
+                      data,
                       signatoryData,
                       schoolInfo,
                       year,
-                      source.label
+                      selectedPeriod,
+                      pajakData
                     );
+                  } else if (activeTab === 'ba-rekons') {
+                    // NEW: Export detailed table for Main Tab
+                    if (!smartTableData || smartTableData.length === 0)
+                      throw new Error('Data Tabel belum dimuat');
+
+                    // Use Shared Config for consistent export
+                    exportTableToPdf(
+                      'smart-table',
+                      { rows: smartTableData, columns: RECONCILIATION_COLUMNS },
+                      signatoryData,
+                      schoolInfo,
+                      year,
+                      'Rincian BA Rekonsiliasi'
+                    );
+                  } else if (activeTab === 'rekap-bunga') {
+                    if (!bungaData) throw new Error('Data Bunga belum dimuat');
+                    exportTableToPdf(
+                      'rekap-bunga',
+                      bungaData,
+                      signatoryData,
+                      schoolInfo,
+                      year,
+                      'Rekap Bunga Bank'
+                    );
+                  } else if (activeTab === 'rekap-pajak') {
+                    if (!pajakData) throw new Error('Data Pajak belum dimuat');
+                    exportTableToPdf(
+                      'rekap-pajak',
+                      pajakData,
+                      signatoryData,
+                      schoolInfo,
+                      year,
+                      'Rekap Pajak'
+                    );
+                  } else {
+                    // Fund Source Tabs
+                    const source = reconSources.find((s) => s.id === activeTab);
+                    if (source) {
+                      if (!fundDetailData) throw new Error('Data Sumber Dana belum dimuat');
+                      exportTableToPdf(
+                        'fund-source',
+                        fundDetailData,
+                        signatoryData,
+                        schoolInfo,
+                        year,
+                        source.label
+                      );
+                    }
                   }
+                } catch (error) {
+                  console.error('Export PDF Error:', error);
+                  toast.error('Gagal export PDF: ' + error.message);
                 }
-              } catch (error) {
-                console.error('Export PDF Error:', error);
-                toast.error('Gagal export PDF: ' + error.message);
-              }
-            }}
-            className="flex items-center gap-2 px-3 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition text-sm font-medium shadow-sm active:scale-95"
-          >
-            <Printer size={16} />
-            Download PDF
-          </button>
-)}
+              }}
+              className="flex items-center gap-2 px-3 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition text-sm font-medium shadow-sm active:scale-95"
+            >
+              <Printer size={16} />
+              Download PDF
+            </button>
+          )}
 
           <button
             onClick={async () => {
@@ -520,7 +519,7 @@ export default function BAReconciliation() {
         {activeTab === 'rekap-pajak' && <PajakTable data={pajakData} />}
 
         {reconSources.some((s) => s.id === activeTab) && (
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+          <div className="bg-white rounded-xl shadow-sm border border-slate-200">
             <FundSourceTable data={fundDetailData} />
           </div>
         )}
