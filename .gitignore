@@ -30,7 +30,10 @@ npm-debug.log*
 # Database files (local development data)
 data/*.sqlite
 data/*.db
+data/*.json
 
-# Temporary files
-*.tmp
-*.temp
+# Temporary/debug scripts
+scripts/_*
+
+# Electron loader (generated)
+electron/main-loader.js

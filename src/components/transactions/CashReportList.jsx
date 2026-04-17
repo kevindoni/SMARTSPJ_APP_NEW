@@ -85,9 +85,28 @@ export default function CashReportList({ stats }) {
       })
     : data;
 
+  // For SEMUA view: remove duplicate monthly saldo carry-forward entries.
+  const displayData = useMemo(() => {
+    if (isMonthView) return sortedData;
+
+    let firstSaldoDate = null;
+    return sortedData.filter((tx) => {
+      const desc = (tx.uraian || '').toLowerCase();
+      const isMonthlySaldo = desc.startsWith('saldo bank bulan') || desc.startsWith('saldo tunai bulan');
+
+      if (!isMonthlySaldo) return true;
+
+      const txDate = (tx.normalized_date || tx.tanggal_transaksi || '').substring(0, 10);
+      if (firstSaldoDate === null) {
+        firstSaldoDate = txDate;
+      }
+      return txDate === firstSaldoDate;
+    });
+  }, [sortedData, isMonthView]);
+
   const hasExistingOpeningBalance =
     isMonthView &&
-    sortedData.some((tx) => {
+    displayData.some((tx) => {
       const isFirstDate =
         tx.tanggal_transaksi.includes(`-${selectedMonth}-01`) ||
         tx.tanggal_transaksi.startsWith(`${year}-${selectedMonth}-01`);
@@ -99,18 +118,18 @@ export default function CashReportList({ stats }) {
 
   const calculatedBalances = useMemo(() => {
     let rb = hasExistingOpeningBalance ? 0 : openingBalance;
-    return sortedData.map((tx) => {
+    return displayData.map((tx) => {
       const isDebit = isPenerimaanTunai(tx);
       if (isDebit) { rb += tx.nominal; } else { rb -= tx.nominal; }
       return rb;
     });
-  }, [sortedData, hasExistingOpeningBalance, openingBalance]);
+  }, [displayData, hasExistingOpeningBalance, openingBalance]);
 
   // Calculate totals for Tunai transactions using cash perspective
   const tablePenerimaan =
-    sortedData.reduce((acc, tx) => acc + (isPenerimaanTunai(tx) ? tx.nominal : 0), 0) +
+    displayData.reduce((acc, tx) => acc + (isPenerimaanTunai(tx) ? tx.nominal : 0), 0) +
     (isMonthView && selectedMonth !== '01' && !hasExistingOpeningBalance ? openingBalance : 0);
-  const tablePengeluaran = sortedData.reduce(
+  const tablePengeluaran = displayData.reduce(
     (acc, tx) => acc + (!isPenerimaanTunai(tx) ? tx.nominal : 0),
     0
   );
@@ -183,7 +202,7 @@ export default function CashReportList({ stats }) {
           });
         }
 
-        sortedData.forEach((tx, idx) => {
+        displayData.forEach((tx, idx) => {
           exportData.push({
             tanggal_transaksi: tx.tanggal_transaksi,
             no_bukti: tx.no_bukti || '',
@@ -283,7 +302,7 @@ export default function CashReportList({ stats }) {
         />
 
         <TransactionTable
-          data={sortedData}
+          data={displayData}
           loading={loading}
           hasMore={hasMore}
           onLoadMore={handleLoadMore}

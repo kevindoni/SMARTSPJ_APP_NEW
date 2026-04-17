@@ -86,6 +86,7 @@ if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
 registerKasHandler.initRegisterKasStorage(DATA_DIR);
 manualTaxHandler.initManualTaxStorage(DATA_DIR);
 notaGroupHandler.initNotaGroupStorage(DATA_DIR);
+reconciliationHandler.initSignatoryStorage(DATA_DIR);
 backupHandler.initBackupStorage(DATA_DIR);
 
 // Secure password management using Electron safeStorage
@@ -177,13 +178,35 @@ function setupAutoUpdater() {
   autoUpdater.autoDownload = false;
   autoUpdater.autoInstallOnAppQuit = true;
 
-  autoUpdater.setFeedURL({
-    provider: 'github',
-    owner: 'kevindoni',
-    repo: 'SMARTSPJ_APP_NEW',
-    private: true,
-    token: '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',
-  });
+  // Load GitHub token from config for auto-updates (private repo)
+  const updaterConfigPath = path.join(DATA_DIR, 'updater.json');
+  let githubToken = '';
+  try {
+    if (fs.existsSync(updaterConfigPath)) {
+      const updaterConfig = JSON.parse(fs.readFileSync(updaterConfigPath, 'utf8'));
+      githubToken = updaterConfig.github_token || '';
+    }
+  } catch (e) {
+    console.error('[Updater] Failed to load updater config:', e.message);
+  }
+
+  if (githubToken) {
+    autoUpdater.setFeedURL({
+      provider: 'github',
+      owner: 'kevindoni',
+      repo: 'SMARTSPJ_APP_NEW',
+      private: true,
+      token: githubToken,
+    });
+  } else {
+    // No token - try public access (won't work for private repos but won't crash)
+    console.warn('[Updater] No GitHub token found. Auto-update may not work for private repo.');
+    autoUpdater.setFeedURL({
+      provider: 'github',
+      owner: 'kevindoni',
+      repo: 'SMARTSPJ_APP_NEW',
+    });
+  }
 
   autoUpdater.on('update-available', (info) => {
     if (mainWindow && !mainWindow.isDestroyed()) {
@@ -288,59 +311,76 @@ app.on('window-all-closed', () => {
 });
 
 const getSchoolInfoWithOfficials = (db) => {
-  const sekolah = db
+  // === STEP 1: Get school data from DB ===
+  // Try mst_sekolah first (has NPSN, alamat, penjab, etc)
+  let sekolah = db
     .prepare(
       `SELECT i.*, mst.* FROM instansi i LEFT JOIN mst_sekolah mst ON i.instansi_id = mst.sekolah_id WHERE mst.sekolah_id IS NOT NULL LIMIT 1`
-    )
-    .get();
+    ).get();
 
-  if (sekolah && sekolah.kode_wilayah) {
-    // Lookup Kecamatan
-    const kecamatan = db
-      .prepare(`SELECT nama FROM mst_wilayah WHERE kode_wilayah = ?`)
-      .get(sekolah.kode_wilayah);
-    if (kecamatan) sekolah.kecamatan = kecamatan.nama;
-
-    // Lookup Kabupaten
-    const kabKode = sekolah.kode_wilayah.substring(0, 4) + '00';
-    const kabupaten = db
-      .prepare(`SELECT nama FROM mst_wilayah WHERE kode_wilayah = ?`)
-      .get(kabKode);
-    if (kabupaten) sekolah.kabupaten = kabupaten.nama;
-
-    // Lookup Provinsi
-    const provKode = sekolah.kode_wilayah.substring(0, 2) + '0000';
-    const provinsi = db
-      .prepare(`SELECT nama FROM mst_wilayah WHERE kode_wilayah = ?`)
-      .get(provKode);
-    if (provinsi) sekolah.provinsi = provinsi.nama;
-
-    // Set nama_sekolah
-    sekolah.nama_sekolah = sekolah.nama;
-
-    // Lookup Officials from sekolah_penjab (Most recent)
-    const officials = db
-      .prepare(
-        `
-            SELECT ks as kepala_sekolah, nip_ks as nip_kepala, 
-                   bendahara, nip_bendahara 
-            FROM sekolah_penjab 
-            WHERE sekolah_id = ? 
-            ORDER BY tahun DESC 
-            LIMIT 1
-        `
-      )
-      .get(sekolah.sekolah_id);
-
-    if (officials) Object.assign(sekolah, officials);
-
-    // MERGE WITH LOCAL CONFIG (User Overrides)
-    // This ensures DB data is never touched, but user sees their custom values.
-    const localConfig = loadLocalConfig();
-    if (localConfig.schoolInfo) {
-      Object.assign(sekolah, localConfig.schoolInfo);
-    }
+  // Fallback 1: if mst_sekolah is empty, use instansi only
+  // For sekolah (jenis_instansi_id=5), kode_instansi = NPSN
+  if (!sekolah) {
+    sekolah = db.prepare(
+      `SELECT i.*, i.instansi_id as sekolah_id, i.kode_instansi as npsn, NULL as bentuk_pendidikan_id, NULL as kode_registrasi, NULL as jumlah_siswa, NULL as status_sekolah FROM instansi i WHERE i.jenis_instansi_id = 5 LIMIT 1`
+    ).get();
   }
+
+  // Fallback 2: if still no result, try any instansi (Dinas, UPTD, etc)
+  if (!sekolah) {
+    sekolah = db.prepare(
+      `SELECT i.*, i.kode_instansi as npsn FROM instansi i LIMIT 1`
+    ).get();
+  }
+
+  if (!sekolah) return null;
+
+  // === STEP 2: Lookup wilayah ===
+  if (sekolah.kode_wilayah && sekolah.kode_wilayah !== '0') {
+    const kecamatan = db.prepare(`SELECT nama FROM mst_wilayah WHERE kode_wilayah = ?`).get(sekolah.kode_wilayah);
+    if (kecamatan) sekolah.kecamatan = kecamatan.nama;
+    const kabKode = sekolah.kode_wilayah.substring(0, 4) + '00';
+    const kabupaten = db.prepare(`SELECT nama FROM mst_wilayah WHERE kode_wilayah = ?`).get(kabKode);
+    if (kabupaten) sekolah.kabupaten = kabupaten.nama;
+    const provKode = sekolah.kode_wilayah.substring(0, 2) + '0000';
+    const provinsi = db.prepare(`SELECT nama FROM mst_wilayah WHERE kode_wilayah = ?`).get(provKode);
+    if (provinsi) sekolah.provinsi = provinsi.nama;
+  }
+
+  sekolah.nama_sekolah = sekolah.nama;
+
+  // === STEP 3: Lookup Officials from sekolah_penjab ===
+  const officials = db.prepare(
+    `SELECT ks as kepala_sekolah, nip_ks as nip_kepala, bendahara, nip_bendahara FROM sekolah_penjab WHERE sekolah_id = ? ORDER BY tahun DESC LIMIT 1`
+  ).get(sekolah.sekolah_id || sekolah.instansi_id);
+  if (officials) Object.assign(sekolah, officials);
+
+  // === STEP 4: Enrich from app_config ===
+  try {
+    const configRows = db.prepare(`SELECT varname, varvalue FROM app_config`).all();
+    const configMap = {};
+    configRows.forEach(r => { configMap[r.varname] = r.varvalue; });
+    if (!sekolah.kode_registrasi && configMap.koreg) sekolah.kode_registrasi = configMap.koreg;
+    if (!sekolah.npsn && configMap.salur) {
+      try {
+        const salurData = JSON.parse(configMap.salur);
+        if (salurData && salurData.length > 0 && salurData[0].npsn) sekolah.npsn = salurData[0].npsn;
+      } catch (e) {}
+    }
+    if (configMap.kepala_dinas) sekolah.kepala_dinas = configMap.kepala_dinas;
+    if (configMap.nip_kepala_dinas) sekolah.nip_kepala_dinas = configMap.nip_kepala_dinas;
+    if (configMap.manager_bos) sekolah.manager_bos = configMap.manager_bos;
+    if (configMap.nip_manager_bos) sekolah.nip_manager_bos = configMap.nip_manager_bos;
+    if (configMap.bud) sekolah.bud = configMap.bud;
+    if (configMap.nip_bud) sekolah.nip_bud = configMap.nip_bud;
+  } catch (e) {
+    console.log('[getSchoolInfo] app_config lookup skipped:', e.message);
+  }
+
+  // === STEP 5: Merge with local config (user overrides) ===
+  const localConfig = loadLocalConfig();
+  if (localConfig.schoolInfo) Object.assign(sekolah, localConfig.schoolInfo);
+
   return sekolah;
 };
 
@@ -534,31 +574,9 @@ ipcMain.handle('arkas:export-bku', async (event, frontendTransactions, params) =
     db.pragma('legacy=4');
     db.pragma(`key='${ARKAS_PASSWORD}'`);
 
-    // 1. Get School Info (Internal Logic)
-    const schoolInfo = db
-      .prepare(
-        `SELECT i.*, mst.* FROM instansi i LEFT JOIN mst_sekolah mst ON i.instansi_id = mst.sekolah_id WHERE i.jenis_instansi_id = 5 LIMIT 1`
-      )
-      .get();
-    if (schoolInfo && schoolInfo.kode_wilayah) {
-      const kecamatan = db
-        .prepare(`SELECT nama FROM mst_wilayah WHERE kode_wilayah = ?`)
-        .get(schoolInfo.kode_wilayah);
-      if (kecamatan) schoolInfo.kecamatan = kecamatan.nama;
+    // 1. Get School Info (using shared function)
+    const schoolInfo = getSchoolInfoWithOfficials(db);
 
-      const kabKode = schoolInfo.kode_wilayah.substring(0, 4) + '00';
-      const kabupaten = db
-        .prepare(`SELECT nama FROM mst_wilayah WHERE kode_wilayah = ?`)
-        .get(kabKode);
-      if (kabupaten) schoolInfo.kabupaten = kabupaten.nama;
-
-      const provKode = schoolInfo.kode_wilayah.substring(0, 2) + '0000';
-      const provinsi = db
-        .prepare(`SELECT nama FROM mst_wilayah WHERE kode_wilayah = ?`)
-        .get(provKode);
-      if (provinsi) schoolInfo.provinsi = provinsi.nama;
-      schoolInfo.nama_sekolah = schoolInfo.nama;
-    }
 
     let payload = [];
 
@@ -746,16 +764,71 @@ ipcMain.handle('arkas:export-bku', async (event, frontendTransactions, params) =
       let transactions = frontendTransactions;
 
       if (actualParams.reportType === 'PAJAK') {
-        // Fetch transactions with tax flags for proper tax column display
+        // Always fetch PAJAK transactions from DB (has tax flags: is_ppn, is_pph_21, etc)
         const taxParams = {
           year: actualParams.year,
-          month: actualParams.month === 'SEMUA' ? 'SEMUA' : actualParams.month, // Keep string format
+          month: actualParams.month === 'SEMUA' ? 'SEMUA' : actualParams.month,
           fundSource: actualParams.fundSource,
           paymentType: 'PAJAK',
           limit: 100000,
         };
         const taxResult = transactionHandler.getTransactions(db, taxParams);
         transactions = taxResult.rows || [];
+
+        // ALWAYS merge manual taxes from backend storage
+        try {
+          const exportYear = parseInt(actualParams.year);
+          const allManualTaxes = manualTaxHandler.getManualTaxesByYear(exportYear);
+          const selectedMonth = actualParams.month;
+          const isMonthView = selectedMonth !== 'SEMUA';
+
+          // Filter manual taxes by month (same logic as frontend)
+          const filteredManual = allManualTaxes.filter((tax) => {
+            if (isMonthView && tax.tanggal) {
+              const txMonth = tax.tanggal.substring(5, 7);
+              return txMonth === selectedMonth;
+            }
+            return true;
+          });
+
+          // Transform manual taxes to transaction format
+          filteredManual.forEach((tax) => {
+            let uraian = tax.keterangan || 'Entri Pajak Manual';
+            if (tax.jenis_input === 'saldo_awal_tahun' || tax.jenis_input === 'saldo_awal') {
+              uraian = 'Saldo Awal ' + tax.jenis_pajak + ' (' + (tax.keterangan || 'Hutang Tahun Lalu') + ')';
+            } else if (tax.jenis_input === 'hutang_bulan') {
+              uraian = 'Hutang ' + tax.jenis_pajak + ' (' + (tax.keterangan || 'Lupa Bayar') + ')';
+            }
+            transactions.push({
+              tanggal_transaksi: tax.tanggal || tax.created_at?.split('T')[0],
+              no_bukti: tax.no_bukti || 'MANUAL',
+              kode_rekening: tax.no_bukti || 'MANUAL',
+              uraian: uraian,
+              nominal: tax.nominal || 0,
+              id_ref_bku: tax.position === 'pungutan' ? 10 : 11,
+              is_manual: true,
+              jenis_pajak: tax.jenis_pajak || '',
+              // Tax flags default to 0 (manual entries use jenis_pajak instead)
+              is_ppn: 0,
+              is_pph_21: 0,
+              is_pph_23: 0,
+              is_pph_4: 0,
+              is_sspd: 0,
+              is_siplah: 0,
+            });
+          });
+
+          // Sort: manual saldo_awal first, then by date
+          transactions.sort((a, b) => {
+            const aManual = a.is_manual && (a.uraian || '').startsWith('Saldo Awal');
+            const bManual = b.is_manual && (b.uraian || '').startsWith('Saldo Awal');
+            if (aManual && !bManual) return -1;
+            if (bManual && !aManual) return 1;
+            return new Date(a.tanggal_transaksi) - new Date(b.tanggal_transaksi);
+          });
+        } catch (e) {
+          console.error('Error merging manual taxes for export:', e);
+        }
       }
 
       payload = {
@@ -2574,28 +2647,8 @@ ipcMain.handle('arkas:export-all-bku', async (event, params) => {
     db.pragma('legacy=4');
     db.pragma(`key='${ARKAS_PASSWORD}'`);
 
-    const schoolInfo = db
-      .prepare(
-        `SELECT i.*, mst.* FROM instansi i LEFT JOIN mst_sekolah mst ON i.instansi_id = mst.sekolah_id WHERE i.jenis_instansi_id = 5 LIMIT 1`
-      )
-      .get();
-    if (schoolInfo && schoolInfo.kode_wilayah) {
-      const kecamatan = db
-        .prepare(`SELECT nama FROM mst_wilayah WHERE kode_wilayah = ?`)
-        .get(schoolInfo.kode_wilayah);
-      if (kecamatan) schoolInfo.kecamatan = kecamatan.nama;
-      const kabKode = schoolInfo.kode_wilayah.substring(0, 4) + '00';
-      const kabupaten = db
-        .prepare(`SELECT nama FROM mst_wilayah WHERE kode_wilayah = ?`)
-        .get(kabKode);
-      if (kabupaten) schoolInfo.kabupaten = kabupaten.nama;
-      const provKode = schoolInfo.kode_wilayah.substring(0, 2) + '0000';
-      const provinsi = db
-        .prepare(`SELECT nama FROM mst_wilayah WHERE kode_wilayah = ?`)
-        .get(provKode);
-      if (provinsi) schoolInfo.provinsi = provinsi.nama;
-      schoolInfo.nama_sekolah = schoolInfo.nama;
-    }
+    const schoolInfo = getSchoolInfoWithOfficials(db);
+
 
     // Get dashboard stats for accurate data
     const dashboardResult = await dashboardHandler.getDashboardStats(

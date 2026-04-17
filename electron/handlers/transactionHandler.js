@@ -349,7 +349,7 @@ function getTransactions(db, params, overrides = {}) {
 
       const isTarikSetor = uraian.includes('tarik tunai') || uraian.includes('setor tunai');
       const hasOtherTunaiKeyword = uraian.includes('tunai') && !isTarikSetor;
-      const isPergeseranBank = uraian.includes('pergeseran uang di bank');
+      const isPergeseranBank = uraian.includes('pergeseran uang di bank') || uraian.includes('pergeseran uang ke bank') || uraian.includes('pergeseran uang ke tunai');
       // Exclude Pungut (10) and Setor (11) to avoid inflation (wash transactions)
       const isPajakWash = [10, 11].includes(idBku);
 

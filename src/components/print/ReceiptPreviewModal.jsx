@@ -247,7 +247,7 @@ export default function ReceiptPreviewModal({ transaction, schoolInfo, year, onC
                       </td>
                     </tr>
                     <tr>
-                      <td style={{ whiteSpace: 'nowrap', padding: '0px 3px' }}>PPh 21%</td>
+                      <td style={{ whiteSpace: 'nowrap', padding: '0px 3px' }}>PPh 21</td>
                       <td style={{ textAlign: 'center', padding: '0px' }}>:</td>
                       <td style={{ textAlign: 'right', padding: '0px 3px' }}>
                         {pph21 > 0 ? formatNumber(pph21) : '-'}

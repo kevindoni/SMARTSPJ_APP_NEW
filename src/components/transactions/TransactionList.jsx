@@ -69,9 +69,32 @@ export default function TransactionList({ stats }) {
       })
     : data;
 
+  // For SEMUA view: remove duplicate monthly saldo carry-forward entries.
+  // Each month starts with "Saldo Bank Bulan X" / "Saldo Tunai Bulan X" entries.
+  // Only the FIRST month entries are the real opening balance.
+  // Subsequent months are carry-forward duplicates that cause double-counting.
+  const displayData = useMemo(() => {
+    if (isMonthView) return sortedData;
+
+    let firstSaldoDate = null;
+    return sortedData.filter((tx) => {
+      const desc = (tx.uraian || '').toLowerCase();
+      const isMonthlySaldo = desc.startsWith('saldo bank bulan') || desc.startsWith('saldo tunai bulan');
+
+      if (!isMonthlySaldo) return true;
+
+      // Keep only the first month saldo entries (initial opening balance)
+      const txDate = (tx.normalized_date || tx.tanggal_transaksi || '').substring(0, 10);
+      if (firstSaldoDate === null) {
+        firstSaldoDate = txDate;
+      }
+      return txDate === firstSaldoDate;
+    });
+  }, [sortedData, isMonthView]);
+
   const hasExistingOpeningBalance =
     isMonthView &&
-    sortedData.some((tx) => {
+    displayData.some((tx) => {
       const isFirstDate =
         tx.tanggal_transaksi.includes(`-${selectedMonth}-01`) ||
         tx.tanggal_transaksi.startsWith(`${year}-${selectedMonth}-01`);
@@ -83,17 +106,17 @@ export default function TransactionList({ stats }) {
 
   const calculatedBalances = useMemo(() => {
     let rb = hasExistingOpeningBalance ? 0 : openingBalance;
-    return sortedData.map((tx) => {
+    return displayData.map((tx) => {
       const isDebit = isPenerimaan(tx);
       if (isDebit) { rb += tx.nominal; } else { rb -= tx.nominal; }
       return rb;
     });
-  }, [sortedData, hasExistingOpeningBalance, openingBalance]);
+  }, [displayData, hasExistingOpeningBalance, openingBalance]);
 
   const tablePenerimaan =
-    sortedData.reduce((acc, tx) => acc + (isPenerimaan(tx) ? tx.nominal : 0), 0) +
+    displayData.reduce((acc, tx) => acc + (isPenerimaan(tx) ? tx.nominal : 0), 0) +
     (isMonthView && selectedMonth !== '01' && !hasExistingOpeningBalance ? openingBalance : 0);
-  const tablePengeluaran = sortedData.reduce(
+  const tablePengeluaran = displayData.reduce(
     (acc, tx) => acc + (!isPenerimaan(tx) ? tx.nominal : 0),
     0
   );
@@ -146,7 +169,7 @@ export default function TransactionList({ stats }) {
         }
 
         // Use the SAME calculated balances as display (already computed correctly)
-        sortedData.forEach((tx, idx) => {
+        displayData.forEach((tx, idx) => {
           exportData.push({
             tanggal_transaksi: tx.tanggal_transaksi,
             no_bukti: tx.no_bukti || '',
@@ -250,7 +273,7 @@ export default function TransactionList({ stats }) {
 
         {/* Table Content */}
         <TransactionTable
-          data={sortedData}
+          data={displayData}
           loading={loading}
           hasMore={hasMore}
           onLoadMore={handleLoadMore}

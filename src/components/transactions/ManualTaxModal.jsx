@@ -78,8 +78,8 @@ export default function ManualTaxModal({ isOpen, onClose, year, onSave }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
+    <div className="fixed inset-0 bg-black/50 flex items-start sm:items-center justify-center z-50 p-4 overflow-y-auto">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md my-4 sm:my-8 animate-in fade-in zoom-in duration-200 flex flex-col max-h-[calc(100vh-2rem)]">
         {/* Header */}
         <div className="bg-gradient-to-r from-amber-500 to-orange-500 p-4 flex items-center justify-between">
           <h3 className="text-white font-bold text-lg">Input Pajak Manual</h3>
@@ -89,7 +89,7 @@ export default function ManualTaxModal({ isOpen, onClose, year, onSave }) {
         </div>
 
         {/* Body */}
-        <div className="p-5 space-y-4">
+        <div className="p-5 space-y-4 overflow-y-auto flex-1">
           {/* Jenis Input */}
           <div>
             <label className="text-sm font-medium text-slate-700 mb-1 block">Jenis Input</label>
@@ -230,7 +230,7 @@ export default function ManualTaxModal({ isOpen, onClose, year, onSave }) {
         </div>
 
         {/* Footer */}
-        <div className="bg-slate-50 px-5 py-4 flex justify-end gap-3">
+        <div className="bg-slate-50 px-5 py-4 flex justify-end gap-3 border-t border-slate-200 shrink-0">
           <button
             onClick={onClose}
             className="px-4 py-2 text-slate-600 hover:bg-slate-200 rounded-lg font-medium transition-colors"

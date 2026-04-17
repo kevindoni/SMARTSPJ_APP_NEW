@@ -230,15 +230,45 @@ export default function TaxReportList({ stats }) {
   };
 
   const handleExport = async (exportType = 'single_xlsx') => {
+    setIsExporting(true);
     try {
-      // Parse export type (e.g., 'single_xlsx', 'bulk_pdf')
       const [scope, formatType] = exportType.split('_');
       const format = formatType === 'pdf' ? 'pdf' : 'excel';
       const exportScope = scope === 'bulk' ? 'bulk' : 'single';
 
-      toast.info('Mengekspor data...');
+      // For single export: pass pre-calculated data including manual taxes
+      let exportTransactions = [];
+      if (exportScope === 'single') {
+        sortedData.forEach((tx, idx) => {
+          exportTransactions.push({
+            tanggal_transaksi: tx.tanggal_transaksi,
+            no_bukti: tx.no_bukti || '',
+            kode_kegiatan: tx.activity_code || tx.kode_kegiatan || '',
+            kode_rekening: tx.kode_rekening || '',
+            uraian: tx.uraian,
+            // Raw fields needed by export handler (getTaxComponentsForExport)
+            nominal: tx.nominal || 0,
+            signed_amount: tx.signed_amount || 0,
+            id_ref_bku: tx.id_ref_bku,
+            is_ppn: tx.is_ppn || 0,
+            is_pph_21: tx.is_pph_21 || 0,
+            is_pph_23: tx.is_pph_23 || 0,
+            is_pph_4: tx.is_pph_4 || 0,
+            is_sspd: tx.is_sspd || 0,
+            is_siplah: tx.is_siplah || 0,
+            // Pre-calculated values for non-PAJAK fallback
+            penerimaan: tx.id_ref_bku === 10 ? tx.nominal : 0,
+            pengeluaran: tx.id_ref_bku === 11 ? tx.nominal : 0,
+            saldo_berjalan: calculatedBalances[idx],
+            // Manual tax fields
+            is_manual: tx.is_manual || false,
+            jenis_pajak: tx.jenis_pajak || '',
+          });
+        });
+      }
+
       if (window.arkas && window.arkas.exportBku) {
-        const result = await window.arkas.exportBku({
+        const result = await window.arkas.exportBku(exportTransactions, {
           year,
           fundSource,
           month: selectedMonth,
@@ -246,18 +276,24 @@ export default function TaxReportList({ stats }) {
           reportType: 'PAJAK',
           scope: exportScope,
           format: format,
+          tablePenerimaan: totalPenerimaan,
+          tablePengeluaran: totalPengeluaran,
+          calculatedSaldo: calculatedSaldo,
+          stats: displayStats,
         });
         if (result.success) {
-          toast.success(`Export berhasil: ${result.filePath}`);
+          toast.success('Export berhasil: ' + result.filePath);
         } else if (result.canceled) {
           toast.info('Export dibatalkan');
         } else {
-          toast.error(`Export gagal: ${result.error}`);
+          toast.error('Export gagal: ' + result.error);
         }
       }
     } catch (error) {
       toast.error('Gagal melakukan export');
       console.error(error);
+    } finally {
+      setIsExporting(false);
     }
   };
 

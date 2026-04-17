@@ -29,6 +29,17 @@ const MONTHS = [
   'Desember',
 ];
 
+// Signatory storage directory (initialized by main.js)
+let signatoryStorageDir = null;
+
+function initSignatoryStorage(dir) {
+  signatoryStorageDir = dir;
+  if (!fs.existsSync(signatoryStorageDir)) {
+    fs.mkdirSync(signatoryStorageDir, { recursive: true });
+  }
+}
+
+
 const fs = require('fs');
 const path = require('path');
 
@@ -1636,8 +1647,8 @@ function getPajakDetail(db, year) {
  */
 function saveSignatoryData(dbPath, data) {
   try {
-    const projectRoot = path.resolve(__dirname, '../../');
-    const dataDir = path.join(projectRoot, 'data');
+    const dataDir = signatoryStorageDir;
+    if (!dataDir) return { success: false, error: 'Storage not initialized' };
     const jsonPath = path.join(dataDir, 'ba_signatory.json');
 
     if (!fs.existsSync(dataDir)) {
@@ -1659,8 +1670,8 @@ function saveSignatoryData(dbPath, data) {
  */
 function getSignatoryData(dbPath) {
   try {
-    const projectRoot = path.resolve(__dirname, '../../');
-    const dataDir = path.join(projectRoot, 'data');
+    const dataDir = signatoryStorageDir;
+    if (!dataDir) return { success: true, data: {} };
     const jsonPath = path.join(dataDir, 'ba_signatory.json');
 
     if (!fs.existsSync(jsonPath)) {
@@ -1878,6 +1889,7 @@ module.exports = {
   getBudgetIdsForFund,
   getBungaDetail,
   getPajakDetail,
+  initSignatoryStorage,
   saveSignatoryData,
   getSignatoryData,
 };

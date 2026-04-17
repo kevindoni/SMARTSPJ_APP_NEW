@@ -1240,7 +1240,7 @@ async function generateKwitansiPdf(transaction, schoolInfo, filePath) {
             : 0,
     },
     {
-      label: 'PPh 21%',
+      label: 'PPh 21',
       val:
         actualTax.pph21 > 0
           ? actualTax.pph21
@@ -1567,8 +1567,26 @@ function getTaxComponentsForExport(tx) {
   const nominal = tx.nominal || Math.abs(tx.signed_amount) || 0;
   const idBku = tx.id_ref_bku;
 
-  // Debug first transaction
-  // Debug first transaction
+  // Handle MANUAL tax entries (from Input Pajak Manual)
+  // Manual entries use jenis_pajak to determine tax column
+  if (tx.is_manual && tx.jenis_pajak) {
+    const isSetor = idBku === 11 || tx.pengeluaran > 0;
+    const jenisMap = {
+      'PPN': 'ppn',
+      'PPh 21': 'pph21',
+      'PPh 23': 'pph23',
+      'PPh 4(2)': 'pph4',
+      'Pajak Daerah': 'sspd',
+    };
+    const taxCol = jenisMap[tx.jenis_pajak] || 'sspd';
+    const result = { ppn: 0, pph21: 0, pph23: 0, pph4: 0, sspd: 0, kredit: 0 };
+    if (isSetor) {
+      result.kredit = nominal;
+    } else {
+      result[taxCol] = nominal;
+    }
+    return result;
+  }
 
   // Expense (Setor) -> Kredit column
   if ([11, 6, 7, 25].includes(idBku)) {

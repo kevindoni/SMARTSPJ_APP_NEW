@@ -26,8 +26,12 @@ export default function SchoolInfoCard({ school, selectedYear, selectedFundSourc
 
   if (!school) {
     return (
-      <div className="w-full bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex items-center justify-center h-32">
-        <span className="text-slate-400 animate-pulse">Memuat Data Sekolah...</span>
+      <div className="w-full bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col items-center justify-center h-32 gap-2">
+        <School size={24} className="text-amber-400" />
+        <span className="text-slate-500 font-medium text-sm">Data Sekolah Tidak Ditemukan</span>
+        <span className="text-slate-400 text-xs text-center max-w-md">
+          Pastikan ARKAS sudah terinstall, sudah registrasi, dan database sudah diunduh dari MARKAS.
+        </span>
       </div>
     );
   }
