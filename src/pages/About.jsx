@@ -17,95 +17,30 @@ import {
 
 const CHANGELOG = [
   {
-    version: '1.5.13',
+    version: '1.5.17',
     date: '17 April 2026',
-    title: 'Fix Data Sekolah Tidak Muncul',
+    title: 'Stabilisasi & Perbaikan Komprehensif',
     changes: [
-      { type: 'fix', text: 'Data sekolah tidak muncul — fallback ke tabel instansi ketika mst_sekolah kosong' },
-      { type: 'fix', text: 'NPSN dari kode_instansi — untuk sekolah, kode_instansi = NPSN' },
       { type: 'feature', text: 'Data pejabat dari app_config — koreg, kepala dinas, manager BOS, BUD' },
-      { type: 'improvement', text: 'Refactor semua handler export pakai getSchoolInfoWithOfficials() — satu sumber data sekolah' },
-      { type: 'fix', text: 'Fix auto-update — file latest.yml sekarang ikut di-upload ke GitHub release' },
+      { type: 'feature', text: 'NPSN dari kode_instansi — identitas sekolah lengkap tanpa mst_sekolah' },
+      { type: 'improvement', text: 'Refactor getSchoolInfoWithOfficials() — satu sumber data sekolah untuk semua handler' },
+      { type: 'improvement', text: 'Changelog halaman Tentang Aplikasi dikonsolidasi — riwayat versi lebih ringkas' },
+      { type: 'fix', text: 'Data sekolah tidak muncul — fallback ke tabel instansi ketika mst_sekolah kosong' },
+      { type: 'fix', text: 'Saldo Akhir Tunai hilang di Rekap Saldo Bulanan — query bank/tunai tidak konsisten' },
+      { type: 'fix', text: 'Penerimaan Dana duplikat dan Rp 0 — hanya tampilkan BBU aktual dengan urutan kronologis' },
+      { type: 'fix', text: 'Label Penerimaan generik (Tahap 1, Kinerja) sekarang menampilkan nama sumber dana' },
+      { type: 'fix', text: 'Auto-update tidak berfungsi — file latest.yml dan blockmap sekarang ikut di-upload' },
+      { type: 'fix', text: 'Export BKU Pajak nominal kosong dan manual taxes tidak muncul' },
+      { type: 'fix', text: 'Filter Semua Bulan double-counting saldo di BKU Umum, Tunai, Bank' },
+      { type: 'fix', text: 'Buku Pembantu Bank salah filter pergeseran uang' },
+      { type: 'fix', text: 'Modal Input Pajak Manual tidak responsive' },
+      { type: 'fix', text: 'Pengaturan gagal menyimpan ENOTDIR dan crash initSignatoryStorage' },
+      { type: 'fix', text: 'Label PPh 21% menjadi PPh 21 di ReceiptPreviewModal dan export' },
     ],
   },
   {
-    version: '1.5.12',
-    date: '17 April 2026',
-    title: 'Fix Crash initSignatoryStorage',
-    changes: [
-      { type: 'fix', text: 'Fix crash initSignatoryStorage is not defined — fungsi tidak pernah ditambahkan ke body file' },
-      { type: 'fix', text: 'Fix label PPh 21% menjadi PPh 21 di ReceiptPreviewModal dan export' },
-    ],
-  },
-  {
-    version: '1.5.11',
-    date: '17 April 2026',
-    title: 'Fix Auto-Update Token Expired',
-    changes: [
-      { type: 'fix', text: 'Auto-update tidak berfungsi karena token GitHub expired — token sekarang dibaca dari updater.json' },
-    ],
-  },
-  {
-    version: '1.5.10',
-    date: '17 April 2026',
-    title: 'Fix Pengaturan ENOTDIR',
-    changes: [
-      { type: 'fix', text: 'Pengaturan gagal menyimpan ENOTDIR — path resolution fix di reconciliationHandler' },
-    ],
-  },
-  {
-    version: '1.5.9',
-    date: '17 April 2026',
-    title: 'Fix Export Pajak Manual Taxes',
-    changes: [
-      { type: 'fix', text: 'Manual taxes tidak muncul di export — backend sekarang langsung fetch dan merge dari manual_taxes.json' },
-    ],
-  },
-  {
-    version: '1.5.8',
-    date: '17 April 2026',
-    title: 'Fix Export BKU Pajak Nominal Kosong',
-    changes: [
-      { type: 'fix', text: 'Export BKU Pajak nominal kosong (semua 0) — frontend perlu kirim field mentah yang dibutuhkan getTaxComponentsForExport()' },
-    ],
-  },
-  {
-    version: '1.5.7',
-    date: '17 April 2026',
-    title: 'Fix Modal Pajak & Export Manual Taxes',
-    changes: [
-      { type: 'fix', text: 'Modal Input Pajak Manual tidak responsive — ditambah overflow-y-auto dan max-height' },
-      { type: 'fix', text: 'Export manual taxes tidak ikut — frontend kirim data lengkap ke backend' },
-    ],
-  },
-  {
-    version: '1.5.6',
-    date: '17 April 2026',
-    title: 'Fix Buku Pembantu Bank Filter',
-    changes: [
-      { type: 'fix', text: 'Buku Pembantu Bank salah karena Pergeseran Uang ke Bank/Tunai lolos filter — ditambahkan ke exclusion list' },
-    ],
-  },
-  {
-    version: '1.5.5',
-    date: '17 April 2026',
-    title: 'Fix Filter Semua Bulan Double-Counting',
-    changes: [
-      { type: 'fix', text: 'Filter Semua Bulan double-counting saldo bulanan — ditambah displayData memo di TransactionList, BankReportList, CashReportList' },
-    ],
-  },
-  {
-    version: '1.5.4',
-    date: '17 April 2026',
-    title: 'Fix Compile Bytecode utils/terbilang',
-    changes: [
-      { type: 'fix', text: 'utils/terbilang tidak ikut compiled — compile-bytecode.js perlu include folder utils' },
-    ],
-  },
 
-  {
     version: '1.4.1',
-    date: '14 April 2026',
     title: 'BA Rekonsiliasi Overhaul & Dashboard Filter Fix',
     changes: [
       {
