@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { X, Download } from 'lucide-react';
 import { terbilang } from '../../utils/terbilang';
 
-
 // Format date like "25-Jan-2025"
 function formatDateShort(dateStr) {
   const date = new Date(dateStr);
@@ -254,7 +253,7 @@ export default function ReceiptPreviewModal({ transaction, schoolInfo, year, onC
                       </td>
                     </tr>
                     <tr>
-                      <td style={{ whiteSpace: 'nowrap', padding: '0px 3px' }}>PPh 23%</td>
+                      <td style={{ whiteSpace: 'nowrap', padding: '0px 3px' }}>PPh 23</td>
                       <td style={{ textAlign: 'center', padding: '0px' }}>:</td>
                       <td style={{ textAlign: 'right', padding: '0px 3px' }}>
                         {pph23 > 0 ? formatNumber(pph23) : '-'}

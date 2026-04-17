@@ -1249,7 +1249,7 @@ async function generateKwitansiPdf(transaction, schoolInfo, filePath) {
             : 0,
     },
     {
-      label: 'PPh 23%',
+      label: 'PPh 23',
       val:
         actualTax.pph23 > 0
           ? actualTax.pph23
@@ -1572,7 +1572,7 @@ function getTaxComponentsForExport(tx) {
   if (tx.is_manual && tx.jenis_pajak) {
     const isSetor = idBku === 11 || tx.pengeluaran > 0;
     const jenisMap = {
-      'PPN': 'ppn',
+      PPN: 'ppn',
       'PPh 21': 'pph21',
       'PPh 23': 'pph23',
       'PPh 4(2)': 'pph4',
@@ -1913,12 +1913,25 @@ async function exportAllReports(allData, options) {
       { type: 'PAJAK', label: 'Buku Pajak', isPajak: true },
     ];
 
-    const monthNames = ['', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-      'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+    const monthNames = [
+      '',
+      'Januari',
+      'Februari',
+      'Maret',
+      'April',
+      'Mei',
+      'Juni',
+      'Juli',
+      'Agustus',
+      'September',
+      'Oktober',
+      'November',
+      'Desember',
+    ];
 
     for (const report of reportTypes) {
       const datasets = allData[report.type] || [];
-      const hasData = datasets.some(d => d.transactions && d.transactions.length > 0);
+      const hasData = datasets.some((d) => d.transactions && d.transactions.length > 0);
       if (!hasData) continue;
 
       const ws = workbook.addWorksheet(report.label, {
@@ -1951,7 +1964,8 @@ async function exportAllReports(allData, options) {
 
       ws.mergeCells('A2:I2');
       const subRow = ws.getRow(2);
-      subRow.getCell(1).value = 'TAHUN ANGGARAN : ' + options.year + '    SUMBER DANA : ' + (options.fundSource || 'SEMUA');
+      subRow.getCell(1).value =
+        'TAHUN ANGGARAN : ' + options.year + '    SUMBER DANA : ' + (options.fundSource || 'SEMUA');
       subRow.getCell(1).font = { bold: true, size: 10 };
       subRow.getCell(1).alignment = { horizontal: 'center' };
       rowNum = 3;
@@ -1981,19 +1995,38 @@ async function exportAllReports(allData, options) {
         const sepRow = ws.getRow(rowNum);
         sepRow.getCell(1).value = 'BULAN : ' + monthName.toUpperCase();
         sepRow.getCell(1).font = { bold: true, size: 11, color: { argb: 'FFFFFFFF' } };
-        sepRow.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: titleColor } };
+        sepRow.getCell(1).fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: titleColor },
+        };
         sepRow.getCell(1).alignment = { horizontal: 'center' };
         sepRow.height = 22;
         rowNum++;
 
         const headerRow = ws.getRow(rowNum);
-        ['BULAN', 'TANGGAL', 'KODE KEGIATAN', 'KODE REKENING', 'NO. BUKTI', 'URAIAN', 'PENERIMAAN', 'PENGELUARAN', 'SALDO'].forEach((h, i) => {
+        [
+          'BULAN',
+          'TANGGAL',
+          'KODE KEGIATAN',
+          'KODE REKENING',
+          'NO. BUKTI',
+          'URAIAN',
+          'PENERIMAAN',
+          'PENGELUARAN',
+          'SALDO',
+        ].forEach((h, i) => {
           const cell = headerRow.getCell(i + 1);
           cell.value = h;
           cell.font = { bold: true, size: 9, color: { argb: 'FFFFFFFF' } };
           cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: titleColor } };
           cell.alignment = { horizontal: 'center', vertical: 'middle' };
-          cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+          cell.border = {
+            top: { style: 'thin' },
+            left: { style: 'thin' },
+            bottom: { style: 'thin' },
+            right: { style: 'thin' },
+          };
         });
         headerRow.height = 20;
         rowNum++;
@@ -2019,7 +2052,12 @@ async function exportAllReports(allData, options) {
           for (let i = 1; i <= 9; i++) {
             const cell = row.getCell(i);
             cell.font = { size: 9 };
-            cell.border = { top: { style: 'thin', color: { argb: 'FFD0D0D0' } }, left: { style: 'thin', color: { argb: 'FFD0D0D0' } }, bottom: { style: 'thin', color: { argb: 'FFD0D0D0' } }, right: { style: 'thin', color: { argb: 'FFD0D0D0' } } };
+            cell.border = {
+              top: { style: 'thin', color: { argb: 'FFD0D0D0' } },
+              left: { style: 'thin', color: { argb: 'FFD0D0D0' } },
+              bottom: { style: 'thin', color: { argb: 'FFD0D0D0' } },
+              right: { style: 'thin', color: { argb: 'FFD0D0D0' } },
+            };
             if (i >= 7) {
               cell.alignment = { horizontal: 'right' };
               if (typeof cell.value === 'number') cell.numFmt = '#,##0';
@@ -2053,4 +2091,3 @@ async function exportAllReports(allData, options) {
     return { success: false, error: err.message };
   }
 }
-
