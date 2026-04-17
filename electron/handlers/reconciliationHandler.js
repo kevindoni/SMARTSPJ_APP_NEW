@@ -712,17 +712,17 @@ function getReconciliationData(db, year) {
     const rows = db
       .prepare(
         `
-            SELECT 
+            SELECT
                 sd.id_ref_sumber_dana,
-                SUM(CASE WHEN k.id_ref_bku = 8 THEN k.saldo ELSE 0 END) as bank,
-                SUM(CASE WHEN k.id_ref_bku = 9 THEN k.saldo ELSE 0 END) as tunai
+                SUM(CASE WHEN k.id_ref_bku IN (2, 8) AND LOWER(k.uraian) NOT LIKE '%tunai%' THEN k.saldo ELSE 0 END) as bank,
+                SUM(CASE WHEN k.id_ref_bku = 9 OR (k.id_ref_bku IN (2, 8) AND LOWER(k.uraian) LIKE '%tunai%') THEN k.saldo ELSE 0 END) as tunai
             FROM kas_umum k
             LEFT JOIN anggaran a ON k.id_anggaran = a.id_anggaran
             LEFT JOIN ref_sumber_dana sd ON a.id_ref_sumber_dana = sd.id_ref_sumber_dana
             WHERE strftime('%Y', k.tanggal_transaksi) = ?
               AND strftime('%m', k.tanggal_transaksi) = ?
               AND k.soft_delete = 0
-              AND k.id_ref_bku IN (8, 9)
+              AND k.id_ref_bku IN (2, 8, 9)
             GROUP BY sd.id_ref_sumber_dana
         `
       )
