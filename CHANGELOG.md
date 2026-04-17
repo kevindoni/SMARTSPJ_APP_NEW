@@ -4,7 +4,7 @@ Semua perubahan penting pada proyek ini akan didokumentasikan dalam file ini.
 
 ---
 
-## [1.4.1] — 2026-04-15
+## [1.6.0] — 2026-04-17
 
 ### Bug Fix — Kritis
 

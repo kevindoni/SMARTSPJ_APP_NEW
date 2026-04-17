@@ -1,6 +1,6 @@
 {
   "name": "smart-spj",
-  "version": "1.5.17",
+  "version": "1.6.0",
   "description": "Aplikasi Pendamping ARKAS untuk Pengelolaan SPJ",
   "main": "electron/main-loader.js",
   "scripts": {

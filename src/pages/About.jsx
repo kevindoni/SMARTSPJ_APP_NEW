@@ -17,7 +17,7 @@ import {
 
 const CHANGELOG = [
   {
-    version: '1.5.17',
+    version: '1.6.0',
     date: '17 April 2026',
     title: 'Stabilisasi & Perbaikan Komprehensif',
     changes: [
@@ -40,7 +40,7 @@ const CHANGELOG = [
   },
   {
 
-    version: '1.4.1',
+    version: '1.6.0',
     title: 'BA Rekonsiliasi Overhaul & Dashboard Filter Fix',
     changes: [
       {

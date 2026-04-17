@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-1.4.1-blue" alt="version"/>
+  <img src="https://img.shields.io/badge/version-1.6.0-blue" alt="version"/>
   <img src="https://img.shields.io/badge/platform-Windows-blue" alt="platform"/>
   <img src="https://img.shields.io/badge/Electron-28-blueviolet" alt="electron"/>
   <img src="https://img.shields.io/badge/React-18+-61DAFB" alt="react"/>
