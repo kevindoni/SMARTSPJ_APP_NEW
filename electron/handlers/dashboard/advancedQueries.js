@@ -398,75 +398,35 @@ function getBelanjaKegiatan(db, yearStr, fundSource, anggaranScope) {
 function getPenerimaanDana(db, yearStr, fundSource, anggaranScope) {
   try {
     let fundFilter = '';
-    
     if (!fundSource || fundSource === 'SEMUA') {
-      // Show all penerimaan
       fundFilter = '';
     } else if (fundSource === 'BOS Reguler') {
-      // BBU entries that are Tahap-based, NOT Kinerja
-      fundFilter = `AND ku.no_bukti LIKE 'BBU%'
-        AND (ku.uraian LIKE '%Tahap%' OR ku.uraian LIKE '%T1%' OR ku.uraian LIKE '%T2%')
-        AND ku.uraian NOT LIKE '%Kinerja%'
-        AND (sd.id_ref_sumber_dana IS NULL OR sd.id_ref_sumber_dana NOT IN (12, 35))`;
+      fundFilter = `AND ku.no_bukti LIKE '%BBU%' AND (ku.uraian LIKE '%Tahap%' OR ku.uraian LIKE '%T1%' OR ku.uraian LIKE '%T2%')`;
+
+      fundFilter += ` AND ku.uraian NOT LIKE '%Kinerja%' AND (sd.id_ref_sumber_dana IS NULL OR sd.id_ref_sumber_dana NOT IN (12, 35))`;
     } else if (fundSource === 'BOS Kinerja') {
-      // BBU entries that are Kinerja
-      fundFilter = `AND ku.no_bukti LIKE 'BBU%'
-        AND (ku.uraian LIKE '%Kinerja%' OR sd.id_ref_sumber_dana IN (12, 35))`;
+      fundFilter = `AND (ku.uraian LIKE '%Kinerja%' OR sd.id_ref_sumber_dana IN (12, 35))`;
     } else if (fundSource === 'Lainnya') {
-      // Dana lainnya (non-BBU, non-Saldo, non-Tahap) + bunga bank
-      fundFilter = `AND (
-        (ku.id_ref_bku = 2 OR ku.kode_rekening LIKE '4.%')
-          AND ku.id_ref_bku NOT IN (5, 33, 10, 11)
-          AND ku.uraian NOT LIKE '%Saldo%'
-          AND ku.uraian NOT LIKE '%Kinerja%'
-          AND ku.uraian NOT LIKE '%Tahap%'
-          AND ku.uraian NOT LIKE '%T1%'
-          AND ku.uraian NOT LIKE '%T2%'
-          AND ku.no_bukti NOT LIKE 'BBU%'
-        OR ku.id_ref_bku = 6
-      )`;
+      fundFilter = 'AND ku.id_ref_bku = 6';
     }
 
-    const query = `
-      SELECT ku.uraian, ku.tanggal_transaksi, ku.saldo as nominal,
-             sd.nama_sumber_dana, sd.id_ref_sumber_dana, ku.id_ref_bku
-      FROM kas_umum ku
-      LEFT JOIN anggaran a ON ku.id_anggaran = a.id_anggaran
-      LEFT JOIN ref_sumber_dana sd ON a.id_ref_sumber_dana = sd.id_ref_sumber_dana
-      WHERE strftime('%Y', ku.tanggal_transaksi) = ?
-        AND ku.soft_delete = 0
-        AND ku.saldo > 0
-        AND ku.id_ref_bku = 2
-        ${fundFilter}
-      LIMIT 10
-    `;
+    const query = `SELECT ku.uraian, ku.tanggal_transaksi, ku.saldo as nominal, sd.nama_sumber_dana, sd.id_ref_sumber_dana FROM kas_umum ku LEFT JOIN anggaran a ON ku.id_anggaran = a.id_anggaran LEFT JOIN ref_sumber_dana sd ON a.id_ref_sumber_dana = sd.id_ref_sumber_dana WHERE strftime('%Y', ku.tanggal_transaksi) = ? AND ku.soft_delete = 0 AND ku.saldo > 0 AND ku.id_ref_bku = 2 ${fundFilter} ORDER BY ku.tanggal_transaksi ASC LIMIT 10`;
     const rows = db.prepare(query).all(yearStr);
 
-    // Map each row to a display-friendly uraian
     return rows.map((row) => {
       let displayUraian = row.uraian;
       const sdId = row.id_ref_sumber_dana;
       const sdName = (row.nama_sumber_dana || '').toLowerCase();
-
-      // Keep original uraian for most entries
-      // Only override for generic Kinerja saldo entries
-      if (sdId && (SOURCE_IDS.KINERJA.includes(sdId) || sdName.includes('kinerja'))) {
-        // For saldo entries (id_ref_bku 8/9), keep original uraian
-        // For generic entries, show fund source name
-        if (row.id_ref_bku === 2 && displayUraian.toLowerCase().includes('kinerja')) {
-          displayUraian = 'Saldo Awal BOS Kinerja';
+      const isGeneric = ['Tahap 1', 'Tahap 2', 'SiLpa', 'Kinerja'].some(g => displayUraian === g);
+      if (isGeneric) {
+        if (SOURCE_IDS.KINERJA.includes(sdId) || sdName.includes('kinerja')) {
+          displayUraian = 'Terima Dana BOS ' + row.uraian;
         }
       }
-
-      return {
-        uraian: displayUraian,
-        tanggal_transaksi: row.tanggal_transaksi,
-        nominal: row.nominal,
-      };
+      return { uraian: displayUraian, tanggal_transaksi: row.tanggal_transaksi, nominal: row.nominal };
     });
-
   } catch (e) {
-    console.error('V3 Query Error (Penerimaan):', e.message);
+    console.error('Query Error (Penerimaan):', e.message);
     return [];
   }
 }
