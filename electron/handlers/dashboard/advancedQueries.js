@@ -436,7 +436,7 @@ function getPenerimaanDana(db, yearStr, fundSource, anggaranScope) {
       WHERE strftime('%Y', ku.tanggal_transaksi) = ?
         AND ku.soft_delete = 0
         AND ku.saldo > 0
-        AND ku.id_ref_bku IN (2, 6, 7, 8, 9)
+        AND ku.id_ref_bku = 2
         ${fundFilter}
       LIMIT 10
     `;
