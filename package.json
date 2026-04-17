@@ -93,7 +93,7 @@
     },
     "publish": {
       "provider": "github",
-      "owner": "KevinDoni",
+      "owner": "kevindoni",
       "repo": "SMARTSPJ_APP_NEW",
       "private": true
     }
