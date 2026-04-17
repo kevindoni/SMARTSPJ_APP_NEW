@@ -1,3 +1,12 @@
+// Fund source IDs for classification
+const SOURCE_IDS = {
+  REGULER: [1, 33],
+  LAINNYA: [5],
+  KINERJA: [12, 35],
+  AFIRMASI: [11, 34],
+  DAERAH: [3],
+};
+
 // advancedQueries.js - Dashboard V3 Analytics Queries
 // Uses ref_kode table for kegiatan grouping (rapbs -> ref_kode via id_ref_kode)
 // Uses anggaranScope (self-contained subquery) for fund source filtering
@@ -420,14 +429,15 @@ function getPenerimaanDana(db, yearStr, fundSource, anggaranScope) {
 
     const query = `
       SELECT ku.uraian, ku.tanggal_transaksi, ku.saldo as nominal,
-             sd.nama_sumber_dana, sd.id_ref_sumber_dana
+             sd.nama_sumber_dana, sd.id_ref_sumber_dana, ku.id_ref_bku
       FROM kas_umum ku
       LEFT JOIN anggaran a ON ku.id_anggaran = a.id_anggaran
       LEFT JOIN ref_sumber_dana sd ON a.id_ref_sumber_dana = sd.id_ref_sumber_dana
-      WHERE strftime('%Y', ku.tanggal_transaksi) = ? 
+      WHERE strftime('%Y', ku.tanggal_transaksi) = ?
         AND ku.soft_delete = 0
+        AND ku.saldo > 0
+        AND ku.id_ref_bku IN (2, 6, 7, 8, 9)
         ${fundFilter}
-      ORDER BY ku.tanggal_transaksi ASC
       LIMIT 10
     `;
     const rows = db.prepare(query).all(yearStr);
@@ -438,8 +448,14 @@ function getPenerimaanDana(db, yearStr, fundSource, anggaranScope) {
       const sdId = row.id_ref_sumber_dana;
       const sdName = (row.nama_sumber_dana || '').toLowerCase();
 
-      if (sdId === 12 || sdId === 35 || sdName.includes('kinerja')) {
-        displayUraian = 'Kinerja';
+      // Keep original uraian for most entries
+      // Only override for generic Kinerja saldo entries
+      if (sdId && (SOURCE_IDS.KINERJA.includes(sdId) || sdName.includes('kinerja'))) {
+        // For saldo entries (id_ref_bku 8/9), keep original uraian
+        // For generic entries, show fund source name
+        if (row.id_ref_bku === 2 && displayUraian.toLowerCase().includes('kinerja')) {
+          displayUraian = 'Saldo Awal BOS Kinerja';
+        }
       }
 
       return {
@@ -448,12 +464,12 @@ function getPenerimaanDana(db, yearStr, fundSource, anggaranScope) {
         nominal: row.nominal,
       };
     });
+
   } catch (e) {
     console.error('V3 Query Error (Penerimaan):', e.message);
     return [];
   }
 }
-
 /**
  * 7. Pengeluaran Terbaru (recent expense transactions)
  */
