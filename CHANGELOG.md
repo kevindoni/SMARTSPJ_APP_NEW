@@ -4,6 +4,35 @@ Semua perubahan penting pada proyek ini akan didokumentasikan dalam file ini.
 
 ---
 
+## [1.7.1] — 2026-04-21
+
+### Bug Fix — Kritis
+
+#### ✅ Fix SiLPA Di-exclude dari Perhitungan Penerimaan & Saldo
+
+**File:** `electron/handlers/dashboard/chartQueries.js`, `electron/handlers/dashboard/statsQueries.js`, `electron/handlers/dashboardHandler.js`
+
+**Masalah:** Transaksi SiLPA (Sisa Lebih Perhitungan Anggaran) selisih Rp 960.000 − Rp 711.093 = **Rp 248.907** tidak dihitung sebagai penerimaan karena filter `NOT LIKE '%silpa%'` di 3 lokasi. Akibatnya:
+
+- Chart "Informasi Keuangan" bulan Desember menampilkan Penerimaan = Rp 0 dan Saldo Akhir = Rp 711.093 (kurang Rp 248.907)
+- `getPenerimaanMurni` menghasilkan angka terlalu rendah → `saldoGlobal` (`targetSaldo`) salah → kalibrasi chart tidak akurat
+
+**Perbaikan:** Hapus `AND LOWER(uraian) NOT LIKE '%silpa%'` dari:
+
+1. `chartQueries.js:65,68` — perhitungan `penerimaan` dan `mutasi_netto` di chart data
+2. `statsQueries.js:142,158` — query `getPenerimaanMurni` untuk SEMUA dan BOS Reguler
+3. `dashboardHandler.js:311,317` — query penerimaan dengan batas tanggal
+
+#### ✅ Fix Widget Sumber Dana Tidak Terfilter
+
+**File:** `electron/handlers/dashboard/advancedQueries.js`, `electron/handlers/dashboardHandler.js`
+
+**Masalah:** Widget "Sumber Dana" di dashboard selalu menampilkan semua sumber dana (BOS Reguler, BOS Kinerja, Lainnya) meskipun sudah memilih salah satu sumber dana di filter. Seharusnya hanya menampilkan sumber dana yang dipilih.
+
+**Perbaikan:** Tambahkan parameter `fundSource` ke `getRingkasanSumberDana` dan filter query dengan `sd.nama_sumber_dana LIKE '%${fundSource}%'`.
+
+---
+
 ## [1.6.0] — 2026-04-17
 
 ### Bug Fix — Kritis
@@ -13,12 +42,14 @@ Semua perubahan penting pada proyek ini akan didokumentasikan dalam file ini.
 **File:** `electron/handlers/dashboard/advancedQueries.js` (`getKasBulanan`)
 
 **Masalah:** Kolom SALDO KAS selalu menampilkan Rp 0 di setiap bulan. Penyebab:
+
 1. Saldo dihitung di frontend dengan `currentSaldo = currentSaldo + row.masuk - row.keluar`, tapi pengeluaran jauh melebihi pemasukan sehingga saldo selalu negatif
 2. `Math.max(row.saldo, 0)` di frontend memaksa saldo minimum 0
 3. Klasifikasi debit/kredit salah — transaksi penerimaan (BBU) salah diklasifikasikan sebagai pengeluaran karena pengecekan `no_bukti LIKE 'BPU%'` dilakukan sebelum `id_ref_bku`
 4. Tidak ada saldo awal yang dihitung
 
 **Perbaikan:**
+
 - Saldo awal dihitung dari `id_ref_bku IN (2, 8, 9)` di bulan Januari (mengikuti `getOpeningBalance` di reconciliation handler)
 - Klasifikasi debit/kredit menggunakan query terpisah yang mengikuti reconciliation handler:
   - **Masuk**: BBU + bunga bank (ref 6) + pajak pungut (ref 5,10,33) + dana lainnya
@@ -35,6 +66,7 @@ Semua perubahan penting pada proyek ini akan didokumentasikan dalam file ini.
 **Masalah:** Semua komponen dashboard (Belanja Kategori, Top 5, Belanja per Kegiatan, Pengeluaran Terbaru, Penerimaan Dana) tidak terfilter per sumber dana — BOS Kinerja menampilkan data BOS Reguler dan sebaliknya.
 
 **Perbaikan:**
+
 1. `getBelanjaKategori` — realisasi difilter via `ku.id_anggaran` langsung (bukan LEFT JOIN rapbs_periode yang bisa NULL)
 2. `getTop5Belanja` — dihapus JOIN yang tidak perlu, filter via `ku.id_anggaran`
 3. `getBelanjaKegiatan` — realisasi per kegiatan difilter via `ku.id_anggaran`
@@ -61,6 +93,7 @@ Semua perubahan penting pada proyek ini akan didokumentasikan dalam file ini.
 **Masalah:** Pagu belanja kategori untuk BOS Kinerja menampilkan Rp 115.852.000 (total semua sumber dana) padahal seharusnya Rp 35.000.000. Penyebabnya adalah query `rapbs` menjumlahkan semua revisi anggaran (4 revisi × Rp 35.000.000 = Rp 140.000.000 untuk Kinerja, plus sumber dana lain).
 
 **Perbaikan:**
+
 - Tambahkan filter `is_revisi = MAX(is_revisi)` agar hanya revisi terakhir per sumber dana yang dihitung
 - Untuk query `rapbs`, gunakan direct JOIN ke `ref_sumber_dana` karena `anggaranScope` (subquery `id_anggaran IN ...`) tidak membedakan sumber dana di tabel `rapbs`
 - Diterapkan ke 3 fungsi: `getBelanjaKategori`, `getRapbsAndKegiatanCount`, `getBelanjaKegiatan`

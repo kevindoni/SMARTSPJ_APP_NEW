@@ -71,7 +71,7 @@ export default function CetakSPTJM() {
 
     // Title
     doc.setFontSize(14);
-    doc.setFont('helvetica', 'bold');
+    doc.setFont('times', 'bold');
     doc.text('SURAT PERNYATAAN TANGGUNG JAWAB MUTLAK', pageWidth / 2, y, { align: 'center' });
     y += 10;
 
@@ -82,7 +82,7 @@ export default function CetakSPTJM() {
 
     // Opening paragraph
     doc.setFontSize(11);
-    doc.setFont('helvetica', 'normal');
+    doc.setFont('times', 'normal');
     const fundLabel = fundSources.find((f) => f.id === activeFund)?.label || 'Dana BOS';
     const openingText = `Saya yang bertanda tangan dibawah ini menyatakan bahwa bertanggung jawab secara formal dan material atas kebenaran realisasi penerimaan dan pengeluaran ${fundLabel} serta kebenaran perhitungan dan setoran pajak yang telah dipungut atas penggunaan ${fundLabel} pada Semester ${activeSemester} tahun anggaran ${year} dengan rincian sebagai berikut:`;
 
@@ -241,7 +241,6 @@ export default function CetakSPTJM() {
             <Download size={16} />
             Export PDF
           </button>
-
         </div>
       </div>
 

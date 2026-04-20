@@ -5,8 +5,8 @@
 
 /**
  * Calculate cash flows (tunai masuk/keluar) with source filtering
- * NOTE: kas_umum does NOT have id_anggaran column directly.
- *       For BPU transactions, we join via rapbs_periode -> rapbs -> anggaran
+ * NOTE: kas_umum HAS id_anggaran column directly for BBU transactions.
+ *       For BNU/BPU transactions, the link may also go via rapbs_periode -> rapbs -> anggaran
  */
 function calculateCashFlows(db, yearStr, anggaranScope, fundSource) {
   // Get all budget IDs for this fund source (for BPU filtering)
@@ -24,7 +24,7 @@ function calculateCashFlows(db, yearStr, anggaranScope, fundSource) {
     budgetIds = budgetRows.map((r) => r.id_anggaran);
   }
 
-  // Get raw transactions for cash flow calculation (without id_anggaran as it doesn't exist)
+  // Get raw transactions for cash flow calculation (including id_anggaran and other fields)
   const rawTransactions = db
     .prepare(
       `
@@ -159,7 +159,7 @@ function getSaldoTunaiCheckpoints(db, yearStr, anggaranScope) {
  * Process raw chart data with running balances
  */
 function processChartDataWithBalances(rawChartData, options) {
-  const { saldoAwalTahun = 0, fundSource, saldoTunaiCheckpoints = {} } = options;
+  const { saldoAwalTahun = 0, fundSource, saldoTunaiCheckpoints = {}, targetSaldo } = options;
 
   // Initial balance
   let currentBalance =
@@ -187,6 +187,34 @@ function processChartDataWithBalances(rawChartData, options) {
       tunai_keluar: 0,
     };
   });
+
+  // First pass: compute raw saldo per month
+  const rawBalances = fullYearData.map((d) => {
+    currentBalance += d.mutasi_netto;
+    if (currentBalance < 0) currentBalance = 0;
+    return currentBalance;
+  });
+
+  // Calibrate: if chart saldo doesn't match stats.saldo, adjust last active month
+  // This accounts for income types (like bunga bank) that SQL can't easily classify
+  if (targetSaldo !== undefined && targetSaldo !== null && rawBalances.length > 0) {
+    const lastRaw = rawBalances[rawBalances.length - 1];
+    const target = Number(targetSaldo) || 0;
+    const diff = target - lastRaw;
+    if (diff !== 0) {
+      // Find last month with activity to add the difference
+      for (let i = fullYearData.length - 1; i >= 0; i--) {
+        if (fullYearData[i].mutasi_netto !== 0) {
+          fullYearData[i] = { ...fullYearData[i], mutasi_netto: fullYearData[i].mutasi_netto + diff };
+          break;
+        }
+      }
+    }
+  }
+
+  // Reset and second pass with calibrated data
+  currentBalance =
+    fundSource === 'Lainnya' || fundSource === 'BOS Kinerja' ? 0 : Number(saldoAwalTahun) || 0;
 
   return fullYearData.map((d) => {
     currentBalance += d.mutasi_netto;

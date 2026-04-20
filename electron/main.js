@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+﻿const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const Database = require('better-sqlite3-multiple-ciphers');
 const fs = require('fs');
@@ -39,11 +39,26 @@ const isDev = !app.isPackaged;
 let DATA_DIR = isDev ? path.join(__dirname, '../data') : path.join(app.getPath('userData'), 'data');
 
 function getDbPath() {
-  return path.join(
-    process.env.APPDATA || path.join(require('os').homedir(), 'AppData', 'Roaming'),
-    'Arkas',
-    'arkas.db'
-  );
+  const homeDir = require('os').homedir();
+  const roaming = process.env.APPDATA || path.join(homeDir, 'AppData', 'Roaming');
+  const local = process.env.LOCALAPPDATA || path.join(homeDir, 'AppData', 'Local');
+
+  // Candidate paths - search in priority order
+  const candidates = [
+    path.join(roaming, 'arkas', 'arkas.db'),       // %APPDATA% arkas (lowercase, most common)
+    path.join(roaming, 'Arkas', 'arkas.db'),        // %APPDATA% Arkas (PascalCase)
+    path.join(roaming, 'ARKAS', 'arkas.db'),        // %APPDATA% ARKAS (uppercase)
+    path.join(local,  'arkas', 'arkas.db'),         // %LOCALAPPDATA% arkas
+    path.join(local,  'Arkas', 'arkas.db'),         // %LOCALAPPDATA% Arkas
+    path.join(roaming, 'RKAS', 'arkas.db'),         // %APPDATA% RKAS (legacy name)
+  ];
+
+  for (const candidate of candidates) {
+    if (fs.existsSync(candidate)) return candidate;
+  }
+
+  // Fallback: default to %APPDATA% arkas arkas.db
+  return candidates[0];
 }
 
 function loadLocalConfig() {
@@ -241,37 +256,40 @@ function setupAutoUpdater() {
   });
 
   autoUpdater.on('error', (err) => {
+    console.error('[Updater] Error:', err.message);
     if (mainWindow && !mainWindow.isDestroyed()) {
       mainWindow.webContents.send('update-error', { message: err.message });
     }
+  });
+
+  // Auto-check for updates 5 seconds after window loads
+  mainWindow.webContents.on('did-finish-load', () => {
+    setTimeout(async () => {
+      try {
+        console.log('[Updater] Auto-checking for updates...');
+        const result = await autoUpdater.checkForUpdates();
+        if (result && result.updateInfo) {
+          const hasUpdate = result.updateInfo.version !== app.getVersion();
+          console.log('[Updater] Auto-check result:', hasUpdate ? 'UPDATE AVAILABLE' : 'up to date', '| remote:', result.updateInfo.version, '| local:', app.getVersion());
+        }
+      } catch (err) {
+        console.error('[Updater] Auto-check failed:', err.message);
+      }
+    }, 5000);
   });
 
   ipcMain.handle('arkas:check-update', async () => {
     try {
       console.log('[Updater] Checking for updates... current:', app.getVersion());
       const result = await autoUpdater.checkForUpdates();
-      console.log(
-        '[Updater] Result:',
-        JSON.stringify({
-          version: result?.updateInfo?.version,
-          currentVersion: app.getVersion(),
-          files: result?.updateInfo?.files?.length,
-        })
-      );
       if (result && result.updateInfo) {
         const hasUpdate = result.updateInfo.version !== app.getVersion();
-        console.log(
-          '[Updater] hasUpdate:',
-          hasUpdate,
-          '| remote:',
-          result.updateInfo.version,
-          '| local:',
-          app.getVersion()
-        );
+        console.log('[Updater] hasUpdate:', hasUpdate, '| remote:', result.updateInfo.version, '| local:', app.getVersion());
         return {
           hasUpdate,
           version: result.updateInfo.version,
           currentVersion: app.getVersion(),
+          releaseNotes: result.updateInfo.releaseNotes || '',
         };
       }
       console.log('[Updater] No updateInfo in result');
@@ -299,7 +317,7 @@ function setupAutoUpdater() {
 app.whenReady().then(() => {
   loadSecurePassword();
   createWindow();
-  setupAutoUpdater();
+  if (!isDev) setupAutoUpdater();
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();

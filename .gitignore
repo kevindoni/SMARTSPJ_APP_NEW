@@ -37,3 +37,16 @@ scripts/_*
 
 # Electron loader (generated)
 electron/main-loader.js
+
+# Temp/test files
+_*.js
+_*.txt
+_*.b64
+stderr.txt
+version.txt
+
+# Playwright MCP
+.playwright-mcp/
+
+# Debug/test scripts in electron/
+electron/test-*.js

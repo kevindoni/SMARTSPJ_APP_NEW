@@ -84,8 +84,16 @@ filesToCompile.forEach((file) => {
 // Buat loader untuk main.js
 const loaderContent = `
 'use strict';
+
 require('bytenode');
-require('./main.jsc');
+
+const { app } = require('electron');
+
+if (!app.isPackaged) {
+  require('./main.js');
+} else {
+  require('./main.jsc');
+}
 `;
 
 fs.writeFileSync(path.join(ELECTRON_DIR, 'main-loader.js'), loaderContent.trim());

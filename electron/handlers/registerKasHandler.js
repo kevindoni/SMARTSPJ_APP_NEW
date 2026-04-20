@@ -6,12 +6,18 @@ let DATA_DIR = path.join(__dirname, '../../data');
 function initRegisterKasStorage(dir) {
   DATA_DIR = dir;
 }
-const REGISTER_FILE = path.join(DATA_DIR, 'register-kas.json');
+
+// Use a getter to always resolve against the current DATA_DIR
+// (avoids stale path when initRegisterKasStorage is called after module load)
+function getRegisterFilePath() {
+  return path.join(DATA_DIR, 'register-kas.json');
+}
 
 function loadFile() {
   try {
-    if (fs.existsSync(REGISTER_FILE)) {
-      return JSON.parse(fs.readFileSync(REGISTER_FILE, 'utf-8'));
+    const filePath = getRegisterFilePath();
+    if (fs.existsSync(filePath)) {
+      return JSON.parse(fs.readFileSync(filePath, 'utf-8'));
     }
   } catch (e) { console.error("Failed to load register kas file:", e.message); }
   return {};
@@ -21,7 +27,7 @@ function saveFile(data) {
   if (!fs.existsSync(DATA_DIR)) {
     fs.mkdirSync(DATA_DIR, { recursive: true });
   }
-  fs.writeFileSync(REGISTER_FILE, JSON.stringify(data, null, 2), 'utf-8');
+  fs.writeFileSync(getRegisterFilePath(), JSON.stringify(data, null, 2), 'utf-8');
 }
 
 function getRegisterKasData(year, month, fundSource) {

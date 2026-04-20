@@ -15,6 +15,7 @@ const {
   getSaldoAwalTahun,
   getRealisasiBelanja,
   getPajak,
+  getKinerjaAnggaranTotal,
   calculateSaldoPerSource,
   calculateCashFlows,
   getSaldoTunaiCheckpoints,
@@ -52,10 +53,13 @@ module.exports = {
       const db = openDatabase(dbPath, password);
       const yearStr = year.toString();
 
+      // Dynamic Kinerja amount
+      const kinerjaAmount = getKinerjaAnggaranTotal(db, year);
+
       // Build filters
       const anggaranScope = buildAnggaranScope(fundSource);
-      const filters = buildFundFilters(fundSource, anggaranScope);
-      const chartConfig = buildChartCases(fundSource, anggaranScope);
+      const filters = buildFundFilters(fundSource, anggaranScope, kinerjaAmount);
+      const chartConfig = buildChartCases(fundSource, anggaranScope, kinerjaAmount);
 
       let anggaranTotal = getAnggaran(db, year, filters.fundFilterAnggaran);
 
@@ -153,6 +157,7 @@ module.exports = {
         saldoAwalTahun,
         fundSource,
         saldoTunaiCheckpoints,
+        targetSaldo: saldoGlobal,
       });
 
       // Get composition
@@ -190,7 +195,7 @@ module.exports = {
         fundSource,
         anggaranScope
       );
-      const ringkasanSumberDana = advancedQueries.getRingkasanSumberDana(db, yearStr);
+      const ringkasanSumberDana = advancedQueries.getRingkasanSumberDana(db, yearStr, fundSource);
 
       db.close();
 
@@ -282,7 +287,8 @@ module.exports = {
 
       // 1. Build Scopes
       const anggaranScope = buildAnggaranScope(fundSource);
-      const filters = buildFundFilters(fundSource, anggaranScope);
+      const kinerjaAmount = getKinerjaAnggaranTotal(db, year);
+      const filters = buildFundFilters(fundSource, anggaranScope, kinerjaAmount);
 
       // 2. Saldo Awal Tahun (Constant for the year)
       const saldoAwalTahun = getSaldoAwalTahun(
@@ -302,13 +308,13 @@ module.exports = {
       // A. Penerimaan Murni (Up to Date)
       let pmWhere = '';
       if (!fundSource || fundSource === 'SEMUA') {
-        pmWhere = `(id_ref_bku = 2 OR (kode_rekening LIKE '4.%' AND id_ref_bku != 26)) AND LOWER(uraian) NOT LIKE '%silpa%'`;
+        pmWhere = `(id_ref_bku = 2 OR (kode_rekening LIKE '4.%' AND id_ref_bku != 26))`;
       } else if (fundSource === 'BOS Reguler') {
         pmWhere = `(
-          (id_ref_bku = 2 AND saldo != 35000000)
+          (id_ref_bku = 2 AND saldo != ${kinerjaAmount})
           OR (kode_rekening LIKE '4.%' AND id_ref_bku != 26)
           OR (LOWER(uraian) LIKE '%bunga bank%' OR LOWER(uraian) LIKE '%jasa giro%')
-        ) AND LOWER(uraian) NOT LIKE '%silpa%'`;
+        )`;
       } else {
         // Fallback others
         pmWhere = `(id_ref_bku = 2 OR kode_rekening LIKE '4.%')`;

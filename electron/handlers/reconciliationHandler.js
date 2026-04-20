@@ -39,7 +39,6 @@ function initSignatoryStorage(dir) {
   }
 }
 
-
 const fs = require('fs');
 const path = require('path');
 
@@ -874,8 +873,7 @@ function getReconciliationData(db, year) {
     let closingRegulerTunai =
       runningReguler.tunai +
       (cashFlow.reguler?.tarikTunai || 0) -
-      (cashFlow.reguler?.setorTunai || 0) -
-      (cashFlow.reguler?.bpuExpense || 0);
+      (cashFlow.reguler?.setorTunai || 0);
 
     if (closingRegulerTunai < 0) closingRegulerTunai = 0;
     if (closingRegulerTotal < 0) {

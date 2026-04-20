@@ -38,7 +38,7 @@ export default function KertasKerjaFormalTable({
   const sekolah = schoolInfo?.nama || '-';
 
   return (
-    <div className="bg-white p-6 rounded-none shadow-none text-black font-sans text-xs">
+    <div className="bg-white p-6 rounded-none shadow-none text-black text-xs">
       {/* HEADERS */}
       <div className="mb-4">
         <h3 className="font-bold text-sm uppercase mb-2">A. PENERIMAAN</h3>

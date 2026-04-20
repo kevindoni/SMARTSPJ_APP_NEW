@@ -130,8 +130,8 @@ function TaxTransactionTable({
 
   return (
     <div className="overflow-x-auto bg-white rounded-lg border border-slate-300 min-h-[300px] relative pb-8">
-      <table className="w-full text-xs border-collapse font-sans">
-        <thead className="bg-[#fcfdff] border-b border-slate-300 sticky top-0 z-10">
+      <table className="w-full text-xs border-collapse">
+        <thead className="bg-slate-50 border-b border-slate-300 sticky top-0 z-10">
           {/* Main Header */}
           <tr>
             <th

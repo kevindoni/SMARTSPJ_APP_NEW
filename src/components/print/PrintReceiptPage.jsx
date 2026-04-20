@@ -201,7 +201,7 @@ export default function PrintReceiptPage() {
   };
 
   return (
-    <div className="font-sans min-h-screen pb-20 bg-slate-50/50">
+    <div className="min-h-screen pb-20 bg-slate-50/50">
       <ToastContainer />
 
       {selectedTransaction && (

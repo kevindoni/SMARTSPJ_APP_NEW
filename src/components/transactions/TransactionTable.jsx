@@ -34,7 +34,7 @@ export default function TransactionTable({
   return (
     <div className="overflow-x-auto bg-white rounded-lg border border-slate-300 min-h-[300px] relative pb-8">
       <table className="w-full text-sm border-collapse">
-        <thead className="bg-[#fcfdff] border-b border-slate-300 sticky top-0 z-10">
+        <thead className="bg-slate-50 border-b border-slate-300 sticky top-0 z-10">
           {/* Main Header */}
           <tr>
             <th className="px-3 py-3 text-center font-bold text-slate-800 border-r border-slate-300 w-[100px] text-[11px] uppercase tracking-wide">
@@ -63,7 +63,7 @@ export default function TransactionTable({
             </th>
           </tr>
           {/* Numbered Sub-Header */}
-          <tr className="bg-[#e2e8f0] border-b border-slate-300 text-slate-600 text-[10px] font-bold">
+          <tr className="bg-slate-200 border-b border-slate-300 text-slate-600 text-[10px] font-bold">
             <td className="text-center py-1 border-r border-slate-300">1</td>
             <td className="text-center py-1 border-r border-slate-300">2</td>
             <td className="text-center py-1 border-r border-slate-300">3</td>

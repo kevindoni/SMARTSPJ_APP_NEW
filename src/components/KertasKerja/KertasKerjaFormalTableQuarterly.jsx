@@ -75,7 +75,7 @@ export default function KertasKerjaFormalTableQuarterly({
   const sekolah = schoolInfo?.nama || '-';
 
   return (
-    <div className="bg-white p-6 rounded-none shadow-none text-black font-sans text-xs overflow-x-auto">
+    <div className="bg-white p-6 rounded-none shadow-none text-black text-xs overflow-x-auto">
       {/* HEADERS */}
       <div className="mb-4">
         <h3 className="font-bold text-sm uppercase mb-2">A. PENERIMAAN</h3>

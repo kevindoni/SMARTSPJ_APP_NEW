@@ -1,3 +1,31 @@
+/**
+ * Get total Kinerja anggaran amount (dynamic replacement for hardcoded transfer amounts)
+ * Queries the anggaran table to find the actual Kinerja budget total.
+ * Returns 0 if no Kinerja anggaran exists for the given year.
+ */
+function getKinerjaAnggaranTotal(db, year) {
+  const result = db
+    .prepare(
+      `
+    SELECT SUM(jumlah) as total FROM anggaran a
+    JOIN ref_sumber_dana sd ON a.id_ref_sumber_dana = sd.id_ref_sumber_dana
+    WHERE sd.nama_sumber_dana LIKE '%Kinerja%'
+      AND a.tahun_anggaran = ?
+      AND a.soft_delete = 0
+      AND a.is_approve = 1
+      AND a.is_revisi = (
+        SELECT MAX(is_revisi) FROM anggaran a2
+        WHERE a2.id_ref_sumber_dana = a.id_ref_sumber_dana
+          AND a2.tahun_anggaran = a.tahun_anggaran
+          AND a2.soft_delete = 0
+          AND a2.is_approve = 1
+      )
+  `
+    )
+    .get(year);
+  return result?.total || 0;
+}
+
 function getAnggaran(db, year, fundFilterAnggaran) {
   const result = db
     .prepare(
@@ -112,10 +140,7 @@ function getPenerimaanMurni(db, yearStr, fundSource, anggaranScope, fundFilterRe
   let whereClause = '';
 
   if (!fundSource || fundSource === 'SEMUA') {
-    whereClause = `(
-        (id_ref_bku = 2 OR (kode_rekening LIKE '4.%' AND id_ref_bku != 26) OR id_kas_umum = 'RwWBy8ZzdkWLzoFas88C3g')
-        AND LOWER(uraian) NOT LIKE '%silpa%'
-    )`;
+    whereClause = `(id_ref_bku = 2 OR (kode_rekening LIKE '4.%' AND id_ref_bku != 26))`;
   } else if (fundSource === 'BOS Kinerja') {
     // Use anggaranScope to filter: only penerimaan linked to Kinerja anggaran
     // anggaranScope = id_anggaran IN (SELECT ... WHERE nama_sumber_dana LIKE '%Kinerja%')
@@ -123,11 +148,14 @@ function getPenerimaanMurni(db, yearStr, fundSource, anggaranScope, fundFilterRe
   } else if (fundSource === 'Lainnya') {
     return 0;
   } else {
+    // Dynamic Kinerja amount filter (replaces hardcoded 35000000)
+    const kinerjaAmount = getKinerjaAnggaranTotal(db, parseInt(yearStr) || yearStr);
+    const excludeKinerja = kinerjaAmount > 0 ? `AND saldo != ${kinerjaAmount}` : ``;
     whereClause = `(
-      (id_ref_bku = 2 AND saldo != 35000000)
+      (id_ref_bku = 2 ${excludeKinerja})
       OR (kode_rekening LIKE '4.%' AND id_ref_bku != 26)
       OR (LOWER(uraian) LIKE '%bunga bank%' OR LOWER(uraian) LIKE '%jasa giro%')
-    ) AND LOWER(uraian) NOT LIKE '%silpa%'`;
+    )`;
   }
 
   const result = db
@@ -211,6 +239,7 @@ function getPajak(db, yearStr, fundFilterRealisasi, fundSource) {
 
 module.exports = {
   getAnggaran,
+  getKinerjaAnggaranTotal,
   getPenerimaanMurni,
   getSaldoAwalTahun,
   getRealisasiBelanja,

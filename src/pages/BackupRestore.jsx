@@ -226,7 +226,7 @@ export default function BackupRestore() {
   const anyBusy = isBackingUp || isFullBackingUp || isRestoring || isExporting;
 
   return (
-    <div className="flex flex-col gap-6 font-sans pb-20 animate-in fade-in zoom-in-95 duration-300">
+    <div className="flex flex-col gap-6 pb-20 animate-in fade-in zoom-in-95 duration-300">
       <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-center gap-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white shadow-lg shadow-blue-200">
@@ -484,7 +484,9 @@ export default function BackupRestore() {
             </div>
             <div>
               <h3 className="font-bold text-slate-800">Export Semua Laporan</h3>
-              <p className="text-xs text-slate-500">Satu file Excel multi-sheet: BKU Umum, Tunai, Bank, Pajak</p>
+              <p className="text-xs text-slate-500">
+                Satu file Excel multi-sheet: BKU Umum, Tunai, Bank, Pajak
+              </p>
             </div>
           </div>
         </div>

@@ -6,7 +6,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { v4: uuidv4 } = require('uuid');
+const { randomUUID } = require('crypto');
 
 let NOTA_GROUPS_PATH = null;
 
@@ -15,12 +15,12 @@ let NOTA_GROUPS_PATH = null;
  * @param {string} dataDir - Data directory path
  */
 function initNotaGroupStorage(dataDir) {
-    NOTA_GROUPS_PATH = path.join(dataDir, 'nota-groups.json');
+  NOTA_GROUPS_PATH = path.join(dataDir, 'nota-groups.json');
 
-    // Create file if doesn't exist
-    if (!fs.existsSync(NOTA_GROUPS_PATH)) {
-        fs.writeFileSync(NOTA_GROUPS_PATH, JSON.stringify({ groups: [] }, null, 2));
-    }
+  // Create file if doesn't exist
+  if (!fs.existsSync(NOTA_GROUPS_PATH)) {
+    fs.writeFileSync(NOTA_GROUPS_PATH, JSON.stringify({ groups: [] }, null, 2));
+  }
 }
 
 /**
@@ -29,19 +29,19 @@ function initNotaGroupStorage(dataDir) {
  * @returns {Array} Array of nota groups
  */
 function getNotaGroups(year = null) {
-    try {
-        const data = JSON.parse(fs.readFileSync(NOTA_GROUPS_PATH, 'utf8'));
-        let groups = data.groups || [];
+  try {
+    const data = JSON.parse(fs.readFileSync(NOTA_GROUPS_PATH, 'utf8'));
+    let groups = data.groups || [];
 
-        if (year) {
-            groups = groups.filter(g => g.year === year.toString());
-        }
-
-        return groups;
-    } catch (error) {
-        console.error('Error loading nota groups:', error);
-        return [];
+    if (year) {
+      groups = groups.filter((g) => g.year === year.toString());
     }
+
+    return groups;
+  } catch (error) {
+    console.error('Error loading nota groups:', error);
+    return [];
+  }
 }
 
 /**
@@ -50,30 +50,30 @@ function getNotaGroups(year = null) {
  * @returns {Object} Result with success status
  */
 function saveNotaGroup(group) {
-    try {
-        const data = JSON.parse(fs.readFileSync(NOTA_GROUPS_PATH, 'utf8'));
+  try {
+    const data = JSON.parse(fs.readFileSync(NOTA_GROUPS_PATH, 'utf8'));
 
-        // Generate ID if new
-        if (!group.id) {
-            group.id = uuidv4();
-            group.createdAt = new Date().toISOString();
-        }
-        group.updatedAt = new Date().toISOString();
-
-        // Find existing or add new
-        const existingIndex = data.groups.findIndex(g => g.id === group.id);
-        if (existingIndex >= 0) {
-            data.groups[existingIndex] = group;
-        } else {
-            data.groups.push(group);
-        }
-
-        fs.writeFileSync(NOTA_GROUPS_PATH, JSON.stringify(data, null, 2));
-        return { success: true, group };
-    } catch (error) {
-        console.error('Error saving nota group:', error);
-        return { success: false, error: error.message };
+    // Generate ID if new
+    if (!group.id) {
+      group.id = randomUUID();
+      group.createdAt = new Date().toISOString();
     }
+    group.updatedAt = new Date().toISOString();
+
+    // Find existing or add new
+    const existingIndex = data.groups.findIndex((g) => g.id === group.id);
+    if (existingIndex >= 0) {
+      data.groups[existingIndex] = group;
+    } else {
+      data.groups.push(group);
+    }
+
+    fs.writeFileSync(NOTA_GROUPS_PATH, JSON.stringify(data, null, 2));
+    return { success: true, group };
+  } catch (error) {
+    console.error('Error saving nota group:', error);
+    return { success: false, error: error.message };
+  }
 }
 
 /**
@@ -82,15 +82,15 @@ function saveNotaGroup(group) {
  * @returns {Object} Result with success status
  */
 function deleteNotaGroup(groupId) {
-    try {
-        const data = JSON.parse(fs.readFileSync(NOTA_GROUPS_PATH, 'utf8'));
-        data.groups = data.groups.filter(g => g.id !== groupId);
-        fs.writeFileSync(NOTA_GROUPS_PATH, JSON.stringify(data, null, 2));
-        return { success: true };
-    } catch (error) {
-        console.error('Error deleting nota group:', error);
-        return { success: false, error: error.message };
-    }
+  try {
+    const data = JSON.parse(fs.readFileSync(NOTA_GROUPS_PATH, 'utf8'));
+    data.groups = data.groups.filter((g) => g.id !== groupId);
+    fs.writeFileSync(NOTA_GROUPS_PATH, JSON.stringify(data, null, 2));
+    return { success: true };
+  } catch (error) {
+    console.error('Error deleting nota group:', error);
+    return { success: false, error: error.message };
+  }
 }
 
 /**
@@ -99,19 +99,19 @@ function deleteNotaGroup(groupId) {
  * @returns {Object|null} Nota group or null
  */
 function getNotaGroupById(groupId) {
-    try {
-        const data = JSON.parse(fs.readFileSync(NOTA_GROUPS_PATH, 'utf8'));
-        return data.groups.find(g => g.id === groupId) || null;
-    } catch (error) {
-        console.error('Error getting nota group:', error);
-        return null;
-    }
+  try {
+    const data = JSON.parse(fs.readFileSync(NOTA_GROUPS_PATH, 'utf8'));
+    return data.groups.find((g) => g.id === groupId) || null;
+  } catch (error) {
+    console.error('Error getting nota group:', error);
+    return null;
+  }
 }
 
 module.exports = {
-    initNotaGroupStorage,
-    getNotaGroups,
-    saveNotaGroup,
-    deleteNotaGroup,
-    getNotaGroupById
+  initNotaGroupStorage,
+  getNotaGroups,
+  saveNotaGroup,
+  deleteNotaGroup,
+  getNotaGroupById,
 };

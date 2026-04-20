@@ -1,6 +1,6 @@
 {
   "name": "smart-spj",
-  "version": "1.6.0",
+  "version": "1.7.1",
   "description": "Aplikasi Pendamping ARKAS untuk Pengelolaan SPJ",
   "main": "electron/main-loader.js",
   "scripts": {
@@ -21,6 +21,7 @@
   "dependencies": {
     "@dotlottie/player-component": "^2.7.12",
     "@lottiefiles/dotlottie-react": "^0.17.13",
+    "archiver": "^7.0.1",
     "better-sqlite3-multiple-ciphers": "^11.10.0",
     "bytenode": "^1.5.7",
     "chart.js": "^4.4.1",

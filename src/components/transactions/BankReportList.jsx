@@ -59,7 +59,8 @@ export default function BankReportList({ stats }) {
     let firstSaldoDate = null;
     return sortedData.filter((tx) => {
       const desc = (tx.uraian || '').toLowerCase();
-      const isMonthlySaldo = desc.startsWith('saldo bank bulan') || desc.startsWith('saldo tunai bulan');
+      const isMonthlySaldo =
+        desc.startsWith('saldo bank bulan') || desc.startsWith('saldo tunai bulan');
 
       if (!isMonthlySaldo) return true;
 
@@ -87,7 +88,11 @@ export default function BankReportList({ stats }) {
     let rb = hasExistingOpeningBalance ? 0 : openingBalance;
     return displayData.map((tx) => {
       const isDebit = isPenerimaan(tx);
-      if (isDebit) { rb += tx.nominal; } else { rb -= tx.nominal; }
+      if (isDebit) {
+        rb += tx.nominal;
+      } else {
+        rb -= tx.nominal;
+      }
       return rb;
     });
   }, [displayData, hasExistingOpeningBalance, openingBalance]);
@@ -213,7 +218,7 @@ export default function BankReportList({ stats }) {
   };
 
   return (
-    <div className="flex flex-col gap-6 font-sans">
+    <div className="flex flex-col gap-6">
       <ToastContainer />
 
       {/* Page Header */}

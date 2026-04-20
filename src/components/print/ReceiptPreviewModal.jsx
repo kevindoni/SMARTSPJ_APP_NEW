@@ -137,7 +137,11 @@ export default function ReceiptPreviewModal({ transaction, schoolInfo, year, onC
         <div className="p-6 bg-slate-50">
           <div
             className="bg-white p-4"
-            style={{ border: '3px solid #000', fontFamily: 'serif', fontSize: '13px' }}
+            style={{
+              border: '3px solid #000',
+              fontFamily: "'Times New Roman', serif",
+              fontSize: '13px',
+            }}
           >
             {/* Header */}
             <div className="text-center mb-3">

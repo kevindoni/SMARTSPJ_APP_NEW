@@ -155,7 +155,7 @@ export default function LaporanK7() {
 
       // Title
       doc.setFontSize(12);
-      doc.setFont('helvetica', 'bold');
+      doc.setFont('times', 'bold');
       doc.text(
         `REKAPITULASI REALISASI PENGGUNAAN DANA BOSP ${activeFund.toUpperCase()}`,
         pageWidth / 2,
@@ -193,7 +193,7 @@ export default function LaporanK7() {
         startY: y,
         body: schoolInfoData,
         theme: 'plain',
-        styles: { fontSize: 9, cellPadding: 1, font: 'helvetica' },
+        styles: { fontSize: 9, cellPadding: 1, font: 'times' },
         columnStyles: {
           0: { cellWidth: 35 },
           1: { cellWidth: 4 },
@@ -287,7 +287,7 @@ export default function LaporanK7() {
           textColor: [0, 0, 0],
           fillColor: [255, 255, 255],
           valign: 'middle',
-          font: 'helvetica',
+          font: 'times',
         },
         headStyles: {
           fillColor: [255, 255, 255],
@@ -339,7 +339,7 @@ export default function LaporanK7() {
         startY: y,
         body: summaryData,
         theme: 'plain',
-        styles: { fontSize: 9, cellPadding: 1, font: 'helvetica' },
+        styles: { fontSize: 9, cellPadding: 1, font: 'times' },
         columnStyles: {
           0: { cellWidth: 70 },
           1: { cellWidth: 4 },
@@ -356,7 +356,7 @@ export default function LaporanK7() {
         y = 20;
       }
 
-      doc.setFont('helvetica', 'normal'); // Reset bold
+      doc.setFont('times', 'normal');
       const sigWidth = 70;
       doc.text('Menyetujui,', margin, y);
       doc.text('Bendahara /', pageWidth - margin - sigWidth, y);
@@ -648,7 +648,13 @@ export default function LaporanK7() {
                   );
                 })}
                 <td className="border border-slate-300 p-2 text-right">
-                  {(() => { const sum = SUB_PROGRAMS.reduce((s, sp) => s + Math.abs(data?.bySubProgram?.[sp.id] || 0), 0); return sum > 0 ? sum.toLocaleString('id-ID') : 0; })()}
+                  {(() => {
+                    const sum = SUB_PROGRAMS.reduce(
+                      (s, sp) => s + Math.abs(data?.bySubProgram?.[sp.id] || 0),
+                      0
+                    );
+                    return sum > 0 ? sum.toLocaleString('id-ID') : 0;
+                  })()}
                 </td>
               </tr>
             </tbody>

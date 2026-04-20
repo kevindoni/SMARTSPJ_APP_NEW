@@ -19,14 +19,12 @@ export default function TransactionClosing({
   // Custom Footer for Tunai/Bank specific reports
   if (reportType === 'TUNAI') {
     return (
-      <div className="mt-6 bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
-        <div className="mb-4">
-          <h3 className="text-slate-800 font-semibold mb-1">
-            Pada hari ini <span className="font-bold text-slate-900">{dateString}</span> Buku Kas
-            Umum Ditutup dengan keadaan/posisi buku sebagai berikut :
-          </h3>
+      <div className="mt-6 bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+        <div className="mb-3 text-xs text-slate-800">
+          Pada hari ini <span className="font-bold text-slate-900">{dateString}</span> Buku Kas Umum
+          Ditutup dengan keadaan/posisi buku sebagai berikut :
         </div>
-        <div className="grid grid-cols-[220px_10px_1fr] gap-y-1 text-sm font-bold text-slate-900">
+        <div className="grid grid-cols-[220px_10px_1fr] gap-y-1 text-xs font-bold text-slate-900">
           <div>Saldo Buku Kas Pembantu Tunai</div>
           <div>:</div>
           <div>{formatRupiah(stats?.saldo_tunai || 0)}</div>
@@ -37,14 +35,12 @@ export default function TransactionClosing({
 
   if (reportType === 'BANK') {
     return (
-      <div className="mt-6 bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
-        <div className="mb-4">
-          <h3 className="text-slate-800 font-semibold mb-1">
-            Pada hari ini <span className="font-bold text-slate-900">{dateString}</span> Buku Kas
-            Umum Ditutup dengan keadaan/posisi buku sebagai berikut :
-          </h3>
+      <div className="mt-6 bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+        <div className="mb-3 text-xs text-slate-800">
+          Pada hari ini <span className="font-bold text-slate-900">{dateString}</span> Buku Kas Umum
+          Ditutup dengan keadaan/posisi buku sebagai berikut :
         </div>
-        <div className="grid grid-cols-[220px_10px_1fr] gap-y-1 text-sm font-bold text-slate-900">
+        <div className="grid grid-cols-[220px_10px_1fr] gap-y-1 text-xs font-bold text-slate-900">
           <div>Saldo Buku Kas Pembantu Bank</div>
           <div>:</div>
           <div>{formatRupiah(stats?.saldo_bank || 0)}</div>
@@ -55,14 +51,12 @@ export default function TransactionClosing({
 
   if (reportType === 'PAJAK') {
     return (
-      <div className="mt-6 bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
-        <div className="mb-4">
-          <h3 className="text-slate-800 font-semibold mb-1">
-            Pada hari ini <span className="font-bold text-slate-900">{dateString}</span> Buku
-            Pembantu Pajak Ditutup dengan keadaan/posisi buku sebagai berikut :
-          </h3>
+      <div className="mt-6 bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+        <div className="mb-3 text-xs text-slate-800">
+          Pada hari ini <span className="font-bold text-slate-900">{dateString}</span> Buku Pembantu
+          Pajak Ditutup dengan keadaan/posisi buku sebagai berikut :
         </div>
-        <div className="grid grid-cols-[220px_10px_1fr] gap-y-1 text-sm font-bold text-slate-900">
+        <div className="grid grid-cols-[220px_10px_1fr] gap-y-1 text-xs font-bold text-slate-900">
           <div>Saldo Buku Pembantu Pajak</div>
           <div>:</div>
           <div>{formatRupiah(calculatedSaldo || 0)}</div>
@@ -79,12 +73,10 @@ export default function TransactionClosing({
   const saldoBank = calculatedSaldo - saldoTunai;
 
   return (
-    <div className="mt-6 bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
-      <div className="mb-4">
-        <h3 className="text-slate-800 font-semibold mb-1">
-          Pada hari ini <span className="font-bold text-slate-900">{dateString}</span> Buku Kas Umum
-          Ditutup dengan keadaan/posisi buku sebagai berikut :
-        </h3>
+    <div className="mt-6 bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+      <div className="mb-3 text-xs text-slate-800">
+        Pada hari ini <span className="font-bold text-slate-900">{dateString}</span> Buku Kas Umum
+        Ditutup dengan keadaan/posisi buku sebagai berikut :
       </div>
 
       <div className="grid grid-cols-[180px_10px_1fr] gap-y-1 text-xs">

@@ -87,7 +87,7 @@ export default function RegisterKas() {
           }
         }
       } catch (e) {
-        console.error("Gagal memuat data register:", e);
+        console.error('Gagal memuat data register:', e);
       }
 
       setLoading(false);
@@ -104,10 +104,10 @@ export default function RegisterKas() {
           coins: coinCounts,
         });
         setLastSaved(new Date().toISOString());
-        toast.success("Register kas berhasil disimpan.");
+        toast.success('Register kas berhasil disimpan.');
       }
     } catch (e) {
-      console.error("Gagal menyimpan register:", e);
+      console.error('Gagal menyimpan register:', e);
     }
     setSaving(false);
   };
@@ -137,12 +137,12 @@ export default function RegisterKas() {
 
     doc
       .setFontSize(14)
-      .setFont('helvetica', 'bold')
+      .setFont('times', 'bold')
       .text('REGISTER PENUTUPAN KAS', 107.5, 20, { align: 'center' });
 
     // Header Info
     let y = 35;
-    doc.setFontSize(10).setFont('helvetica', 'normal');
+    doc.setFontSize(10).setFont('times', 'normal');
 
     const mLabel = MONTHS.find((m) => m.id === activeMonth)?.label;
     // Last Day of Month Calculation
@@ -284,13 +284,13 @@ export default function RegisterKas() {
 
     doc
       .setFontSize(14)
-      .setFont('helvetica', 'bold')
+      .setFont('times', 'bold')
       .text('BERITA ACARA PEMERIKSAAAN KAS', 107.5, 20, { align: 'center' });
     const mLabel = MONTHS.find((m) => m.id === activeMonth)?.label;
     doc.text(`PERIODE : ${mLabel} ${year}`, 107.5, 27, { align: 'center' });
 
     let y = 40;
-    doc.setFontSize(10).setFont('helvetica', 'normal');
+    doc.setFontSize(10).setFont('times', 'normal');
 
     // Date calculation moved below to dateObj
 
@@ -558,7 +558,7 @@ export default function RegisterKas() {
   };
 
   return (
-    <div className="space-y-6 font-sans animate-in fade-in zoom-in-95 duration-300">
+    <div className="space-y-6 animate-in fade-in zoom-in-95 duration-300">
       <ToastContainer />
       {/* Page Header */}
       <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-center gap-4">

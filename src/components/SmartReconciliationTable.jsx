@@ -80,33 +80,6 @@ export default function SmartReconciliationTable({ data }) {
     return base;
   };
 
-  // Enhanced row styling based on type
-  const getEnhancedRowStyle = (row) => {
-    const type = row.type;
-
-    // Monthly rows - regular styling with subtle striping
-    if (type === 'month') {
-      return 'bg-white hover:bg-slate-50/80 transition-colors';
-    }
-
-    // Quarterly subtotals
-    if (type === 'quarter') {
-      return 'bg-amber-50 border-y-2 border-amber-200 font-semibold';
-    }
-
-    // Semester subtotals
-    if (type === 'semester') {
-      return 'bg-violet-50 border-y-2 border-violet-200 font-semibold';
-    }
-
-    // Annual total
-    if (type === 'annual') {
-      return 'bg-emerald-800 text-white font-bold';
-    }
-
-    return 'bg-white';
-  };
-
   return (
     <div className={`${theme.card} overflow-hidden`}>
       {/* Table Section Header */}
@@ -150,60 +123,47 @@ export default function SmartReconciliationTable({ data }) {
           <tbody>
             {data.map((row, rIdx) => {
               const rowType = row.type;
-              const rowBgClass = getEnhancedRowStyle(row);
 
-              // Determine cell background for all cells based on row type
-              // Using a more professional color palette
-              const getCellBg = () => {
-                if (rowType === 'annual') return 'bg-slate-800'; // Dark slate for annual total
-                if (rowType === 'quarter') return 'bg-amber-100'; // Warm amber for quarterly
-                if (rowType === 'semester') return 'bg-indigo-100'; // Cool indigo for semester
-                return 'bg-white'; // White for regular months
+              const rowBgMap = {
+                annual: 'bg-slate-800',
+                quarter: 'bg-amber-100',
+                semester: 'bg-indigo-100',
               };
-              const cellBg = getCellBg();
+              const rowBgClass = rowBgMap[rowType] || '';
+
+              const rowBgHexMap = {
+                annual: '#1e293b',
+                quarter: '#fef3c7',
+                semester: '#e0e7ff',
+              };
+              const rowBgHex = rowBgHexMap[rowType] || '#ffffff';
+
+              const isAnnual = rowType === 'annual';
+              const isSummaryRow = ['quarter', 'semester', 'annual'].includes(rowType);
 
               return (
-                <tr key={rIdx} className="border-b border-slate-200">
+                <tr
+                  key={rIdx}
+                  className={`border-b border-slate-200 ${rowBgClass} ${isAnnual ? 'text-white font-bold' : ''} ${isSummaryRow && !isAnnual ? 'font-semibold' : ''}`}
+                >
                   {leafColumns.map((col, cIdx) => {
                     const val = getNestedValue(row, col.accessor);
                     let content = col.format === 'currency' ? formatRupiah(val) : val;
 
-                    // Custom visual tweaks
                     const isSticky = col.sticky === 'left';
-                    const isAnnual = rowType === 'annual';
-                    const isSummaryRow = ['quarter', 'semester', 'annual'].includes(rowType);
 
-                    // Get background color value for inline style
-                    const getBgColor = () => {
-                      if (rowType === 'annual') return '#1e293b'; // slate-800
-                      if (rowType === 'quarter') return '#fef3c7'; // amber-100
-                      if (rowType === 'semester') return '#e0e7ff'; // indigo-100
-                      return '#ffffff'; // white
-                    };
-
-                    // Apply background to ALL cells for consistent row coloring
                     let cellClass = `px-2 py-2 border-r border-slate-200 whitespace-nowrap ${col.className || ''}`;
 
-                    // Sticky column styling
                     if (isSticky) {
-                      cellClass += ` sticky left-0 z-20`;
+                      cellClass += ' sticky left-0 z-20';
                     }
 
-                    // Number alignment
                     if (col.format === 'currency') {
                       cellClass += ' text-right font-mono';
                     }
 
-                    // Text color and font weight for summary rows
-                    if (isAnnual) {
-                      cellClass += ' text-white font-bold';
-                    } else if (isSummaryRow) {
-                      cellClass += ' font-semibold';
-                    }
-
-                    // Apply offset for sticky + background color inline
                     const style = {
-                      backgroundColor: getBgColor(),
+                      backgroundColor: rowBgHex,
                       ...(isSticky ? { left: col.leftOffset } : {}),
                     };
 

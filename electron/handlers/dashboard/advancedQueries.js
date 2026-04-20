@@ -61,7 +61,7 @@ function getRapbsAndKegiatanCount(db, yearStr, fundSource, anggaranScope) {
 
 /**
  * 2. Kategori Belanja (Barang Jasa, Modal Alat, Modal Aset Lain)
- * 
+ *
  * Realisasi: filtered via ku.id_anggaran (anggaranScope) - works for kas_umum
  * Anggaran/Pagu: filtered via direct JOIN ref_sumber_dana - proven approach from statsQueries
  */
@@ -153,7 +153,7 @@ function getBelanjaKategori(db, yearStr, fundSource, anggaranScope) {
  * - MASUK: BBU no_bukti + BOSP (id_ref_bku=2) + bunga (6) + pajak pungut (5,10,33) + dana lainnya (kode_rekening 4.%)
  * - KELUAR: BNU/BPU no_bukti with kode_rekening 5.% + biaya admin (7) + setor pajak (11)
  * - SALDO AWAL: id_ref_bku IN (2,8,9) in January (matching getOpeningBalance)
- * 
+ *
  * Fund source filtering uses anggaranScope on k.id_anggaran (kas_umum has id_anggaran directly).
  * For BBU transactions, filtering is via k.id_anggaran -> anggaran -> ref_sumber_dana.
  * For BNU/BPU transactions, filtering is via k.id_anggaran (or k.id_rapbs_periode -> rapbs -> anggaran).
@@ -161,8 +161,18 @@ function getBelanjaKategori(db, yearStr, fundSource, anggaranScope) {
 function getKasBulanan(db, yearStr, fundSource, anggaranScope) {
   try {
     const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun',
-      'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des',
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'Mei',
+      'Jun',
+      'Jul',
+      'Agu',
+      'Sep',
+      'Okt',
+      'Nov',
+      'Des',
     ];
 
     // Build fund source filter conditions
@@ -174,7 +184,9 @@ function getKasBulanan(db, yearStr, fundSource, anggaranScope) {
     // --- Saldo Awal (matching reconciliationHandler getOpeningBalance) ---
     // Includes id_ref_bku 2 (BOSP recorded as Saldo Awal), 8 (Saldo Bank), 9 (Saldo Tunai)
     // Excludes "Tahap" and "Terima Dana" (those are income, not opening balance)
-    const saldoAwalRow = db.prepare(`
+    const saldoAwalRow = db
+      .prepare(
+        `
       SELECT SUM(k.saldo) as total
       FROM kas_umum k
       WHERE k.id_ref_bku IN (2, 8, 9)
@@ -184,7 +196,9 @@ function getKasBulanan(db, yearStr, fundSource, anggaranScope) {
         AND k.uraian NOT LIKE '%Tahap%'
         AND k.uraian NOT LIKE '%Terima Dana%'
         ${fundWhere}
-    `).get(yearStr);
+    `
+      )
+      .get(yearStr);
     const saldoAwal = saldoAwalRow?.total || 0;
 
     // --- Monthly Penerimaan (MASUK) ---
@@ -255,10 +269,16 @@ function getKasBulanan(db, yearStr, fundSource, anggaranScope) {
       const mRow = masukRows.find((r) => r.bulan === monthKey);
       const kRow = keluarRows.find((r) => r.bulan === monthKey);
 
-      const masuk = (mRow?.bbu || 0) + (mRow?.bunga || 0) +
-                    (mRow?.pajak_pungut || 0) + (mRow?.dana_lainnya || 0);
-      const keluar = (kRow?.belanja || 0) + (kRow?.biaya_admin || 0) +
-                     (kRow?.setor_pajak || 0) + (kRow?.lainnya || 0);
+      const masuk =
+        (mRow?.bbu || 0) +
+        (mRow?.bunga || 0) +
+        (mRow?.pajak_pungut || 0) +
+        (mRow?.dana_lainnya || 0);
+      const keluar =
+        (kRow?.belanja || 0) +
+        (kRow?.biaya_admin || 0) +
+        (kRow?.setor_pajak || 0) +
+        (kRow?.lainnya || 0);
 
       runningSaldo = runningSaldo + masuk - keluar;
       results.push({
@@ -417,13 +437,17 @@ function getPenerimaanDana(db, yearStr, fundSource, anggaranScope) {
       let displayUraian = row.uraian;
       const sdId = row.id_ref_sumber_dana;
       const sdName = (row.nama_sumber_dana || '').toLowerCase();
-      const isGeneric = ['Tahap 1', 'Tahap 2', 'SiLpa', 'Kinerja'].some(g => displayUraian === g);
+      const isGeneric = ['Tahap 1', 'Tahap 2', 'SiLpa', 'Kinerja'].some((g) => displayUraian === g);
       if (isGeneric) {
         if (SOURCE_IDS.KINERJA.includes(sdId) || sdName.includes('kinerja')) {
           displayUraian = 'Terima Dana BOS ' + row.uraian;
         }
       }
-      return { uraian: displayUraian, tanggal_transaksi: row.tanggal_transaksi, nominal: row.nominal };
+      return {
+        uraian: displayUraian,
+        tanggal_transaksi: row.tanggal_transaksi,
+        nominal: row.nominal,
+      };
     });
   } catch (e) {
     console.error('Query Error (Penerimaan):', e.message);
@@ -461,8 +485,10 @@ function getPengeluaranTerbaru(db, yearStr, fundSource, anggaranScope) {
 /**
  * 8. Ringkasan per Sumber Dana
  */
-function getRingkasanSumberDana(db, yearStr) {
+function getRingkasanSumberDana(db, yearStr, fundSource) {
   try {
+    const fundFilter =
+      fundSource && fundSource !== 'SEMUA' ? `AND sd.nama_sumber_dana LIKE '%${fundSource}%'` : '';
     const query = `
       SELECT 
         sd.nama_sumber_dana,
@@ -482,6 +508,7 @@ function getRingkasanSumberDana(db, yearStr) {
           AND a2.soft_delete = 0
           AND a2.is_approve = 1
         )
+        ${fundFilter}
       GROUP BY sd.nama_sumber_dana
       ORDER BY pagu DESC
     `;

@@ -1,4 +1,3 @@
-
 // Format number: "1.000.000" (without Rp prefix, but with dots)
 const formatNumber = (number) =>
   new Intl.NumberFormat('id-ID', { minimumFractionDigits: 0 }).format(number || 0);
@@ -32,7 +31,12 @@ const Th = ({ children, className = '', width, rowSpan = 1, colSpan = 1 }) => (
   </th>
 );
 
-export default function LembarKertasKerjaFormal({ processedData, fundSource: _fundSource, year, schoolInfo }) {
+export default function LembarKertasKerjaFormal({
+  processedData,
+  fundSource: _fundSource,
+  year,
+  schoolInfo,
+}) {
   // 1. Aggregation Logic
   const safeData = Array.isArray(processedData) ? processedData : [];
 
@@ -119,7 +123,7 @@ export default function LembarKertasKerjaFormal({ processedData, fundSource: _fu
   const regionCode = `${pad(prov)}.${pad(kab)}.${pad(kec)}`;
 
   return (
-    <div className="bg-white p-6 rounded-none shadow-none text-black font-sans box-border overflow-x-auto">
+    <div className="bg-white p-6 rounded-none shadow-none text-black box-border overflow-x-auto">
       {/* CONTAINER TABLE FOR LAYOUT CONSISTENCY */}
       <div className="min-w-[800px]">
         {/* MAIN TABLE 1 STRUCTURING HEADER + CONTENT */}

@@ -91,7 +91,9 @@ export default function NotaGroupManager() {
     try {
       const saved = localStorage.getItem('printed_groups');
       if (saved) setPrintedGroups(new Set(JSON.parse(saved)));
-    } catch (e) { console.error("Failed to load printed status:", e); }
+    } catch (e) {
+      console.error('Failed to load printed status:', e);
+    }
   }, [year, month]);
 
   // Reload printed status when switching tabs (sync with Cetak Manual)
@@ -117,21 +119,21 @@ export default function NotaGroupManager() {
 
   const handlePrintA2 = async (group) => {
     if (!group.items?.length) return;
-    const ids = group.items.map(i => i.id_kas_umum).filter(Boolean);
-    const noBus = [...new Set(group.items.map(i => i.no_bukti).filter(Boolean))];
+    const ids = group.items.map((i) => i.id_kas_umum).filter(Boolean);
+    const noBus = [...new Set(group.items.map((i) => i.no_bukti).filter(Boolean))];
     if (window.arkas?.printA2AutoSave) {
       await window.arkas.printA2AutoSave(ids, noBus, year);
-      markAsPrinted(group.items?.map(i => i.no_bukti).filter(Boolean), "A2");
+      markAsPrinted(group.items?.map((i) => i.no_bukti).filter(Boolean), 'A2');
     }
   };
 
   const handlePrintBukti = async (group) => {
     if (!group.items?.length) return;
-    const ids = group.items.map(i => i.id_kas_umum).filter(Boolean);
-    const noBus = [...new Set(group.items.map(i => i.no_bukti).filter(Boolean))];
+    const ids = group.items.map((i) => i.id_kas_umum).filter(Boolean);
+    const noBus = [...new Set(group.items.map((i) => i.no_bukti).filter(Boolean))];
     if (window.arkas?.printBuktiAutoSave) {
       await window.arkas.printBuktiAutoSave(ids, noBus, year);
-      markAsPrinted(group.items?.map(i => i.no_bukti).filter(Boolean), "BUKTI");
+      markAsPrinted(group.items?.map((i) => i.no_bukti).filter(Boolean), 'BUKTI');
     }
   };
 
@@ -139,21 +141,21 @@ export default function NotaGroupManager() {
     setPrintedGroups((prev) => {
       const next = new Set(prev);
       const keys = Array.isArray(noBuktiList) ? noBuktiList : [noBuktiList];
-      keys.forEach(k => next.add(k + "_" + type));
+      keys.forEach((k) => next.add(k + '_' + type));
       localStorage.setItem('printed_groups', JSON.stringify(Array.from(next)));
       return next;
     });
   };
 
-  const resetPrintStatus = (noBuktiList, type = "ALL") => {
+  const resetPrintStatus = (noBuktiList, type = 'ALL') => {
     setPrintedGroups((prev) => {
       const next = new Set(prev);
       const keys = Array.isArray(noBuktiList) ? noBuktiList : [noBuktiList];
-      keys.forEach(k => {
-        if (type === "ALL") {
-          next.delete(k + "_A2");
-          next.delete(k + "_BUKTI");
-        } else next.delete(k + "_" + type);
+      keys.forEach((k) => {
+        if (type === 'ALL') {
+          next.delete(k + '_A2');
+          next.delete(k + '_BUKTI');
+        } else next.delete(k + '_' + type);
       });
       localStorage.setItem('printed_groups', JSON.stringify(Array.from(next)));
       return next;
@@ -184,7 +186,7 @@ export default function NotaGroupManager() {
   };
 
   return (
-    <div className="space-y-6 font-sans animate-in fade-in zoom-in-95 duration-300">
+    <div className="space-y-6 animate-in fade-in zoom-in-95 duration-300">
       <ToastContainer />
 
       {/* Page Header */}
@@ -367,201 +369,227 @@ export default function NotaGroupManager() {
               {filteredGroups.length > 0 && (
                 <div className="space-y-2">
                   {filteredGroups.map((group, gi) => {
-                    const gNoBus = [...new Set((group.items || []).map(i => i.no_bukti).filter(Boolean))];
-                    const isPA2 = gNoBus.some(b => printedGroups.has(b + "_A2"));
-                    const isPBukti = gNoBus.some(b => printedGroups.has(b + "_BUKTI"));
+                    const gNoBus = [
+                      ...new Set((group.items || []).map((i) => i.no_bukti).filter(Boolean)),
+                    ];
+                    const isPA2 = gNoBus.some((b) => printedGroups.has(b + '_A2'));
+                    const isPBukti = gNoBus.some((b) => printedGroups.has(b + '_BUKTI'));
                     const isFull = gNoBus.length > 0 && isPA2 && isPBukti;
                     return (
-                    <div
-                      key={group.notaId}
-                      className={`rounded-xl border overflow-hidden transition-all ${
-                        expandedNota === group.notaId
-                          ? 'border-violet-200 shadow-md shadow-violet-100/50'
-                          : 'border-slate-200 shadow-sm hover:shadow hover:border-slate-300'
-                      } ${isFull ? 'opacity-60' : ''}`}
-                    >
-                      {/* Card Header */}
                       <div
-                        className="px-4 py-3 cursor-pointer transition-colors"
-                        onClick={() => toggleExpand(group.notaId)}
+                        key={group.notaId}
+                        className={`rounded-xl border overflow-hidden transition-all ${
+                          expandedNota === group.notaId
+                            ? 'border-violet-200 shadow-md shadow-violet-100/50'
+                            : 'border-slate-200 shadow-sm hover:shadow hover:border-slate-300'
+                        } ${isFull ? 'opacity-60' : ''}`}
                       >
-                        <div className="flex items-center gap-3">
-                          {/* Number badge */}
-                          <div className="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                            <span className="text-xs font-bold text-slate-500">{gi + 1}</span>
-                          </div>
+                        {/* Card Header */}
+                        <div
+                          className="px-4 py-3 cursor-pointer transition-colors"
+                          onClick={() => toggleExpand(group.notaId)}
+                        >
+                          <div className="flex items-center gap-3">
+                            {/* Number badge */}
+                            <div className="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                              <span className="text-xs font-bold text-slate-500">{gi + 1}</span>
+                            </div>
 
-                          {/* Icon */}
-                          <div
-                            className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                              isFull
-                                ? 'bg-emerald-100'
-                                : group.isGrouped
-                                  ? group.isSiplah
-                                    ? 'bg-blue-100'
-                                    : 'bg-violet-100'
-                                  : 'bg-slate-100'
-                            }`}
-                          >
-                            {isFull ? (
-                              <CheckCircle size={16} className="text-emerald-600" />
-                            ) : (
-                              <Store size={16} className={group.isGrouped ? (group.isSiplah ? 'text-blue-600' : 'text-violet-600') : 'text-slate-500'} />
-                            )}
-                          </div>
-
-                          {/* Info */}
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-1.5">
-                              <span className={`font-semibold text-sm truncate ${isFull ? 'text-slate-400 line-through' : 'text-slate-800'}`}>
-                                {group.namaToko || 'Tanpa Nama'}
-                              </span>
-                              {group.isGrouped && (
-                                <span className="px-1.5 py-0.5 bg-violet-100 text-violet-700 text-[10px] font-bold rounded flex-shrink-0">
-                                  {group.items.length}
-                                </span>
-                              )}
-                              {group.isSiplah && (
-                                <span className="px-1.5 py-0.5 bg-blue-100 text-blue-700 text-[10px] font-bold rounded flex-shrink-0">
-                                  SIPLah
-                                </span>
-                              )}
-                              {group.hasPPN && (
-                                <span className="px-1.5 py-0.5 bg-emerald-100 text-emerald-700 text-[10px] font-bold rounded flex-shrink-0">
-                                  PPN
-                                </span>
-                              )}
-                              {isPA2 && (
-                                <span className="px-1.5 py-0.5 bg-orange-100 text-orange-700 text-[10px] font-bold rounded flex-shrink-0">A2</span>
-                              )}
-                              {isPBukti && (
-                                <span className="px-1.5 py-0.5 bg-violet-100 text-violet-700 text-[10px] font-bold rounded flex-shrink-0">Bukti</span>
+                            {/* Icon */}
+                            <div
+                              className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                                isFull
+                                  ? 'bg-emerald-100'
+                                  : group.isGrouped
+                                    ? group.isSiplah
+                                      ? 'bg-blue-100'
+                                      : 'bg-violet-100'
+                                    : 'bg-slate-100'
+                              }`}
+                            >
+                              {isFull ? (
+                                <CheckCircle size={16} className="text-emerald-600" />
+                              ) : (
+                                <Store
+                                  size={16}
+                                  className={
+                                    group.isGrouped
+                                      ? group.isSiplah
+                                        ? 'text-blue-600'
+                                        : 'text-violet-600'
+                                      : 'text-slate-500'
+                                  }
+                                />
                               )}
                             </div>
-                            <p className={`text-xs mt-0.5 truncate ${isFull ? 'text-slate-300' : 'text-slate-500'}`}>
-                              {group.noNota || group.items[0]?.no_bukti || 'Tanpa No. Nota'} •{' '}
-                              {formatDate(group.tanggalNota)}
-                            </p>
-                          </div>
 
-                          {/* Amount */}
-                          <div className="text-right flex-shrink-0 mr-2">
-                            <p className={`font-bold text-sm tabular-nums ${isFull ? 'text-slate-300 line-through' : 'text-slate-800'}`}>
-                              {formatCurrency(group.totalNominal)}
-                            </p>
-                          </div>
+                            {/* Info */}
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-1.5">
+                                <span
+                                  className={`font-semibold text-sm truncate ${isFull ? 'text-slate-400 line-through' : 'text-slate-800'}`}
+                                >
+                                  {group.namaToko || 'Tanpa Nama'}
+                                </span>
+                                {group.isGrouped && (
+                                  <span className="px-1.5 py-0.5 bg-violet-100 text-violet-700 text-[10px] font-bold rounded flex-shrink-0">
+                                    {group.items.length}
+                                  </span>
+                                )}
+                                {group.isSiplah && (
+                                  <span className="px-1.5 py-0.5 bg-blue-100 text-blue-700 text-[10px] font-bold rounded flex-shrink-0">
+                                    SIPLah
+                                  </span>
+                                )}
+                                {group.hasPPN && (
+                                  <span className="px-1.5 py-0.5 bg-emerald-100 text-emerald-700 text-[10px] font-bold rounded flex-shrink-0">
+                                    PPN
+                                  </span>
+                                )}
+                                {isPA2 && (
+                                  <span className="px-1.5 py-0.5 bg-orange-100 text-orange-700 text-[10px] font-bold rounded flex-shrink-0">
+                                    A2
+                                  </span>
+                                )}
+                                {isPBukti && (
+                                  <span className="px-1.5 py-0.5 bg-violet-100 text-violet-700 text-[10px] font-bold rounded flex-shrink-0">
+                                    Bukti
+                                  </span>
+                                )}
+                              </div>
+                              <p
+                                className={`text-xs mt-0.5 truncate ${isFull ? 'text-slate-300' : 'text-slate-500'}`}
+                              >
+                                {group.noNota || group.items[0]?.no_bukti || 'Tanpa No. Nota'} •{' '}
+                                {formatDate(group.tanggalNota)}
+                              </p>
+                            </div>
 
-                          {/* Chevron */}
-                          <div
-                            className={`w-7 h-7 rounded-full flex items-center justify-center transition-all flex-shrink-0 ${
-                              expandedNota === group.notaId
-                                ? 'bg-violet-100 text-violet-600 rotate-180'
-                                : 'bg-slate-100 text-slate-400'
-                            }`}
-                          >
-                            <ChevronDown size={14} />
+                            {/* Amount */}
+                            <div className="text-right flex-shrink-0 mr-2">
+                              <p
+                                className={`font-bold text-sm tabular-nums ${isFull ? 'text-slate-300 line-through' : 'text-slate-800'}`}
+                              >
+                                {formatCurrency(group.totalNominal)}
+                              </p>
+                            </div>
+
+                            {/* Chevron */}
+                            <div
+                              className={`w-7 h-7 rounded-full flex items-center justify-center transition-all flex-shrink-0 ${
+                                expandedNota === group.notaId
+                                  ? 'bg-violet-100 text-violet-600 rotate-180'
+                                  : 'bg-slate-100 text-slate-400'
+                              }`}
+                            >
+                              <ChevronDown size={14} />
+                            </div>
                           </div>
                         </div>
-                      </div>
 
-                      {/* Expanded Content */}
-                      {expandedNota === group.notaId && (
-                        <div className="border-t border-slate-200 bg-slate-50/50">
-                          <div className="overflow-x-auto">
-                            <table className="w-full text-sm">
-                              <thead>
-                                <tr className="border-b border-slate-200">
-                                  <th className="px-4 py-2 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                                    No Bukti
-                                  </th>
-                                  <th className="px-4 py-2 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                                    Uraian
-                                  </th>
-                                  <th className="px-4 py-2 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                                    Tanggal
-                                  </th>
-                                  <th className="px-4 py-2 text-right text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                                    Nominal
-                                  </th>
-                                </tr>
-                              </thead>
-                              <tbody className="divide-y divide-slate-200/50">
-                                {group.items.map((item, idx) => (
-                                  <tr key={item.id_kas_umum || idx} className="hover:bg-white/80">
-                                    <td className="px-4 py-2.5">
-                                      <span className="inline-flex items-center px-2 py-0.5 bg-violet-50 text-violet-700 text-xs font-semibold rounded-md">
-                                        {item.no_bukti || '-'}
-                                      </span>
-                                    </td>
-                                    <td className="px-4 py-2.5 text-slate-700">{item.uraian}</td>
-                                    <td className="px-4 py-2.5 text-slate-500 text-xs">
-                                      {formatDate(item.tanggal_transaksi)}
-                                    </td>
-                                    <td className="px-4 py-2.5 text-right font-semibold text-slate-800 tabular-nums">
-                                      {formatCurrency(item.nominal)}
-                                    </td>
+                        {/* Expanded Content */}
+                        {expandedNota === group.notaId && (
+                          <div className="border-t border-slate-200 bg-slate-50/50">
+                            <div className="overflow-x-auto">
+                              <table className="w-full text-sm">
+                                <thead>
+                                  <tr className="border-b border-slate-200">
+                                    <th className="px-4 py-2 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                                      No Bukti
+                                    </th>
+                                    <th className="px-4 py-2 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                                      Uraian
+                                    </th>
+                                    <th className="px-4 py-2 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                                      Tanggal
+                                    </th>
+                                    <th className="px-4 py-2 text-right text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                                      Nominal
+                                    </th>
                                   </tr>
-                                ))}
-                              </tbody>
-                              <tfoot>
-                                <tr className="border-t border-slate-300 bg-white">
-                                  <td
-                                    colSpan="3"
-                                    className="px-4 py-2.5 font-bold text-slate-800 text-sm"
-                                  >
-                                    Total
-                                  </td>
-                                  <td className="px-4 py-2.5 text-right font-extrabold text-slate-900 text-sm tabular-nums">
-                                    {formatCurrency(group.totalNominal)}
-                                  </td>
-                                </tr>
-                                {group.hasPPN && (
-                                  <tr className="border-t border-slate-200 bg-emerald-50/30">
+                                </thead>
+                                <tbody className="divide-y divide-slate-200/50">
+                                  {group.items.map((item, idx) => (
+                                    <tr key={item.id_kas_umum || idx} className="hover:bg-white/80">
+                                      <td className="px-4 py-2.5">
+                                        <span className="inline-flex items-center px-2 py-0.5 bg-violet-50 text-violet-700 text-xs font-semibold rounded-md">
+                                          {item.no_bukti || '-'}
+                                        </span>
+                                      </td>
+                                      <td className="px-4 py-2.5 text-slate-700">{item.uraian}</td>
+                                      <td className="px-4 py-2.5 text-slate-500 text-xs">
+                                        {formatDate(item.tanggal_transaksi)}
+                                      </td>
+                                      <td className="px-4 py-2.5 text-right font-semibold text-slate-800 tabular-nums">
+                                        {formatCurrency(item.nominal)}
+                                      </td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                                <tfoot>
+                                  <tr className="border-t border-slate-300 bg-white">
                                     <td
                                       colSpan="3"
-                                      className="px-4 py-2.5 font-medium text-emerald-700 text-xs"
+                                      className="px-4 py-2.5 font-bold text-slate-800 text-sm"
                                     >
-                                      PPN (11%)
+                                      Total
                                     </td>
-                                    <td className="px-4 py-2.5 text-right font-bold text-emerald-700 text-xs tabular-nums">
-                                      {formatCurrency(group.calculatedPPN)}
+                                    <td className="px-4 py-2.5 text-right font-extrabold text-slate-900 text-sm tabular-nums">
+                                      {formatCurrency(group.totalNominal)}
                                     </td>
                                   </tr>
-                                )}
-                              </tfoot>
-                            </table>
-                          </div>
-                          <div className="px-4 py-3 bg-white border-t border-slate-200 flex items-center justify-between">
-                            <div className="flex items-center gap-2">
+                                  {group.hasPPN && (
+                                    <tr className="border-t border-slate-200 bg-emerald-50/30">
+                                      <td
+                                        colSpan="3"
+                                        className="px-4 py-2.5 font-medium text-emerald-700 text-xs"
+                                      >
+                                        PPN (11%)
+                                      </td>
+                                      <td className="px-4 py-2.5 text-right font-bold text-emerald-700 text-xs tabular-nums">
+                                        {formatCurrency(group.calculatedPPN)}
+                                      </td>
+                                    </tr>
+                                  )}
+                                </tfoot>
+                              </table>
+                            </div>
+                            <div className="px-4 py-3 bg-white border-t border-slate-200 flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <button
+                                  onClick={() => handlePrintA2(group)}
+                                  disabled={isPA2}
+                                  className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg shadow-sm transition active:scale-[0.97] ${isPA2 ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-orange-500 text-white hover:bg-orange-600'}`}
+                                >
+                                  <FileText size={12} />
+                                  {isPA2 ? '✓ A2' : 'Cetak A2'}
+                                </button>
+                                <button
+                                  onClick={() => handlePrintBukti(group)}
+                                  disabled={isPBukti}
+                                  className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg shadow-sm transition active:scale-[0.97] ${isPBukti ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-violet-600 text-white hover:bg-violet-700'}`}
+                                >
+                                  <Printer size={12} />
+                                  {isPBukti ? '✓ Bukti' : 'Cetak Bukti'}
+                                </button>
+                              </div>
                               <button
-                                onClick={() => handlePrintA2(group)}
-                                disabled={isPA2}
-                                className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg shadow-sm transition active:scale-[0.97] ${isPA2 ? "bg-slate-100 text-slate-400 cursor-not-allowed" : "bg-orange-500 text-white hover:bg-orange-600"}`}
+                                onClick={() =>
+                                  resetPrintStatus(
+                                    group.items?.map((i) => i.no_bukti).filter(Boolean),
+                                    'ALL'
+                                  )
+                                }
+                                className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-lg transition active:scale-[0.97]"
                               >
-                                <FileText size={12} />
-                                {isPA2 ? "✓ A2" : "Cetak A2"}
-                              </button>
-                              <button
-                                onClick={() => handlePrintBukti(group)}
-                                disabled={isPBukti}
-                                className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg shadow-sm transition active:scale-[0.97] ${isPBukti ? "bg-slate-100 text-slate-400 cursor-not-allowed" : "bg-violet-600 text-white hover:bg-violet-700"}`}
-                              >
-                                <Printer size={12} />
-                                {isPBukti ? "✓ Bukti" : "Cetak Bukti"}
+                                <RefreshCw size={12} />
+                                Reset Cetak
                               </button>
                             </div>
-                            <button
-                              onClick={() => resetPrintStatus(group.items?.map(i => i.no_bukti).filter(Boolean), "ALL")}
-                              className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-lg transition active:scale-[0.97]"
-                            >
-                              <RefreshCw size={12} />
-                              Reset Cetak
-                            </button>
                           </div>
-                        </div>
-                      )}
-                    </div>
-                  );
+                        )}
+                      </div>
+                    );
                   })}
                 </div>
               )}

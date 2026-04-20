@@ -9,11 +9,17 @@
  * Filters by fund source for expenses via rapbs/anggaran JOINs
  */
 function getChartData(db, yearStr, chartConfig, fundSource) {
+  // Dynamic Kinerja amount
+  const { getKinerjaAnggaranTotal } = require('./statsQueries');
+  const kinerjaAmount = getKinerjaAnggaranTotal(db, parseInt(yearStr) || yearStr);
+
   // Build fund source filter for expenses
   let fundJoin = '';
   let fundWhere = '';
 
-  if (fundSource && fundSource !== 'SEMUA') {
+  const isFiltered = fundSource && fundSource !== 'SEMUA';
+
+  if (isFiltered) {
     fundJoin = `
       LEFT JOIN rapbs_periode rp ON k.id_rapbs_periode = rp.id_rapbs_periode
       LEFT JOIN rapbs r ON rp.id_rapbs = r.id_rapbs
@@ -26,12 +32,11 @@ function getChartData(db, yearStr, chartConfig, fundSource) {
 
     if (fundSource === 'BOS Kinerja') {
       // Income strictly 35jt (Transfer Kinerja)
-      incomeFilter = "OR (k.id_ref_bku = 2 AND k.saldo = 35000000)";
+      incomeFilter = `OR (k.id_ref_bku = 2 AND k.saldo = ${kinerjaAmount})`;
     } else if (fundSource === 'BOS Reguler') {
       // Income NOT 35jt (Not Kinerja) AND Not Interest (Not Lainnya)
-      // FIX: Use explicit ID/Code check instead of NOT LIKE '5.%' to handle NULL values correctly
       incomeFilter = `OR (
-        (k.id_ref_bku = 2 AND k.saldo != 35000000 AND LOWER(k.uraian) NOT LIKE '%bunga%' AND LOWER(k.uraian) NOT LIKE '%jasa giro%')
+        (k.id_ref_bku = 2 AND k.saldo != ${kinerjaAmount} AND LOWER(k.uraian) NOT LIKE '%bunga%' AND LOWER(k.uraian) NOT LIKE '%jasa giro%')
         OR 
         (k.kode_rekening LIKE '4.%' AND k.id_ref_bku != 26 AND LOWER(k.uraian) NOT LIKE '%bunga%' AND LOWER(k.uraian) NOT LIKE '%jasa giro%')
       )`;
@@ -47,18 +52,19 @@ function getChartData(db, yearStr, chartConfig, fundSource) {
     )`;
   }
 
+  // For SEMUA: include ALL income types (including bunga bank BKU 26, BKU 8, BKU 28)
+  // For filtered: exclude BKU 26 (bunga) which belongs to Lainnya
+  const bku26Exclude = isFiltered ? ' AND k.id_ref_bku != 26' : '';
+
   const query = `
     SELECT
       strftime('%m', k.tanggal_transaksi) as bulan,
       SUM(CASE WHEN k.kode_rekening LIKE '5.%' AND k.id_ref_bku NOT IN(5, 33, 10, 11) THEN k.saldo ELSE 0 END) as pengeluaran,
-      -- Exclude SiLPA from penerimaan (aligns with BKU table logic)
-      SUM(CASE WHEN (k.id_ref_bku = 2 OR k.kode_rekening LIKE '4.%') 
+      SUM(CASE WHEN (k.id_ref_bku = 2 OR (k.kode_rekening LIKE '4.%'${bku26Exclude}))
                 AND k.id_ref_bku NOT IN(5, 33, 10, 11) 
-                AND LOWER(k.uraian) NOT LIKE '%silpa%'
            THEN k.saldo ELSE 0 END) as penerimaan,
-      -- Exclude SiLPA from mutasi_netto
       SUM(CASE 
-        WHEN (k.id_ref_bku = 2 OR k.kode_rekening LIKE '4.%') AND LOWER(k.uraian) NOT LIKE '%silpa%' THEN k.saldo
+        WHEN (k.id_ref_bku = 2 OR (k.kode_rekening LIKE '4.%'${bku26Exclude})) THEN k.saldo
         WHEN k.kode_rekening LIKE '5.%' AND k.id_ref_bku NOT IN(5, 33, 10, 11) THEN -k.saldo
         ELSE 0 
       END) as mutasi_netto,
@@ -108,7 +114,9 @@ function getComposition(db, yearStr, fundFilterBelanja, fundSource) {
     fundWhere = `AND sd.nama_sumber_dana LIKE '%${fundSource}%'`;
   }
 
-  const composition = db.prepare(`
+  const composition = db
+    .prepare(
+      `
     SELECT
       substr(k.kode_rekening, 1, 6) as kategori,
       SUM(k.saldo) as total
@@ -121,7 +129,9 @@ function getComposition(db, yearStr, fundFilterBelanja, fundSource) {
       AND k.id_ref_bku NOT IN(5, 33, 10, 11)
       ${fundWhere}
     GROUP BY kategori
-  `).all(yearStr);
+  `
+    )
+    .all(yearStr);
 
   // Category name mapping
   const namaMap = {
@@ -131,13 +141,13 @@ function getComposition(db, yearStr, fundFilterBelanja, fundSource) {
     '5.2.02': 'Modal Peralatan',
     '5.2.03': 'Modal Gedung',
     '5.2.04': 'Modal Jalan',
-    '5.2.05': 'Modal Aset Lain'
+    '5.2.05': 'Modal Aset Lain',
   };
 
-  return composition.map(item => ({
+  return composition.map((item) => ({
     kategori: item.kategori,
     nama: namaMap[item.kategori] || item.kategori,
-    total: item.total
+    total: item.total,
   }));
 }
 
@@ -145,7 +155,9 @@ function getComposition(db, yearStr, fundFilterBelanja, fundSource) {
  * Get chart data for "Lainnya" source (interest income only)
  */
 function getChartDataLainnya(db, yearStr) {
-  return db.prepare(`
+  return db
+    .prepare(
+      `
     SELECT
       strftime('%m', k.tanggal_transaksi) as bulan,
       SUM(CASE 
@@ -205,11 +217,13 @@ function getChartDataLainnya(db, yearStr) {
       )
     GROUP BY bulan
     ORDER BY bulan
-  `).all(yearStr);
+  `
+    )
+    .all(yearStr);
 }
 
 module.exports = {
   getChartData,
   getComposition,
-  getChartDataLainnya
+  getChartDataLainnya,
 };

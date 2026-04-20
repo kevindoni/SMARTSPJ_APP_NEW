@@ -36,7 +36,7 @@ function buildAnggaranScope(fundSource) {
 /**
  * Build all fund filters for different query types
  */
-function buildFundFilters(fundSource, anggaranScope) {
+function buildFundFilters(fundSource, anggaranScope, kinerjaAmount = 0) {
   let fundFilterAnggaran = '';
   let fundFilterRealisasi = '';
   let fundFilterBelanja = '';
@@ -63,7 +63,7 @@ function buildFundFilters(fundSource, anggaranScope) {
     } else {
       // BOS Reguler (Smart Mode)
       // We DO NOT exclude Bunga/Jasa Giro anymore, to match user book
-      extraFilter += ` OR (${incCritNoBunga} AND saldo != 35000000)`;
+      extraFilter += ` OR (${incCritNoBunga} AND saldo != ${kinerjaAmount})`;
     }
 
     fundFilterRealisasi = `AND ( (${anggaranScope}) ${extraFilter} )`;
@@ -83,7 +83,7 @@ function buildFundFilters(fundSource, anggaranScope) {
 /**
  * Build chart CASE statements based on fund source
  */
-function buildChartCases(fundSource, anggaranScope) {
+function buildChartCases(fundSource, anggaranScope, kinerjaAmount = 0) {
   let chartWhereClause = '';
   let pengeluaranCase, penerimaanCase, mutasiNettoCase;
 
@@ -91,7 +91,7 @@ function buildChartCases(fundSource, anggaranScope) {
   let extraFilter = '';
   if (fundSource === 'BOS Kinerja') {
     extraFilter = `(id_ref_bku IN (4, 13) OR uraian LIKE '%ergeseran%' OR uraian LIKE '%Setor Tunai%')`;
-    extraFilter += ` OR (id_ref_bku IN (3, 4, 9, 10, 11, 13, 33) OR ((id_ref_bku = 2 AND ${anggaranScope}) OR (kode_rekening LIKE '4.%' AND ${anggaranScope}) OR (id_ref_bku IN (7, 8, 26, 28) AND (uraian LIKE '%SiLpa%' OR uraian LIKE '%Bunga%' OR uraian LIKE '%Jasa Giro%') AND uraian NOT LIKE 'Saldo Awal%') OR id_kas_umum = 'NaXlxoQ9NEuZYlNl71p06A'))`;
+    extraFilter += ` OR (id_ref_bku IN (3, 4, 9, 10, 11, 13, 33) OR ((id_ref_bku = 2 AND ${anggaranScope}) OR (kode_rekening LIKE '4.%' AND ${anggaranScope}) OR (id_ref_bku IN (7, 8, 26, 28) AND (uraian LIKE '%SiLpa%' OR uraian LIKE '%Bunga%' OR uraian LIKE '%Jasa Giro%') AND uraian NOT LIKE 'Saldo Awal%')))`;
   } else if (fundSource === 'BOS Reguler') {
     // Smart Reguler: Include almost everything (Cash ops, etc)
     extraFilter = `(id_ref_bku IN (4, 13) OR uraian LIKE '%ergeseran%' OR uraian LIKE '%Setor Tunai%')`;
@@ -115,9 +115,9 @@ function buildChartCases(fundSource, anggaranScope) {
   } else if (fundSource === 'SEMUA' || !fundSource) {
     chartWhereClause = '';
     pengeluaranCase = `SUM(CASE WHEN kode_rekening LIKE '5.%' AND id_ref_bku NOT IN(5, 33, 10, 11) THEN saldo ELSE 0 END)`;
-    penerimaanCase = `SUM(CASE WHEN (id_ref_bku = 2 OR kode_rekening LIKE '4.%') AND id_ref_bku NOT IN(5, 33, 10, 11) THEN saldo ELSE 0 END)`;
+    penerimaanCase = `SUM(CASE WHEN (id_ref_bku = 2 OR (kode_rekening LIKE '4.%' AND id_ref_bku != 26)) AND id_ref_bku NOT IN(5, 33, 10, 11) THEN saldo ELSE 0 END)`;
     mutasiNettoCase = `SUM(CASE 
-          WHEN id_ref_bku = 2 OR kode_rekening LIKE '4.%' THEN saldo
+          WHEN id_ref_bku = 2 OR (kode_rekening LIKE '4.%' AND id_ref_bku != 26) THEN saldo
           WHEN kode_rekening LIKE '5.%' AND id_ref_bku NOT IN(5, 33, 10, 11) THEN -saldo
           ELSE 0 
         END)`;
@@ -142,13 +142,13 @@ function buildChartCases(fundSource, anggaranScope) {
     penerimaanCase = `SUM(CASE 
           WHEN (kode_rekening LIKE '4.%' OR id_ref_bku = 2 OR uraian LIKE '%Bunga%' OR uraian LIKE '%SiLpa%') 
                AND id_ref_bku NOT IN(5, 33, 10, 11) 
-               AND saldo != 35000000 
+               AND saldo != ${kinerjaAmount} 
           THEN saldo
           ELSE 0 END)`;
 
     mutasiNettoCase = `SUM(CASE 
           WHEN (kode_rekening LIKE '4.%' OR id_ref_bku = 2 OR uraian LIKE '%Bunga%' OR uraian LIKE '%SiLpa%') 
-               AND saldo != 35000000 
+               AND saldo != ${kinerjaAmount} 
           THEN saldo
           WHEN kode_rekening LIKE '5.%' AND id_ref_bku NOT IN(5, 33, 10, 11) THEN -saldo
           ELSE 0 

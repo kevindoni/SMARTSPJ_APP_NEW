@@ -1,4 +1,4 @@
-const { contextBridge, ipcRenderer } = require('electron');
+﻿const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('arkas', {
   checkConnection: () => ipcRenderer.invoke('arkas:check-connection'),
@@ -25,7 +25,6 @@ contextBridge.exposeInMainWorld('arkas', {
     ipcRenderer.invoke('arkas:merge-transactions', idList, targetNoBukti),
   printMergedKwitansi: (idList, customNoBukti, customUraian, year) =>
     ipcRenderer.invoke('arkas:print-merged-kwitansi', idList, customNoBukti, customUraian, year),
-  // Auto-save PDF without dialog
   printBuktiAutoSave: (idList, noBuktiList, year) =>
     ipcRenderer.invoke('arkas:print-bukti-autosave', idList, noBuktiList, year),
   printA2AutoSave: (idList, noBuktiList, year) =>
@@ -49,24 +48,17 @@ contextBridge.exposeInMainWorld('arkas', {
   getRelatedTaxes: (uraian, date, kodeRekening, year, nominal) =>
     ipcRenderer.invoke('arkas:get-related-taxes', uraian, date, kodeRekening, year, nominal),
   saveSchoolInfo: (data) => ipcRenderer.invoke('arkas:save-school-info', data),
-
-  // Bank Reconciliation
   getBankReconciliation: (year) => ipcRenderer.invoke('arkas:get-bank-reconciliation', year),
   saveBankReconciliation: (year, values) =>
     ipcRenderer.invoke('arkas:save-bank-reconciliation', year, values),
-
   getRegisterKas: (year, month, fundSource) =>
     ipcRenderer.invoke('arkas:get-register-kas', year, month, fundSource),
   saveRegisterKas: (year, month, fundSource, denominations) =>
     ipcRenderer.invoke('arkas:save-register-kas', year, month, fundSource, denominations),
-
-  // Manual Tax APIs
   getManualTaxes: (year) => ipcRenderer.invoke('arkas:get-manual-taxes', year),
   saveManualTax: (entry) => ipcRenderer.invoke('arkas:save-manual-tax', entry),
-  updateManualTax: (id, updates) => ipcRenderer.invoke('arkas:update-manual-tax', { id, updates }),
+  updateManualTax: (id, updates) => ipcRenderer.invoke('arkas:update-manual-taxes', { id, updates }),
   deleteManualTax: (id) => ipcRenderer.invoke('arkas:delete-manual-tax', id),
-
-  // Backup & Restore
   createBackup: (savePath, localStorageData) =>
     ipcRenderer.invoke('arkas:create-backup', savePath, localStorageData),
   createFullBackup: (savePath, localStorageData) =>
@@ -76,10 +68,6 @@ contextBridge.exposeInMainWorld('arkas', {
     ipcRenderer.invoke('arkas:restore-backup', filePath, currentLocalStorageData),
   showSaveDialog: (options) => ipcRenderer.invoke('arkas:show-save-dialog', options),
   showOpenDialog: (options) => ipcRenderer.invoke('arkas:show-open-dialog', options),
-
-  // Nota Groups APIs (Local Storage)
-
-  // Export All BKU Reports
   exportAllBku: (params) => ipcRenderer.invoke('arkas:export-all-bku', params),
   notaGroups: {
     getAll: (year) => ipcRenderer.invoke('nota-groups:get-all', year),
@@ -89,22 +77,35 @@ contextBridge.exposeInMainWorld('arkas', {
     getTransactionsByNota: (year, month) =>
       ipcRenderer.invoke('arkas:get-transactions-by-nota', year, month),
   },
+
+  // ─── Updater APIs ───
   checkForUpdate: () => ipcRenderer.invoke('arkas:check-update'),
   downloadUpdate: () => ipcRenderer.invoke('arkas:download-update'),
   installUpdate: () => ipcRenderer.invoke('arkas:install-update'),
+
   onUpdateAvailable: (cb) => {
-    ipcRenderer.on('update-available', (_, info) => cb(info));
+    const handler = (_, info) => cb(info);
+    ipcRenderer.on('update-available', handler);
+    return () => ipcRenderer.removeListener('update-available', handler);
   },
   onUpdateProgress: (cb) => {
-    ipcRenderer.on('update-progress', (_, p) => cb(p));
+    const handler = (_, p) => cb(p);
+    ipcRenderer.on('update-progress', handler);
+    return () => ipcRenderer.removeListener('update-progress', handler);
   },
   onUpdateDownloaded: (cb) => {
-    ipcRenderer.on('update-downloaded', () => cb());
+    const handler = () => cb();
+    ipcRenderer.on('update-downloaded', handler);
+    return () => ipcRenderer.removeListener('update-downloaded', handler);
   },
   onUpdateNotAvailable: (cb) => {
-    ipcRenderer.on('update-not-available', () => cb());
+    const handler = () => cb();
+    ipcRenderer.on('update-not-available', handler);
+    return () => ipcRenderer.removeListener('update-not-available', handler);
   },
   onUpdateError: (cb) => {
-    ipcRenderer.on('update-error', (_, err) => cb(err));
+    const handler = (_, err) => cb(err);
+    ipcRenderer.on('update-error', handler);
+    return () => ipcRenderer.removeListener('update-error', handler);
   },
 });

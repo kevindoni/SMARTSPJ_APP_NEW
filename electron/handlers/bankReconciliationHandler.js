@@ -1,8 +1,16 @@
 const fs = require('fs');
 const path = require('path');
 
-const DATA_DIR = path.join(__dirname, '../../data');
-const BANK_RECON_FILE = path.join(DATA_DIR, 'bank-reconciliation.json');
+let DATA_DIR = path.join(__dirname, '../../data');
+
+function initBankReconStorage(dir) {
+  DATA_DIR = dir;
+}
+
+// Dynamic path getter to avoid stale-const bug
+function getReconFilePath() {
+  return path.join(DATA_DIR, 'bank-reconciliation.json');
+}
 
 const MONTHS = [
   'Januari',
@@ -21,8 +29,9 @@ const MONTHS = [
 
 function loadLocalData() {
   try {
-    if (fs.existsSync(BANK_RECON_FILE)) {
-      return JSON.parse(fs.readFileSync(BANK_RECON_FILE, 'utf-8'));
+    const filePath = getReconFilePath();
+    if (fs.existsSync(filePath)) {
+      return JSON.parse(fs.readFileSync(filePath, 'utf-8'));
     }
   } catch (e) {}
   return {};
@@ -32,7 +41,7 @@ function saveLocalData(data) {
   if (!fs.existsSync(DATA_DIR)) {
     fs.mkdirSync(DATA_DIR, { recursive: true });
   }
-  fs.writeFileSync(BANK_RECON_FILE, JSON.stringify(data, null, 2), 'utf-8');
+  fs.writeFileSync(getReconFilePath(), JSON.stringify(data, null, 2), 'utf-8');
 }
 
 function getBankReconciliationData(db, year) {
@@ -227,6 +236,7 @@ function saveBankStatementValues(year, values) {
 }
 
 module.exports = {
+  initBankReconStorage,
   getBankReconciliationData,
   saveBankStatementValues,
 };

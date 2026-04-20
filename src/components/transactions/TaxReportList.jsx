@@ -75,8 +75,12 @@ export default function TaxReportList({ stats }) {
     if (refetch) refetch();
   };
 
-  const confirmDeleteManualTax = (id) => { setPendingDeleteId(id); };
-  const cancelDelete = () => { setPendingDeleteId(null); };
+  const confirmDeleteManualTax = (id) => {
+    setPendingDeleteId(id);
+  };
+  const cancelDelete = () => {
+    setPendingDeleteId(null);
+  };
   const handleDeleteManualTax = async (id) => {
     try {
       const result = await window.arkas.deleteManualTax(id);
@@ -187,25 +191,30 @@ export default function TaxReportList({ stats }) {
   // 2. Sort Data (saldo_awal entries first, then by date)
   const sortedData = isMonthView
     ? [...mergedData].sort((a, b) => {
-      // Saldo_awal entries should come first
-      if (a.manual_type === 'saldo_awal' && b.manual_type !== 'saldo_awal') return -1;
-      if (b.manual_type === 'saldo_awal' && a.manual_type !== 'saldo_awal') return 1;
+        // Saldo_awal entries should come first
+        if (a.manual_type === 'saldo_awal' && b.manual_type !== 'saldo_awal') return -1;
+        if (b.manual_type === 'saldo_awal' && a.manual_type !== 'saldo_awal') return 1;
 
-      const dateA = new Date(a.tanggal_transaksi);
-      const dateB = new Date(b.tanggal_transaksi);
-      return dateA - dateB;
-    })
+        const dateA = new Date(a.tanggal_transaksi);
+        const dateB = new Date(b.tanggal_transaksi);
+        return dateA - dateB;
+      })
     : mergedData;
 
   // 3. Running Balance
   const calculatedBalances = useMemo(() => {
     let rb = openingBalance;
     return sortedData.map((tx) => {
-      if (tx.id_ref_bku === 10) { rb += tx.nominal; }
-      else if (tx.id_ref_bku === 11) { rb -= tx.nominal; }
-      else {
-        if ([11, 26, 28].includes(tx.id_ref_bku)) { rb -= tx.nominal; }
-        else { rb += tx.nominal; }
+      if (tx.id_ref_bku === 10) {
+        rb += tx.nominal;
+      } else if (tx.id_ref_bku === 11) {
+        rb -= tx.nominal;
+      } else {
+        if ([11, 26, 28].includes(tx.id_ref_bku)) {
+          rb -= tx.nominal;
+        } else {
+          rb += tx.nominal;
+        }
       }
       return rb;
     });
@@ -221,7 +230,10 @@ export default function TaxReportList({ stats }) {
   );
 
   // Stats for Summary
-  const calculatedSaldo = calculatedBalances.length > 0 ? calculatedBalances[calculatedBalances.length - 1] : openingBalance; // Final balance
+  const calculatedSaldo =
+    calculatedBalances.length > 0
+      ? calculatedBalances[calculatedBalances.length - 1]
+      : openingBalance; // Final balance
 
   const displayStats = {
     saldo: calculatedSaldo,
@@ -298,7 +310,7 @@ export default function TaxReportList({ stats }) {
   };
 
   return (
-    <div className="flex flex-col gap-6 font-sans">
+    <div className="flex flex-col gap-6">
       <ToastContainer />
 
       {/* Page Header */}

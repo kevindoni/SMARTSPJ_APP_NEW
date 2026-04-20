@@ -1,4 +1,4 @@
-import {
+﻿import {
   LayoutDashboard,
   BookOpen,
   PieChart,
@@ -18,21 +18,16 @@ import {
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
+const isElectron = typeof window !== 'undefined' && window.arkas;
+
 export default function Sidebar({ activeTab, setActiveTab }) {
-  const [appVersion, setAppVersion] = useState('...');
+  const [appVersion, setAppVersion] = useState('');
 
   useEffect(() => {
-    const loadVersion = async () => {
-      try {
-        if (window.arkas?.getAppVersion) {
-          const v = await window.arkas.getAppVersion();
-          setAppVersion(v.appVersion);
-        }
-      } catch {
-        setAppVersion('1.0.0');
-      }
-    };
-    loadVersion();
+    if (!isElectron) return;
+    window.arkas?.getAppVersion?.()
+      .then((v) => setAppVersion(v.appVersion))
+      .catch(() => setAppVersion(''));
   }, []);
 
   const menuGroups = [
@@ -80,64 +75,42 @@ export default function Sidebar({ activeTab, setActiveTab }) {
   return (
     <aside className="w-64 bg-white/80 backdrop-blur-xl border-r border-slate-200/60 flex flex-col h-screen fixed left-0 top-0 z-50 transition-all duration-300 shadow-[4px_0_24px_-12px_rgba(0,0,0,0.1)]">
       {/* Brand */}
-      <div className="p-6 h-[88px] flex items-center gap-3 border-b border-slate-100/60">
-        <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-blue-500/30 ring-1 ring-white/20">
+      <div className="p-5 h-[72px] flex items-center gap-3 border-b border-slate-100/60">
+        <div className="w-9 h-9 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-blue-500/30 ring-1 ring-white/20">
           S
         </div>
         <div>
-          <h1 className="text-slate-800 font-bold font-sans text-lg tracking-tight leading-none mb-0.5">
-            SmartSPJ
-          </h1>
-          {typeof window !== 'undefined' && window.arkas && (
-            <p className="text-[10px] uppercase font-bold text-slate-500 tracking-wider bg-slate-100 inline-block px-1.5 py-0.5 rounded-md">
+          <h1 className="text-slate-800 font-bold text-base tracking-tight leading-none">SmartSPJ</h1>
+          {isElectron && (
+            <p className="text-[9px] uppercase font-bold text-slate-400 tracking-wider mt-0.5">
               Desktop Edition
             </p>
           )}
         </div>
       </div>
 
-      {/* Menu List */}
-      <div className="flex-1 overflow-y-auto py-6 px-4 space-y-6 scrollbar-thin scrollbar-thumb-slate-200 hover:scrollbar-thumb-slate-300">
+      {/* Menu */}
+      <div className="flex-1 overflow-y-auto py-4 px-3 space-y-5 custom-scrollbar">
         {menuGroups.map((group, idx) => (
           <div key={idx}>
             {group.title && (
-              <h3 className="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-3 ml-1">
+              <h3 className="px-3 text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-2 ml-1">
                 {group.title}
               </h3>
             )}
-
-            <div className="space-y-1">
+            <div className="space-y-0.5">
               {group.items.map((item) => {
                 const Icon = item.icon;
                 const isActive = activeTab === item.id;
-
                 return (
                   <button
                     key={item.id}
                     onClick={() => setActiveTab(item.id)}
-                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 group relative overflow-hidden
-                                        ${
-                                          isActive
-                                            ? 'text-white shadow-lg shadow-blue-500/25 ring-1 ring-white/20'
-                                            : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
-                                        }`}
+                    className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium transition-all duration-200 group relative overflow-hidden ${isActive ? 'text-white shadow-lg shadow-blue-500/25 ring-1 ring-white/20' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'}`}
                   >
-                    {isActive && (
-                      <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 z-0"></div>
-                    )}
-
-                    <Icon
-                      size={18}
-                      className={`relative z-10 transition-transform duration-300 ${isActive ? 'scale-110' : 'group-hover:scale-110 text-slate-400 group-hover:text-blue-500'}`}
-                      strokeWidth={isActive ? 2.5 : 2}
-                    />
-                    <span className={`relative z-10 ${isActive ? 'font-semibold' : ''}`}>
-                      {item.label}
-                    </span>
-
-                    {isActive && (
-                      <div className="absolute right-3 w-1.5 h-1.5 rounded-full bg-white animate-pulse z-10"></div>
-                    )}
+                    {isActive && <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 z-0" />}
+                    <Icon size={17} className={`relative z-10 transition-transform duration-200 ${isActive ? 'scale-110' : 'group-hover:scale-105 text-slate-400 group-hover:text-blue-500'}`} strokeWidth={isActive ? 2.5 : 2} />
+                    <span className={`relative z-10 ${isActive ? 'font-semibold' : ''}`}>{item.label}</span>
                   </button>
                 );
               })}
@@ -146,11 +119,10 @@ export default function Sidebar({ activeTab, setActiveTab }) {
         ))}
       </div>
 
-      {/* Footer Info */}
-      {typeof window !== 'undefined' && window.arkas && (
-        <div className="p-4 bg-slate-50/50 border-t border-slate-100 text-[10px] text-center text-slate-400 backdrop-blur-sm">
+      {/* Footer */}
+      {isElectron && appVersion && (
+        <div className="p-3 bg-slate-50/50 border-t border-slate-100 text-[10px] text-center text-slate-400">
           <p className="font-medium text-slate-500">SmartSPJ v{appVersion}</p>
-          <p>Terintegrasi dengan ARKAS</p>
         </div>
       )}
     </aside>
