@@ -427,10 +427,11 @@ function getPenerimaanDana(db, yearStr, fundSource, anggaranScope) {
     } else if (fundSource === 'BOS Kinerja') {
       fundFilter = `AND (ku.uraian LIKE '%Kinerja%' OR sd.id_ref_sumber_dana IN (12, 35))`;
     } else if (fundSource === 'Lainnya') {
-      fundFilter = 'AND ku.id_ref_bku = 6';
+      fundFilter =
+        "AND (ku.id_ref_bku = 6 OR LOWER(ku.uraian) LIKE '%silpa%' OR LOWER(ku.uraian) LIKE '%sisa lebih%')";
     }
 
-    const query = `SELECT ku.uraian, ku.tanggal_transaksi, ku.saldo as nominal, sd.nama_sumber_dana, sd.id_ref_sumber_dana FROM kas_umum ku LEFT JOIN anggaran a ON ku.id_anggaran = a.id_anggaran LEFT JOIN ref_sumber_dana sd ON a.id_ref_sumber_dana = sd.id_ref_sumber_dana WHERE strftime('%Y', ku.tanggal_transaksi) = ? AND ku.soft_delete = 0 AND ku.saldo > 0 AND ku.id_ref_bku = 2 ${fundFilter} ORDER BY ku.tanggal_transaksi ASC LIMIT 10`;
+    const query = `SELECT ku.uraian, ku.tanggal_transaksi, ku.saldo as nominal, sd.nama_sumber_dana, sd.id_ref_sumber_dana FROM kas_umum ku LEFT JOIN anggaran a ON ku.id_anggaran = a.id_anggaran LEFT JOIN ref_sumber_dana sd ON a.id_ref_sumber_dana = sd.id_ref_sumber_dana WHERE strftime('%Y', ku.tanggal_transaksi) = ? AND ku.soft_delete = 0 AND ku.saldo > 0 AND (ku.id_ref_bku = 2 OR LOWER(ku.uraian) LIKE '%silpa%') ${fundFilter} ORDER BY ku.tanggal_transaksi ASC LIMIT 10`;
     const rows = db.prepare(query).all(yearStr);
 
     return rows.map((row) => {

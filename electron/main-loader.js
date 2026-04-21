@@ -1,3 +1,11 @@
 'use strict';
+
 require('bytenode');
-require('./main.jsc');
+
+const { app } = require('electron');
+
+if (!app.isPackaged) {
+  require('./main.js');
+} else {
+  require('./main.jsc');
+}
