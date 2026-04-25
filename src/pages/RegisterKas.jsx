@@ -69,7 +69,7 @@ export default function RegisterKas() {
       try {
         const res = await window.arkas.getClosingBalances(year, activeMonth, fundSource);
         if (res.success) {
-          setBalances(res.data);
+          setBalances((prev) => ({ ...prev, ...res.data }));
         }
       } catch (error) {
         console.error('Failed to load closing balances', error);
@@ -217,13 +217,13 @@ export default function RegisterKas() {
       '3. Saldo Bank, Surat Berharga dll',
       '',
       'Sub Jumlah (3)',
-      `Rp. ${balances.saldo_bank.toLocaleString('id-ID')}`,
+      `Rp. ${(balances.saldo_bank || 0).toLocaleString('id-ID')}`,
     ]);
     body.push([
       '4. Saldo Kas Pajak',
       '',
       'Sub Jumlah (4)',
-      `Rp. ${balances.saldo_pajak.toLocaleString('id-ID')}`,
+      `Rp. ${(balances.saldo_pajak || 0).toLocaleString('id-ID')}`,
     ]);
 
     const totalSemua = subTotal1 + subTotal2 + balances.saldo_bank; // + Pajak? Usually Pajak is part of Bank/Tunai mix, but here treated separate line? No, layout imply addition.

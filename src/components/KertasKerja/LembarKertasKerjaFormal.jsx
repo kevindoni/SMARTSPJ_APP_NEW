@@ -14,7 +14,7 @@ const Td = ({
   <td
     colSpan={colSpan}
     rowSpan={rowSpan}
-    className={`border border-black px-2 py-1 align-top text-${align} ${bold ? 'font-bold' : ''} ${className}`}
+    className={`border border-black px-2 py-1 align-top ${({ left: 'text-left', right: 'text-right', center: 'text-center' })[align] || 'text-left'} ${bold ? 'font-bold' : ''} ${className}`}
   >
     {children}
   </td>

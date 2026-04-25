@@ -14,15 +14,7 @@ const SplashScreen = ({ onComplete }) => {
   const [progress, setProgress] = useState(0);
   const [stepIndex, setStepIndex] = useState(0);
   const [fadeOut, setFadeOut] = useState(false);
-  const [version, setVersion] = useState('');
-
-  useEffect(() => {
-    if (window.arkas?.getAppVersion) {
-      window.arkas.getAppVersion().then((v) => {
-        if (v?.appVersion) setVersion(v.appVersion);
-      }).catch(() => {});
-    }
-  }, []);
+  const [version] = useState(__APP_VERSION__);
 
   useEffect(() => {
     let frame;
@@ -40,7 +32,10 @@ const SplashScreen = ({ onComplete }) => {
       let acc = 0;
       for (let i = 0; i < LOADING_STEPS.length; i++) {
         acc += LOADING_STEPS[i].duration;
-        if (elapsed < acc) { setStepIndex(i); break; }
+        if (elapsed < acc) {
+          setStepIndex(i);
+          break;
+        }
       }
 
       if (p < 1) {
@@ -48,7 +43,9 @@ const SplashScreen = ({ onComplete }) => {
       } else {
         setStepIndex(LOADING_STEPS.length - 1);
         setFadeOut(true);
-        setTimeout(() => { if (onComplete) onComplete(); }, 300);
+        setTimeout(() => {
+          if (onComplete) onComplete();
+        }, 300);
       }
     };
 
@@ -74,7 +71,9 @@ const SplashScreen = ({ onComplete }) => {
 
       {/* Title */}
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-slate-800 mb-2">SMART <span className="text-blue-600">SPJ</span></h1>
+        <h1 className="text-3xl font-bold text-slate-800 mb-2">
+          SMART <span className="text-blue-600">SPJ</span>
+        </h1>
         <p className="text-slate-500 text-base font-medium">Aplikasi Pendamping ARKAS</p>
       </div>
 

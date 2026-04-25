@@ -1,4 +1,4 @@
-﻿const { contextBridge, ipcRenderer } = require('electron');
+const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('arkas', {
   checkConnection: () => ipcRenderer.invoke('arkas:check-connection'),
@@ -57,7 +57,7 @@ contextBridge.exposeInMainWorld('arkas', {
     ipcRenderer.invoke('arkas:save-register-kas', year, month, fundSource, denominations),
   getManualTaxes: (year) => ipcRenderer.invoke('arkas:get-manual-taxes', year),
   saveManualTax: (entry) => ipcRenderer.invoke('arkas:save-manual-tax', entry),
-  updateManualTax: (id, updates) => ipcRenderer.invoke('arkas:update-manual-taxes', { id, updates }),
+  updateManualTax: (id, updates) => ipcRenderer.invoke('arkas:update-manual-tax', { id, updates }),
   deleteManualTax: (id) => ipcRenderer.invoke('arkas:delete-manual-tax', id),
   createBackup: (savePath, localStorageData) =>
     ipcRenderer.invoke('arkas:create-backup', savePath, localStorageData),
@@ -82,6 +82,8 @@ contextBridge.exposeInMainWorld('arkas', {
   checkForUpdate: () => ipcRenderer.invoke('arkas:check-update'),
   downloadUpdate: () => ipcRenderer.invoke('arkas:download-update'),
   installUpdate: () => ipcRenderer.invoke('arkas:install-update'),
+  saveUpdaterToken: (token) => ipcRenderer.invoke('arkas:save-updater-token', token),
+  getUpdaterTokenStatus: () => ipcRenderer.invoke('arkas:get-updater-token-status'),
 
   onUpdateAvailable: (cb) => {
     const handler = (_, info) => cb(info);

@@ -49,9 +49,9 @@ function smartMatchTransactions(db, rows, validBudgetIds, selectedMonth) {
                   AND LOWER(TRIM(r.uraian)) = LOWER(TRIM(?))
                   AND ku.soft_delete = 0
                   AND ku.id_ref_bku NOT IN (5, 33, 10, 11)
-                  AND strftime('%m', ku.tanggal_transaksi) <= '${mStr}'
+                  AND strftime('%m', ku.tanggal_transaksi) <= ?
             `;
-      const transactions = db.prepare(txQuery).all(...validBudgetIds, uraian);
+      const transactions = db.prepare(txQuery).all(...validBudgetIds, uraian, mStr);
 
       if (transactions.length === 0) continue;
 
@@ -276,8 +276,7 @@ const kertasKerjaHandler = {
 
       let monthCondition = '1=1';
       if (selectedMonth && selectedMonth > 0) {
-        const mStr = String(selectedMonth).padStart(2, '0');
-        monthCondition = `strftime('%m', ku.tanggal_transaksi) = '${mStr}'`;
+        monthCondition = `strftime('%m', ku.tanggal_transaksi) = ?`;
       }
 
       const m = selectedMonth || 0;
@@ -343,7 +342,7 @@ const kertasKerjaHandler = {
                     JOIN kas_umum ku ON rp_sub.id_rapbs_periode = ku.id_rapbs_periode
                     WHERE ku.soft_delete = 0
                       AND ku.id_ref_bku NOT IN (5, 33, 10, 11)
-                      AND strftime('%m', ku.tanggal_transaksi) <= '${String(m || 12).padStart(2, '0')}'
+                      AND strftime('%m', ku.tanggal_transaksi) <= ?
                     GROUP BY rp_sub.id_rapbs
                 ) realisasi ON r.id_rapbs = realisasi.id_rapbs
                 WHERE a.id_anggaran IN (${idPlaceholders})
@@ -361,7 +360,13 @@ const kertasKerjaHandler = {
                 ORDER BY k.id_kode ASC, r.kode_rekening ASC
             `;
 
-      const rows = db.prepare(query).all(m, yearStr, yearNum, yearStr, yearNum, ...validBudgetIds);
+      const mStr = selectedMonth > 0 ? String(selectedMonth).padStart(2, '0') : null;
+            const mStrEnd = String(m || 12).padStart(2, '0');
+            const queryParams = [m, yearStr, yearNum, yearStr, yearNum];
+            if (mStr) { queryParams.push(mStr, mStr); }
+            queryParams.push(mStrEnd);
+            queryParams.push(...validBudgetIds);
+            const rows = db.prepare(query).all(...queryParams);
 
       const annualPagu = db
         .prepare(

@@ -1,4 +1,4 @@
-﻿import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useArkasData } from '../../hooks/useArkasData';
 import { useFilter } from '../../context/FilterContext';
 import { formatRupiah } from '../../utils/transactionHelpers';
@@ -229,7 +229,7 @@ export default function DashboardRedesigned() {
                         <td className="py-2 px-3 text-right">
                           <div className="flex items-center justify-end gap-1.5">
                             <div className="w-10 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                              <div className={`h-full rounded-full ${pct > 90 ? 'bg-rose-500' : rawPct > 50 ? 'bg-amber-500' : 'bg-emerald-500'}`} style={{ width: `${Math.min(pct, 100)}%` }} />
+                              <div className={`h-full rounded-full ${pct > 90 ? 'bg-rose-500' : pct > 50 ? 'bg-amber-500' : 'bg-emerald-500'}`} style={{ width: `${Math.min(pct, 100)}%` }} />
                             </div>
                             <span className="text-[10px] font-bold text-slate-600 min-w-[32px] text-right">{pct.toFixed(1)}%</span>
                           </div>

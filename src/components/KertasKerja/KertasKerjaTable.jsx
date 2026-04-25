@@ -57,16 +57,16 @@ export default function KertasKerjaTable({
 
               // Calculate Quarter Values if needed
               const tw1 = isQuarterly
-                ? ((item.v1 || 0) + (item.v2 || 0) + (item.v3 || 0)) * item.harga_satuan
+                ? ((item.v1 || 0) + (item.v2 || 0) + (item.v3 || 0)) * (item.harga_satuan || 0)
                 : 0;
               const tw2 = isQuarterly
-                ? ((item.v4 || 0) + (item.v5 || 0) + (item.v6 || 0)) * item.harga_satuan
+                ? ((item.v4 || 0) + (item.v5 || 0) + (item.v6 || 0)) * (item.harga_satuan || 0)
                 : 0;
               const tw3 = isQuarterly
-                ? ((item.v7 || 0) + (item.v8 || 0) + (item.v9 || 0)) * item.harga_satuan
+                ? ((item.v7 || 0) + (item.v8 || 0) + (item.v9 || 0)) * (item.harga_satuan || 0)
                 : 0;
               const tw4 = isQuarterly
-                ? ((item.v10 || 0) + (item.v11 || 0) + (item.v12 || 0)) * item.harga_satuan
+                ? ((item.v10 || 0) + (item.v11 || 0) + (item.v12 || 0)) * (item.harga_satuan || 0)
                 : 0;
 
               // Group Header: Kegiatan

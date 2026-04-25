@@ -1890,4 +1890,5 @@ module.exports = {
   initSignatoryStorage,
   saveSignatoryData,
   getSignatoryData,
+  getBaAuditData,
 };

@@ -109,7 +109,7 @@ export default function RealisasiBelanja() {
         rekenings: [],
       };
     }
-    acc[key].anggaran += current.total_anggaran;
+    acc[key].anggaran += current.total_anggaran || 0;
     acc[key].realisasi += current.total_realisasi || 0;
     acc[key].vol_pagu += current.total_volume_pagu || 0;
     acc[key].vol_realisasi += current.total_volume_realisasi || 0;
@@ -218,7 +218,7 @@ export default function RealisasiBelanja() {
             <div className="w-full h-1.5 bg-slate-100 rounded-lg overflow-hidden">
               <div
                 className="h-full bg-red-500 transition-all"
-                style={{ width: `${Math.min(100, (totalRealisasiInternal / annualPagu) * 100)}%` }}
+                style={{ width: `${annualPagu > 0 ? Math.min(100, (totalRealisasiInternal / annualPagu) * 100) : 0}%` }}
               ></div>
             </div>
           </div>
@@ -403,7 +403,7 @@ export default function RealisasiBelanja() {
                       })
                     : (viewMode === 'summary' ? sortedActivities : items).map((item, idx) => {
                         const isSummary = viewMode === 'summary';
-                        const prog = (item.kode || item.kode_kegiatan).split('.')[0];
+                        const prog = ((item.kode || item.kode_kegiatan) || '').split('.')[0];
 
                         const vPagu = isSummary ? item.vol_pagu : item.total_volume_pagu;
                         const vCumReal = isSummary

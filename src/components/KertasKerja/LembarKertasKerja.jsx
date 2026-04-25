@@ -25,7 +25,7 @@ export default function LembarKertasKerja({
     if (target) {
       target.total += item.total;
       // Calculate TWs using parsed v1..v12
-      const p = item.harga_satuan;
+      const p = item.harga_satuan || 0;
       target.tw[0] += ((item.v1 || 0) + (item.v2 || 0) + (item.v3 || 0)) * p;
       target.tw[1] += ((item.v4 || 0) + (item.v5 || 0) + (item.v6 || 0)) * p;
       target.tw[2] += ((item.v7 || 0) + (item.v8 || 0) + (item.v9 || 0)) * p;

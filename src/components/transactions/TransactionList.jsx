@@ -30,7 +30,7 @@ export default function TransactionList({ stats }) {
   if (isMonthView && stats?.chart) {
     const monthIndex = MONTHS.findIndex((m) => m.id === selectedMonth);
     if (monthIndex > 0) {
-      openingBalance = stats.chart[monthIndex - 1].saldo_akhir;
+      openingBalance = stats.chart[monthIndex - 1].saldo_akhir || 0;
     } else {
       if (monthIndex === 0) openingBalance = 0;
     }

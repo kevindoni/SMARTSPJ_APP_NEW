@@ -61,7 +61,7 @@ export default function useTransactions({
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [year, fundSource, search, selectedMonth, selectedFilters]
+    [year, fundSource, search, selectedMonth, selectedFilters, paymentType]
   );
 
   const handleLoadMore = useCallback(() => {
@@ -76,5 +76,6 @@ export default function useTransactions({
     hasMore,
     fetchTransactions,
     handleLoadMore,
+    refetch: () => fetchTransactions(0, true),
   };
 }

@@ -192,8 +192,8 @@ export default function TaxReportList({ stats }) {
   const sortedData = isMonthView
     ? [...mergedData].sort((a, b) => {
         // Saldo_awal entries should come first
-        if (a.manual_type === 'saldo_awal' && b.manual_type !== 'saldo_awal') return -1;
-        if (b.manual_type === 'saldo_awal' && a.manual_type !== 'saldo_awal') return 1;
+        if ((a.manual_type === 'saldo_awal' || a.manual_type === 'saldo_awal_tahun') && b.manual_type !== 'saldo_awal' && b.manual_type !== 'saldo_awal_tahun') return -1;
+        if ((b.manual_type === 'saldo_awal' || b.manual_type === 'saldo_awal_tahun') && a.manual_type !== 'saldo_awal' && a.manual_type !== 'saldo_awal_tahun') return 1;
 
         const dateA = new Date(a.tanggal_transaksi);
         const dateB = new Date(b.tanggal_transaksi);

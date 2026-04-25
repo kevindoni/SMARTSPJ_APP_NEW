@@ -39,15 +39,14 @@ export default function KertasKerjaFormalTableAnnual({
     else if (src.includes('AFIRMASI') || src.includes('KINERJA')) sourceKey = 'AFIRMASI';
     else if (src.includes('SILPA')) sourceKey = 'SILPA';
 
-    item.annualType = typeKey;
-    item.annualSource = sourceKey;
+    const enrichedItem = { ...item, annualType: typeKey, annualSource: sourceKey };
 
-    grouped[codeL1].l2[codeL2].l3[codeL3].items.push(item);
+    grouped[codeL1].l2[codeL2].l3[codeL3].items.push(enrichedItem);
 
     // Add to Grand Totals
     const grandKey = `${sourceKey}-${typeKey}`;
     grandTotals[grandKey] = (grandTotals[grandKey] || 0) + item.total;
-    totalAll += item.total;
+    totalAll += (item.total || 0);
   });
 
   // Helper to calculate row columns

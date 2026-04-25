@@ -1,14 +1,13 @@
 {
   "name": "smart-spj",
-  "version": "1.7.1",
+  "version": "1.7.2",
   "description": "Aplikasi Pendamping ARKAS untuk Pengelolaan SPJ",
   "main": "electron/main-loader.js",
   "scripts": {
     "dev": "concurrently \"vite\" \"wait-on tcp:3847 && electron .\"",
     "build": "vite build",
     "preview": "vite preview",
-    "compile:bytecode": "node scripts/compile-bytecode.js",
-    "build:electron": "npm run build && npm run compile:bytecode && electron-builder"
+    "build:electron": "npm run build && electron-builder"
   },
   "keywords": [
     "arkas",
@@ -50,6 +49,7 @@
     "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.16",
     "concurrently": "^8.2.2",
+    "docx": "^9.6.1",
     "electron": "^28.1.0",
     "electron-builder": "^26.4.0",
     "eslint": "^8.56.0",
@@ -71,17 +71,15 @@
     },
     "files": [
       "dist/**/*",
-      "electron/**/*.jsc",
-      "electron/main-loader.js",
-      "electron/preload.js",
-      "electron/logo.png",
+      "electron/**/*",
       "node_modules/**/*",
       ".env",
       "src/config/reconciliation_columns_full.json"
     ],
     "asar": true,
     "asarUnpack": [
-      "src/config/reconciliation_columns_full.json"
+      "src/config/reconciliation_columns_full.json",
+      "electron/**/*.js"
     ],
     "win": {
       "icon": "electron/logo.png",

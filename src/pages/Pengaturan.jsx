@@ -177,7 +177,9 @@ export default function Pengaturan() {
             <div>
               <span className={theme.text.label}>Lokasi</span>
               <div className="font-semibold text-slate-800 text-sm mt-1">
-                {[school?.kecamatan, school?.kabupaten].filter(Boolean).join(', ') || '-'}
+                {[school?.kecamatan, school?.kabupaten, school?.provinsi]
+                  .filter(Boolean)
+                  .join(', ') || '-'}
               </div>
             </div>
           </div>

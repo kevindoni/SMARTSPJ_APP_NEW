@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { useFilter } from '../context/FilterContext';
 import { formatRupiah } from '../utils/transactionHelpers';
+import { toast, ToastContainer } from 'react-toastify';
 
 export default function BankReconciliation() {
   const { year } = useFilter();
@@ -91,6 +92,8 @@ export default function BankReconciliation() {
     return num.toLocaleString('id-ID');
   };
 
+  const months = data?.months || [];
+
   const getLastPopulatedMonth = () => {
     for (let i = months.length - 1; i >= 0; i--) {
       if (parseNum(bankValues[months[i].bulan]) > 0) return months[i];
@@ -117,8 +120,6 @@ export default function BankReconciliation() {
       </div>
     );
   }
-
-  const months = data?.months || [];
 
   const lastPopulated = getLastPopulatedMonth();
   const lastBkuSaldo = lastPopulated
@@ -413,6 +414,7 @@ export default function BankReconciliation() {
           </div>
         </div>
       )}
+          <ToastContainer position="top-right" autoClose={3000} />
     </div>
   );
 }

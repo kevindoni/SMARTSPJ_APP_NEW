@@ -4,6 +4,96 @@ Semua perubahan penting pada proyek ini akan didokumentasikan dalam file ini.
 
 ---
 
+## [1.7.2] — 2026-04-23
+
+### Bug Fix — Kritis
+
+#### ✅ Fix Data Sekolah Tidak Muncul (Nama, NPSN, Alamat, Wilayah, Pejabat)
+
+**File:** `electron/main.js` (`getSchoolInfoWithOfficials`), `src/pages/Pengaturan.jsx`
+
+**Masalah:** Pada beberapa sekolah (terutama SLB, TK, RA, dan sekolah dengan struktur ID berbeda), data sekolah tidak muncul sama sekali di dashboard dan halaman Pengaturan. Tampilan menampilkan "-" untuk NPSN, alamat, provinsi/kabupaten/kecamatan, dan nama pejabat.
+
+**Penyebab:** Fungsi `getSchoolInfoWithOfficials` memiliki 5 bug:
+
+1. **JOIN kaku** — Query utama `i.instansi_id = mst.sekolah_id` hanya cocok untuk sekolah yang ID-nya sama persis. Di banyak database Arkas, `mst_sekolah.sekolah_id` berisi UUID/NPSN yang berbeda dari `instansi.instansi_id`, sehingga JOIN gagal total.
+
+2. **WHERE clause mematikan LEFT JOIN** — `WHERE mst.sekolah_id IS NOT NULL` membuat LEFT JOIN berfungsi sebagai INNER JOIN, sehingga jika `mst_sekolah` tidak cocok, seluruh query return NULL.
+
+3. **Fallback terlalu sempit** — Fallback 1 hanya mencari `jenis_instansi_id = 5` (sekolah umum), melewatkan SLB, TK, RA, dan jenis lain. Di beberapa database, `instansi` berisi Dinas (jenis 3), bukan sekolah.
+
+4. **Wilayah lookup hanya dari instansi** — Jika `instansi.kode_wilayah` = '0' atau NULL, lookup wilayah di-skip sepenuhnya, padahal `mst_sekolah.kode_wilayah` mungkin berisi data valid.
+
+5. **Pejabat lookup hanya 1 ID** — Hanya mencoba `sekolah.sekolah_id`, padahal `sekolah_penjab` bisa menggunakan NPSN atau ID lain sebagai foreign key.
+
+**Perbaikan:**
+
+- **STEP 1**: Selalu ambil `instansi` dulu (tanpa filter jenis), lalu cari `mst_sekolah` dengan 3 strategi berurutan: via `sekolah_id`, via `npsn`, atau `LIMIT 1`
+- **STEP 2**: Merge data `mst_sekolah` tanpa menimpa kolom `instansi` yang sudah ada (safe merge per-kolom)
+- **STEP 3**: Wilayah lookup menggunakan dual source: `instansi.kode_wilayah` **atau** `mst_sekolah.kode_wilayah`
+- **STEP 4**: Pejabat lookup mencoba semua ID yang tersedia: `sekolah_id`, `instansi_id`, `npsn`
+- **STEP 5**: Alamat fallback ke `mst_sekolah.alamat_jalan` jika `instansi.alamat` kosong
+
+**Verifikasi:** Dites langsung ke database Arkas (SMP Nur Lintang Kedu, NPSN 70007889) di mana `instansi` hanya berisi Dinas dan `mst_sekolah` berisi data sekolah. Semua field berhasil ditampilkan dengan benar.
+
+---
+
+### Bug Fix — Auto Update
+
+#### ✅ Fix Race Condition Auto-Check vs Manual Check
+
+**File:** `electron/main.js` (`setupAutoUpdater`)
+
+**Masalah:** Auto-check (5 detik setelah load) dan manual check bisa berjalan bersamaan, menyebabkan state flicker di UI dan duplikasi events ke renderer.
+
+**Perbaikan:** Tambahkan flag `isCheckingUpdate` untuk mencegah concurrent `checkForUpdates()`, dan `isAutoCheck` untuk suppress events non-kritis (`update-not-available`, `update-error`) dari auto-check agar tidak mengganggu UI.
+
+---
+
+#### ✅ Fix Version Comparison NaN untuk Pre-release Tag
+
+**File:** `electron/main.js` (`isNewerVersion`)
+
+**Masalah:** Versi string seperti `1.0.0-beta` menghasilkan `NaN` saat `.map(Number)` karena `"0-beta"` gagal dikonversi. Perbandingan `NaN > x` selalu `false`, sehingga update tidak terdeteksi.
+
+**Perbaikan:** Ubah `.map(Number)` menjadi `.map(s => parseInt(s, 10) || 0)` untuk menangani suffix non-numerik.
+
+---
+
+#### ✅ Fix Crash di Dev Mode: "No handler registered"
+
+**File:** `electron/main.js`
+
+**Masalah:** `setupAutoUpdater()` hanya dipanggil saat `!isDev`, tapi preload.js tetap expose API ke renderer. Klik tombol update di dev mode menyebabkan crash `Error: No handler registered for 'arkas:check-update'`.
+
+**Perbaikan:** Register stub IPC handlers di dev mode yang mengembalikan pesan "tidak tersedia dalam mode pengembangan".
+
+---
+
+### Peningkatan
+
+#### ✅ Auto Update: Encrypted Token Storage & Timeout Protection
+
+**File:** `electron/main.js`, `src/components/layout/Header.jsx`
+
+- GitHub token untuk auto-update disimpan terenkripsi menggunakan Electron `safeStorage` (OS-level encryption)
+- Auto-migrasi dari plain-text `updater.json` ke encrypted `.updater-key`
+- Cek update timeout 30 detik, download timeout 5 menit (sebelumnya tidak ada timeout)
+- Download speed ditampilkan saat update diunduh (MB/s atau KB/s)
+- IPC handler guard untuk mencegah double-register
+
+---
+
+#### ✅ Pengaturan: Tampilkan Provinsi di Lokasi Sekolah
+
+**File:** `src/pages/Pengaturan.jsx`
+
+**Masalah:** Halaman Pengaturan hanya menampilkan "Kecamatan, Kabupaten" di field Lokasi, tanpa Provinsi. Dashboard sudah menampilkan ketiganya.
+
+**Perbaikan:** Tambahkan `school?.provinsi` ke array Lokasi di Pengaturan.
+
+---
+
 ## [1.7.1] — 2026-04-21
 
 ### Bug Fix — Kritis

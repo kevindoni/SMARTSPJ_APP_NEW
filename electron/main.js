@@ -1,8 +1,13 @@
-﻿const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const Database = require('better-sqlite3-multiple-ciphers');
 const fs = require('fs');
-const { autoUpdater } = require('electron-updater');
+let autoUpdater;
+try {
+  autoUpdater = require('electron-updater').autoUpdater;
+} catch (e) {
+  // electron-updater not available
+}
 
 // Format no_bukti list: ['BNU173','BNU174',...,'BNU182'] -> 'BNU173 - BNU182'
 function formatNoBuktiList(list) {
@@ -10,12 +15,12 @@ function formatNoBuktiList(list) {
   if (unique.length === 0) return 'GABUNGAN';
   if (unique.length === 1) return unique[0];
   // Try to extract prefix + number pattern
-  const match = unique[0].match(/^(.*?)(d+)$/);
+  const match = unique[0].match(/^(.*?)(\d+)$/);
   if (match) {
     const prefix = match[1];
     const nums = unique
       .map((s) => {
-        const m = s.match(/^.*?(d+)$/);
+        const m = s.match(/^.*?(\d+)$/);
         return m ? parseInt(m[1]) : null;
       })
       .filter((n) => n !== null)
@@ -35,6 +40,25 @@ function formatNoBuktiList(list) {
   return unique.join(', ');
 }
 
+// Helper: compare semver versions (true if remote > local)
+function isNewerVersion(remote, local) {
+  const r = remote
+    .replace(/^v/, '')
+    .split('.')
+    .map((s) => parseInt(s, 10) || 0);
+  const l = local
+    .replace(/^v/, '')
+    .split('.')
+    .map((s) => parseInt(s, 10) || 0);
+  for (let i = 0; i < Math.max(r.length, l.length); i++) {
+    const rv = r[i] || 0;
+    const lv = l[i] || 0;
+    if (rv > lv) return true;
+    if (rv < lv) return false;
+  }
+  return false;
+}
+
 const isDev = !app.isPackaged;
 let DATA_DIR = isDev ? path.join(__dirname, '../data') : path.join(app.getPath('userData'), 'data');
 
@@ -45,12 +69,12 @@ function getDbPath() {
 
   // Candidate paths - search in priority order
   const candidates = [
-    path.join(roaming, 'arkas', 'arkas.db'),       // %APPDATA% arkas (lowercase, most common)
-    path.join(roaming, 'Arkas', 'arkas.db'),        // %APPDATA% Arkas (PascalCase)
-    path.join(roaming, 'ARKAS', 'arkas.db'),        // %APPDATA% ARKAS (uppercase)
-    path.join(local,  'arkas', 'arkas.db'),         // %LOCALAPPDATA% arkas
-    path.join(local,  'Arkas', 'arkas.db'),         // %LOCALAPPDATA% Arkas
-    path.join(roaming, 'RKAS', 'arkas.db'),         // %APPDATA% RKAS (legacy name)
+    path.join(roaming, 'arkas', 'arkas.db'), // %APPDATA% arkas (lowercase, most common)
+    path.join(roaming, 'Arkas', 'arkas.db'), // %APPDATA% Arkas (PascalCase)
+    path.join(roaming, 'ARKAS', 'arkas.db'), // %APPDATA% ARKAS (uppercase)
+    path.join(local, 'arkas', 'arkas.db'), // %LOCALAPPDATA% arkas
+    path.join(local, 'Arkas', 'arkas.db'), // %LOCALAPPDATA% Arkas
+    path.join(roaming, 'RKAS', 'arkas.db'), // %APPDATA% RKAS (legacy name)
   ];
 
   for (const candidate of candidates) {
@@ -159,6 +183,65 @@ function loadSecurePassword() {
 } // Password will be loaded after app is ready (safeStorage requires app ready)
 // loadSecurePassword() is called in app.whenReady()
 
+function getSecureTokenPath() {
+  return path.join(DATA_DIR, '.updater-key');
+}
+
+function loadSecureGithubToken() {
+  const keyPath = getSecureTokenPath();
+
+  // 1. Try encrypted storage first
+  if (fs.existsSync(keyPath)) {
+    try {
+      const { safeStorage } = require('electron');
+      if (safeStorage.isEncryptionAvailable()) {
+        const encrypted = fs.readFileSync(keyPath);
+        return safeStorage.decryptString(Buffer.from(encrypted)).toString();
+      }
+    } catch (e) {
+      console.error('[Updater] Failed to decrypt token:', e.message);
+    }
+  }
+
+  // 2. Fallback: read from updater.json (plain text)
+  const updaterConfigPath = path.join(DATA_DIR, 'updater.json');
+  let token = '';
+  try {
+    if (fs.existsSync(updaterConfigPath)) {
+      const config = JSON.parse(fs.readFileSync(updaterConfigPath, 'utf8'));
+      token = config.github_token || '';
+    }
+  } catch (e) {
+    console.error('[Updater] Failed to load updater config:', e.message);
+  }
+
+  // 3. Migrate to encrypted storage and remove plain text
+  if (token) {
+    try {
+      const { safeStorage } = require('electron');
+      if (safeStorage.isEncryptionAvailable()) {
+        const encrypted = safeStorage.encryptString(token);
+        if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+        fs.writeFileSync(keyPath, encrypted);
+        // Remove plain text token from updater.json
+        try {
+          const config = JSON.parse(fs.readFileSync(updaterConfigPath, 'utf8'));
+          delete config.github_token;
+          config._migrated = 'Token telah dimigrasikan ke penyimpanan terenkripsi';
+          fs.writeFileSync(updaterConfigPath, JSON.stringify(config, null, 2), 'utf8');
+        } catch (e) {
+          /* ignore */
+        }
+        console.log('[Updater] Token migrated to encrypted storage');
+      }
+    } catch (e) {
+      console.error('[Updater] Token migration failed:', e.message);
+    }
+  }
+
+  return token;
+}
+
 let mainWindow = null;
 
 function createWindow() {
@@ -189,21 +272,14 @@ function createWindow() {
   });
 }
 
+let isCheckingUpdate = false;
+
 function setupAutoUpdater() {
   autoUpdater.autoDownload = false;
-  autoUpdater.autoInstallOnAppQuit = true;
+  autoUpdater.autoInstallOnAppQuit = false;
 
-  // Load GitHub token from config for auto-updates (private repo)
-  const updaterConfigPath = path.join(DATA_DIR, 'updater.json');
-  let githubToken = '';
-  try {
-    if (fs.existsSync(updaterConfigPath)) {
-      const updaterConfig = JSON.parse(fs.readFileSync(updaterConfigPath, 'utf8'));
-      githubToken = updaterConfig.github_token || '';
-    }
-  } catch (e) {
-    console.error('[Updater] Failed to load updater config:', e.message);
-  }
+  // Load GitHub token from encrypted storage (auto-migrates from updater.json)
+  const githubToken = loadSecureGithubToken();
 
   if (githubToken) {
     autoUpdater.setFeedURL({
@@ -223,7 +299,10 @@ function setupAutoUpdater() {
     });
   }
 
+  let isAutoCheck = false;
+
   autoUpdater.on('update-available', (info) => {
+    if (isAutoCheck) return;
     if (mainWindow && !mainWindow.isDestroyed()) {
       mainWindow.webContents.send('update-available', {
         version: info.version,
@@ -250,6 +329,7 @@ function setupAutoUpdater() {
   });
 
   autoUpdater.on('update-not-available', () => {
+    if (isAutoCheck) return;
     if (mainWindow && !mainWindow.isDestroyed()) {
       mainWindow.webContents.send('update-not-available');
     }
@@ -257,6 +337,7 @@ function setupAutoUpdater() {
 
   autoUpdater.on('error', (err) => {
     console.error('[Updater] Error:', err.message);
+    if (isAutoCheck) return;
     if (mainWindow && !mainWindow.isDestroyed()) {
       mainWindow.webContents.send('update-error', { message: err.message });
     }
@@ -265,26 +346,74 @@ function setupAutoUpdater() {
   // Auto-check for updates 5 seconds after window loads
   mainWindow.webContents.on('did-finish-load', () => {
     setTimeout(async () => {
+      if (isCheckingUpdate) return;
+      isAutoCheck = true;
+      isCheckingUpdate = true;
       try {
         console.log('[Updater] Auto-checking for updates...');
         const result = await autoUpdater.checkForUpdates();
         if (result && result.updateInfo) {
-          const hasUpdate = result.updateInfo.version !== app.getVersion();
-          console.log('[Updater] Auto-check result:', hasUpdate ? 'UPDATE AVAILABLE' : 'up to date', '| remote:', result.updateInfo.version, '| local:', app.getVersion());
+          const hasUpdate = isNewerVersion(result.updateInfo.version, app.getVersion());
+          console.log(
+            '[Updater] Auto-check result:',
+            hasUpdate ? 'UPDATE AVAILABLE' : 'up to date',
+            '| remote:',
+            result.updateInfo.version,
+            '| local:',
+            app.getVersion()
+          );
+          if (hasUpdate && mainWindow && !mainWindow.isDestroyed()) {
+            mainWindow.webContents.send('update-available', {
+              version: result.updateInfo.version,
+              releaseNotes: result.updateInfo.releaseNotes || '',
+            });
+          }
         }
       } catch (err) {
         console.error('[Updater] Auto-check failed:', err.message);
+      } finally {
+        isAutoCheck = false;
+        isCheckingUpdate = false;
       }
     }, 5000);
   });
 
+  // Guard: remove existing handlers to prevent double-register
+  ['arkas:check-update', 'arkas:download-update', 'arkas:install-update'].forEach((ch) => {
+    try {
+      ipcMain.removeHandler(ch);
+    } catch (e) {
+      /* not registered yet */
+    }
+  });
+
   ipcMain.handle('arkas:check-update', async () => {
+    if (isCheckingUpdate) {
+      return {
+        hasUpdate: false,
+        currentVersion: app.getVersion(),
+        error: 'Cek update sedang berjalan',
+      };
+    }
+    isCheckingUpdate = true;
     try {
       console.log('[Updater] Checking for updates... current:', app.getVersion());
-      const result = await autoUpdater.checkForUpdates();
+      const result = await Promise.race([
+        autoUpdater.checkForUpdates(),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Timeout: cek update melebihi 30 detik')), 30000)
+        ),
+      ]);
       if (result && result.updateInfo) {
-        const hasUpdate = result.updateInfo.version !== app.getVersion();
-        console.log('[Updater] hasUpdate:', hasUpdate, '| remote:', result.updateInfo.version, '| local:', app.getVersion());
+        const hasUpdate = isNewerVersion(result.updateInfo.version, app.getVersion());
+        console.log(
+          '[Updater] hasUpdate:',
+          hasUpdate,
+          '| remote:',
+          result.updateInfo.version,
+          '| local:',
+          app.getVersion()
+        );
         return {
           hasUpdate,
           version: result.updateInfo.version,
@@ -297,12 +426,19 @@ function setupAutoUpdater() {
     } catch (err) {
       console.error('[Updater] Check failed:', err.message);
       return { hasUpdate: false, error: err.message, currentVersion: app.getVersion() };
+    } finally {
+      isCheckingUpdate = false;
     }
   });
 
   ipcMain.handle('arkas:download-update', async () => {
     try {
-      await autoUpdater.downloadUpdate();
+      await Promise.race([
+        autoUpdater.downloadUpdate(),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Timeout: download melebihi 5 menit')), 300000)
+        ),
+      ]);
       return { success: true };
     } catch (err) {
       return { success: false, error: err.message };
@@ -314,10 +450,68 @@ function setupAutoUpdater() {
   });
 }
 
+// ─── Updater Token Management (outside setupAutoUpdater to avoid double-register) ───
+ipcMain.handle('arkas:save-updater-token', async (_event, token) => {
+  try {
+    if (!token || typeof token !== 'string' || token.trim().length < 10) {
+      return { success: false, error: 'Token tidak valid' };
+    }
+    const { safeStorage } = require('electron');
+    if (safeStorage.isEncryptionAvailable()) {
+      const encrypted = safeStorage.encryptString(token.trim());
+      if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+      fs.writeFileSync(getSecureTokenPath(), encrypted);
+    } else {
+      // Fallback: save to updater.json
+      const updaterConfigPath = path.join(DATA_DIR, 'updater.json');
+      const config = fs.existsSync(updaterConfigPath)
+        ? JSON.parse(fs.readFileSync(updaterConfigPath, 'utf8'))
+        : {};
+      config.github_token = token.trim();
+      fs.writeFileSync(updaterConfigPath, JSON.stringify(config, null, 2), 'utf8');
+    }
+    return { success: true };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+});
+
+ipcMain.handle('arkas:get-updater-token-status', async () => {
+  try {
+    const hasEncrypted = fs.existsSync(getSecureTokenPath());
+    const updaterConfigPath = path.join(DATA_DIR, 'updater.json');
+    let hasPlainText = false;
+    if (fs.existsSync(updaterConfigPath)) {
+      try {
+        const config = JSON.parse(fs.readFileSync(updaterConfigPath, 'utf8'));
+        hasPlainText = !!config.github_token;
+      } catch (e) {
+        /* ignore */
+      }
+    }
+    return { success: true, hasToken: hasEncrypted || hasPlainText, isEncrypted: hasEncrypted };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+});
+
 app.whenReady().then(() => {
   loadSecurePassword();
   createWindow();
-  if (!isDev) setupAutoUpdater();
+  if (!isDev) {
+    setupAutoUpdater();
+  } else {
+    ipcMain.handle('arkas:check-update', async () => ({
+      hasUpdate: false,
+      currentVersion: app.getVersion(),
+      error: 'Auto-update tidak tersedia dalam mode pengembangan',
+    }));
+    ipcMain.handle('arkas:download-update', async () => ({
+      success: false,
+      error: 'Auto-update tidak tersedia dalam mode pengembangan',
+    }));
+    ipcMain.handle('arkas:install-update', () => {});
+  }
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
@@ -329,60 +523,113 @@ app.on('window-all-closed', () => {
 });
 
 const getSchoolInfoWithOfficials = (db) => {
-  // === STEP 1: Get school data from DB ===
-  // Try mst_sekolah first (has NPSN, alamat, penjab, etc)
-  let sekolah = db
-    .prepare(
-      `SELECT i.*, mst.* FROM instansi i LEFT JOIN mst_sekolah mst ON i.instansi_id = mst.sekolah_id WHERE mst.sekolah_id IS NOT NULL LIMIT 1`
-    ).get();
+  let sekolah = null;
+  let mstData = null;
 
-  // Fallback 1: if mst_sekolah is empty, use instansi only
-  // For sekolah (jenis_instansi_id=5), kode_instansi = NPSN
-  if (!sekolah) {
-    sekolah = db.prepare(
-      `SELECT i.*, i.instansi_id as sekolah_id, i.kode_instansi as npsn, NULL as bentuk_pendidikan_id, NULL as kode_registrasi, NULL as jumlah_siswa, NULL as status_sekolah FROM instansi i WHERE i.jenis_instansi_id = 5 LIMIT 1`
-    ).get();
-  }
-
-  // Fallback 2: if still no result, try any instansi (Dinas, UPTD, etc)
-  if (!sekolah) {
-    sekolah = db.prepare(
-      `SELECT i.*, i.kode_instansi as npsn FROM instansi i LIMIT 1`
-    ).get();
-  }
+  // === STEP 1a: Get instansi data (always) ===
+  sekolah = db.prepare(`SELECT * FROM instansi LIMIT 1`).get();
 
   if (!sekolah) return null;
 
+  // === STEP 1b: Try to get mst_sekolah data via multiple join strategies ===
+  const mstQueries = [
+    sekolah.instansi_id ? `SELECT * FROM mst_sekolah WHERE sekolah_id = ?` : null,
+    sekolah.kode_instansi ? `SELECT * FROM mst_sekolah WHERE npsn = ?` : null,
+    `SELECT * FROM mst_sekolah LIMIT 1`,
+  ];
+
+  for (const q of mstQueries) {
+    if (!q) continue;
+    try {
+      const param = q.includes('sekolah_id = ?')
+        ? sekolah.instansi_id
+        : q.includes('npsn = ?')
+          ? sekolah.kode_instansi
+          : undefined;
+      const row = param !== undefined ? db.prepare(q).get(param) : db.prepare(q).get();
+      if (row) {
+        mstData = row;
+        break;
+      }
+    } catch (e) {
+      /* skip */
+    }
+  }
+
+  // Merge mst_sekolah fields without overwriting instansi columns
+  if (mstData) {
+    const iCols = Object.keys(sekolah);
+    for (const [k, v] of Object.entries(mstData)) {
+      if (!iCols.includes(k) || v !== null) {
+        sekolah[k] = v;
+      }
+    }
+    sekolah.sekolah_id = mstData.sekolah_id || sekolah.instansi_id;
+    if (!sekolah.npsn && mstData.npsn) sekolah.npsn = mstData.npsn;
+    if (!sekolah.alamat && mstData.alamat_jalan) sekolah.alamat = mstData.alamat_jalan;
+  } else {
+    sekolah.sekolah_id = sekolah.sekolah_id || sekolah.instansi_id;
+    if (!sekolah.npsn && sekolah.kode_instansi) sekolah.npsn = sekolah.kode_instansi;
+  }
+
   // === STEP 2: Lookup wilayah ===
-  if (sekolah.kode_wilayah && sekolah.kode_wilayah !== '0') {
-    const kecamatan = db.prepare(`SELECT nama FROM mst_wilayah WHERE kode_wilayah = ?`).get(sekolah.kode_wilayah);
-    if (kecamatan) sekolah.kecamatan = kecamatan.nama;
-    const kabKode = sekolah.kode_wilayah.substring(0, 4) + '00';
-    const kabupaten = db.prepare(`SELECT nama FROM mst_wilayah WHERE kode_wilayah = ?`).get(kabKode);
-    if (kabupaten) sekolah.kabupaten = kabupaten.nama;
-    const provKode = sekolah.kode_wilayah.substring(0, 2) + '0000';
-    const provinsi = db.prepare(`SELECT nama FROM mst_wilayah WHERE kode_wilayah = ?`).get(provKode);
-    if (provinsi) sekolah.provinsi = provinsi.nama;
+  const kodeWilayah = sekolah.kode_wilayah || mstData?.kode_wilayah;
+  if (kodeWilayah && kodeWilayah !== '0' && kodeWilayah.length >= 2) {
+    try {
+      const kecamatan = db
+        .prepare(`SELECT nama FROM mst_wilayah WHERE kode_wilayah = ?`)
+        .get(kodeWilayah);
+      if (kecamatan) sekolah.kecamatan = kecamatan.nama;
+      const kabKode = kodeWilayah.substring(0, 4) + '00';
+      const kabupaten = db
+        .prepare(`SELECT nama FROM mst_wilayah WHERE kode_wilayah = ?`)
+        .get(kabKode);
+      if (kabupaten) sekolah.kabupaten = kabupaten.nama;
+      const provKode = kodeWilayah.substring(0, 2) + '0000';
+      const provinsi = db
+        .prepare(`SELECT nama FROM mst_wilayah WHERE kode_wilayah = ?`)
+        .get(provKode);
+      if (provinsi) sekolah.provinsi = provinsi.nama;
+    } catch (e) {
+      console.log('[getSchoolInfo] Wilayah lookup failed:', e.message);
+    }
   }
 
   sekolah.nama_sekolah = sekolah.nama;
 
-  // === STEP 3: Lookup Officials from sekolah_penjab ===
-  const officials = db.prepare(
-    `SELECT ks as kepala_sekolah, nip_ks as nip_kepala, bendahara, nip_bendahara FROM sekolah_penjab WHERE sekolah_id = ? ORDER BY tahun DESC LIMIT 1`
-  ).get(sekolah.sekolah_id || sekolah.instansi_id);
+  // === STEP 3: Lookup Officials from sekolah_penjab via multiple IDs ===
+  const officialIds = [sekolah.sekolah_id, sekolah.instansi_id, sekolah.npsn].filter(Boolean);
+  let officials = null;
+  for (const id of officialIds) {
+    try {
+      const row = db
+        .prepare(
+          `SELECT ks as kepala_sekolah, nip_ks as nip_kepala, bendahara, nip_bendahara FROM sekolah_penjab WHERE sekolah_id = ? ORDER BY tahun DESC LIMIT 1`
+        )
+        .get(id);
+      if (row && (row.kepala_sekolah || row.bendahara)) {
+        officials = row;
+        break;
+      }
+    } catch (e) {
+      /* skip */
+    }
+  }
   if (officials) Object.assign(sekolah, officials);
 
   // === STEP 4: Enrich from app_config ===
   try {
     const configRows = db.prepare(`SELECT varname, varvalue FROM app_config`).all();
     const configMap = {};
-    configRows.forEach(r => { configMap[r.varname] = r.varvalue; });
+    configRows.forEach((r) => {
+      configMap[r.varname] = r.varvalue;
+    });
     if (!sekolah.kode_registrasi && configMap.koreg) sekolah.kode_registrasi = configMap.koreg;
     if (!sekolah.npsn && configMap.salur) {
       try {
         const salurData = JSON.parse(configMap.salur);
-        if (salurData && salurData.length > 0 && salurData[0].npsn) sekolah.npsn = salurData[0].npsn;
+        if (salurData && salurData.length > 0 && salurData[0].npsn)
+          sekolah.npsn = salurData[0].npsn;
       } catch (e) {}
     }
     if (configMap.kepala_dinas) sekolah.kepala_dinas = configMap.kepala_dinas;
@@ -594,7 +841,6 @@ ipcMain.handle('arkas:export-bku', async (event, frontendTransactions, params) =
 
     // 1. Get School Info (using shared function)
     const schoolInfo = getSchoolInfoWithOfficials(db);
-
 
     let payload = [];
 
@@ -813,7 +1059,12 @@ ipcMain.handle('arkas:export-bku', async (event, frontendTransactions, params) =
           filteredManual.forEach((tax) => {
             let uraian = tax.keterangan || 'Entri Pajak Manual';
             if (tax.jenis_input === 'saldo_awal_tahun' || tax.jenis_input === 'saldo_awal') {
-              uraian = 'Saldo Awal ' + tax.jenis_pajak + ' (' + (tax.keterangan || 'Hutang Tahun Lalu') + ')';
+              uraian =
+                'Saldo Awal ' +
+                tax.jenis_pajak +
+                ' (' +
+                (tax.keterangan || 'Hutang Tahun Lalu') +
+                ')';
             } else if (tax.jenis_input === 'hutang_bulan') {
               uraian = 'Hutang ' + tax.jenis_pajak + ' (' + (tax.keterangan || 'Lupa Bayar') + ')';
             }
@@ -2127,7 +2378,7 @@ ipcMain.handle('arkas:get-ba-audit-data', async (event, year) => {
     const db = new Database(getDbPath(), { readonly: true });
     db.pragma("cipher='sqlcipher'");
     db.pragma('legacy=4');
-    db.pragma();
+    db.pragma(`key='${ARKAS_PASSWORD}'`);
     const data = reconciliationHandler.getBaAuditData(db, year);
     db.close();
     return { success: true, data };
@@ -2666,7 +2917,6 @@ ipcMain.handle('arkas:export-all-bku', async (event, params) => {
     db.pragma(`key='${ARKAS_PASSWORD}'`);
 
     const schoolInfo = getSchoolInfoWithOfficials(db);
-
 
     // Get dashboard stats for accurate data
     const dashboardResult = await dashboardHandler.getDashboardStats(

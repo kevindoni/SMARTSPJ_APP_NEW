@@ -34,20 +34,15 @@ export default function KertasKerjaFormalTableQuarterly({
     const q3 = ((item.v7 || 0) + (item.v8 || 0) + (item.v9 || 0)) * price;
     const q4 = ((item.v10 || 0) + (item.v11 || 0) + (item.v12 || 0)) * price;
 
-    item.q1 = q1;
-    item.q2 = q2;
-    item.q3 = q3;
-    item.q4 = q4;
-
-    item.totalYear = q1 + q2 + q3 + q4;
+    const enrichedItem = { ...item, q1, q2, q3, q4, totalYear: q1 + q2 + q3 + q4 };
 
     grandQ[0] += q1;
     grandQ[1] += q2;
     grandQ[2] += q3;
     grandQ[3] += q4;
-    totalAll += item.totalYear;
+    totalAll += enrichedItem.totalYear;
 
-    grouped[codeL1].l2[codeL2].l3[codeL3].items.push(item);
+    grouped[codeL1].l2[codeL2].l3[codeL3].items.push(enrichedItem);
   });
 
   const getGroupTotal = (groupLevel, level) => {
@@ -60,7 +55,7 @@ export default function KertasKerjaFormalTableQuarterly({
     else items = groupLevel.items;
 
     return {
-      total: items.reduce((s, i) => s + i.totalYear, 0),
+      total: items.reduce((s, i) => s + (Number(i.totalYear) || 0), 0),
       q: [
         items.reduce((s, i) => s + i.q1, 0),
         items.reduce((s, i) => s + i.q2, 0),

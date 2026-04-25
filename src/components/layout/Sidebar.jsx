@@ -1,4 +1,4 @@
-﻿import {
+import {
   LayoutDashboard,
   BookOpen,
   PieChart,
@@ -16,19 +16,12 @@
   Info,
   HardDrive,
 } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 const isElectron = typeof window !== 'undefined' && window.arkas;
 
 export default function Sidebar({ activeTab, setActiveTab }) {
-  const [appVersion, setAppVersion] = useState('');
-
-  useEffect(() => {
-    if (!isElectron) return;
-    window.arkas?.getAppVersion?.()
-      .then((v) => setAppVersion(v.appVersion))
-      .catch(() => setAppVersion(''));
-  }, []);
+  const [appVersion] = useState(__APP_VERSION__);
 
   const menuGroups = [
     {
@@ -80,7 +73,9 @@ export default function Sidebar({ activeTab, setActiveTab }) {
           S
         </div>
         <div>
-          <h1 className="text-slate-800 font-bold text-base tracking-tight leading-none">SmartSPJ</h1>
+          <h1 className="text-slate-800 font-bold text-base tracking-tight leading-none">
+            SmartSPJ
+          </h1>
           {isElectron && (
             <p className="text-[9px] uppercase font-bold text-slate-400 tracking-wider mt-0.5">
               Desktop Edition
@@ -108,9 +103,17 @@ export default function Sidebar({ activeTab, setActiveTab }) {
                     onClick={() => setActiveTab(item.id)}
                     className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium transition-all duration-200 group relative overflow-hidden ${isActive ? 'text-white shadow-lg shadow-blue-500/25 ring-1 ring-white/20' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'}`}
                   >
-                    {isActive && <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 z-0" />}
-                    <Icon size={17} className={`relative z-10 transition-transform duration-200 ${isActive ? 'scale-110' : 'group-hover:scale-105 text-slate-400 group-hover:text-blue-500'}`} strokeWidth={isActive ? 2.5 : 2} />
-                    <span className={`relative z-10 ${isActive ? 'font-semibold' : ''}`}>{item.label}</span>
+                    {isActive && (
+                      <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 z-0" />
+                    )}
+                    <Icon
+                      size={17}
+                      className={`relative z-10 transition-transform duration-200 ${isActive ? 'scale-110' : 'group-hover:scale-105 text-slate-400 group-hover:text-blue-500'}`}
+                      strokeWidth={isActive ? 2.5 : 2}
+                    />
+                    <span className={`relative z-10 ${isActive ? 'font-semibold' : ''}`}>
+                      {item.label}
+                    </span>
                   </button>
                 );
               })}

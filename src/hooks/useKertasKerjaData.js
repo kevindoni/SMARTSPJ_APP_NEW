@@ -81,7 +81,7 @@ export function useKertasKerjaData(selectedFormat, selectedMonth, searchTerm) {
               // Normalize (Capital First)
               const blnNorm = bln.charAt(0).toUpperCase() + bln.slice(1).toLowerCase();
               const idx = monthMap[bln] || monthMap[blnNorm];
-              if (idx) newItem[`v${idx}`] += parseFloat(volRaw);
+              if (idx) { const parsed = parseFloat(volRaw); if (!isNaN(parsed)) newItem[`v${idx}`] += parsed; }
             }
           });
         }
@@ -99,7 +99,7 @@ export function useKertasKerjaData(selectedFormat, selectedMonth, searchTerm) {
       if (isMonthly) {
         const volMonth = newItem[`v${selectedMonth}`] || 0;
         newItem.volume = volMonth;
-        newItem.total = volMonth * newItem.harga_satuan;
+        newItem.total = volMonth * (newItem.harga_satuan || 0);
         newItem._hidden = volMonth === 0;
       } else {
         newItem._hidden = false;

@@ -1,7 +1,126 @@
-﻿import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { Heart, Calendar, ChevronDown, Sparkles, CheckCircle, ArrowRight, Bug } from 'lucide-react';
 
 const CHANGELOG = [
+  {
+    version: '1.7.2',
+    date: '25 April 2026',
+    title: 'Codebase Audit & Bug Fix Besar-Besaran',
+    changes: [
+      {
+        type: 'fix',
+        text: 'Data sekolah tidak muncul di beberapa sekolah — rewrite getSchoolInfoWithOfficials dengan multi-strategy lookup (via sekolah_id, npsn, LIMIT 1) menggantikan single JOIN yang kaku',
+      },
+      {
+        type: 'fix',
+        text: 'NPSN, alamat, wilayah kosong — fix merge instansi + mst_sekolah yang kolom tabrakan, tambah fallback alamat_jalan dan kode_wilayah dual source',
+      },
+      {
+        type: 'fix',
+        text: 'Data pejabat (kepala sekolah, bendahara) tidak muncul — lookup via sekolah_id, instansi_id, dan npsn secara berurutan',
+      },
+      {
+        type: 'fix',
+        text: 'Race condition auto-update — tambah isCheckingUpdate guard antara auto-check dan manual check',
+      },
+      {
+        type: 'fix',
+        text: 'Version comparison gagal untuk pre-release tag (1.0.0-beta) — parseInt menggantikan Number() untuk handle NaN',
+      },
+      {
+        type: 'fix',
+        text: 'Crash "No handler registered" di dev mode — register stub IPC handlers saat isDev',
+      },
+      {
+        type: 'fix',
+        text: 'Dashboard: Tab "Per Kegiatan" crash (ReferenceError rawPct) — fix variabel yang salah referensi',
+      },
+      {
+        type: 'fix',
+        text: 'Kertas Kerja: Export PDF/Excel crash karena toast tidak diimport di KertasKerjaToolbar',
+      },
+      {
+        type: 'fix',
+        text: 'Kertas Kerja: Lembar Kertas Kerja alignment rusak — dynamic Tailwind class text-${align} tidak ter-compile, ganti dengan lookup map',
+      },
+      {
+        type: 'fix',
+        text: 'Realisasi Belanja: Progress bar NaN/Infinity saat annualPagu = 0 — tambah guard division by zero',
+      },
+      {
+        type: 'fix',
+        text: 'Realisasi Belanja: Crash null.split() saat kode_kegiatan null dari LEFT JOIN — tambah fallback empty string',
+      },
+      {
+        type: 'fix',
+        text: 'Rekonsiliasi Bank: Halaman crash total — toast tidak diimport + variabel months diakses sebelum deklarasi (temporal dead zone)',
+      },
+      {
+        type: 'fix',
+        text: 'BA Rekonsiliasi: getBaAuditData tidak di-export dari reconciliationHandler — IPC handler crash saat dipanggil',
+      },
+      {
+        type: 'fix',
+        text: 'BA Rekonsiliasi: Missing key pragma di getBaAuditData — database tidak bisa di-decrypt',
+      },
+      {
+        type: 'fix',
+        text: 'Buku Pembantu Pajak: IPC channel mismatch (update-manual-taxes vs update-manual-tax) — update pajak manual gagal total',
+      },
+      {
+        type: 'fix',
+        text: 'Buku Pembantu Pajak: Saldo Awal Tahun tidak di-sort ke atas — sort check saldo_awal tapi value-nya saldo_awal_tahun',
+      },
+      {
+        type: 'fix',
+        text: 'Buku Kas Umum: saldo_akhir NaN karena missing || 0 fallback — running balance menampilkan Rp 0',
+      },
+      {
+        type: 'fix',
+        text: 'Buku Kas Umum: refetch tidak ada di return useTransactions — data tidak refresh setelah simpan/hapus pajak manual',
+      },
+      {
+        type: 'fix',
+        text: 'Register Kas: Crash .toLocaleString() pada saldo_bank/saldo_pajak undefined — PDF generation gagal',
+      },
+      {
+        type: 'fix',
+        text: 'Register Kas: State replacement hilangkan field — merge state alih-alih replace',
+      },
+      {
+        type: 'fix',
+        text: 'Format no_bukti range (BNU173-BNU182) tidak pernah aktif — regex bug (d+) seharusnya (\\d+)',
+      },
+      {
+        type: 'fix',
+        text: 'NaN propagation di 6 file berbeda — tambah || 0 guard pada harga_satuan, total_anggaran, parseFloat, dsb.',
+      },
+      {
+        type: 'fix',
+        text: 'SQL injection pattern di kertasKerjaHandler — ganti string interpolation dengan parameterized query (? placeholder)',
+      },
+      {
+        type: 'imp',
+        text: 'Auto-update: GitHub token disimpan terenkripsi via Electron safeStorage (OS-level), auto-migrasi dari plain text',
+      },
+      {
+        type: 'imp',
+        text: 'Auto-update timeout protection — cek update 30 detik, download 5 menit',
+      },
+      {
+        type: 'imp',
+        text: 'Download speed ditampilkan saat update diunduh (MB/s atau KB/s)',
+      },
+      {
+        type: 'imp',
+        text: 'Versi aplikasi sekarang dinamis dari package.json — single source of truth, tidak perlu update manual di 3 tempat',
+      },
+      {
+        type: 'imp',
+        text: 'Pengaturan: Lokasi sekolah sekarang menampilkan Provinsi (sebelumnya hanya kecamatan + kabupaten)',
+      },
+    ],
+  },
   {
     version: '1.7.1',
     date: '21 April 2026',
@@ -186,7 +305,7 @@ const CHANGELOG = [
       { type: 'new', text: 'BA Rekonsiliasi dengan export PDF & Excel' },
       { type: 'new', text: 'Cetak SPTJM, Laporan K7/K7a, Register Kas' },
       { type: 'new', text: 'Realisasi Belanja, Nota Group, Rekonsiliasi Bank' },
-      { type: 'new', text: 'Integrasi database ARKAS (SQLCipher)' },
+      { type: 'new', text: 'Integrasi database ARKAS' },
       { type: 'fix', text: 'Dashboard SISA ANGGARAN = PAGU - REALISASI' },
       { type: 'fix', text: 'Belanja per Kegiatan duplikasi (subquery fix)' },
       { type: 'fix', text: 'PAGU filter BOS Reguler akurat' },
@@ -241,20 +360,9 @@ CHANGELOG.forEach((r) =>
 );
 
 export default function About() {
-  const [appVersion, setAppVersion] = useState('...');
+  const [appVersion] = useState(__APP_VERSION__);
   const [expanded, setExpanded] = useState({ 0: true });
   const [filter, setFilter] = useState('all');
-
-  useEffect(() => {
-    if (window.arkas?.getAppVersion) {
-      window.arkas
-        .getAppVersion()
-        .then((v) => setAppVersion(v.appVersion))
-        .catch(() => setAppVersion(CHANGELOG[0].version));
-    } else {
-      setAppVersion(CHANGELOG[0].version);
-    }
-  }, []);
   const toggle = (i) => setExpanded((p) => ({ ...p, [i]: !p[i] }));
   const filtered = useMemo(() => {
     if (filter === 'all') return CHANGELOG;
