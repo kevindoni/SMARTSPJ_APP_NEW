@@ -1,173 +1,174 @@
-# SmartSPJ
-
 <p align="center">
-  <img src="src/assets/logo.png" alt="SmartSPJ" width="120"/>
+  <img src="https://img.shields.io/badge/SmartSPJ-v1.7.2-0F172A?style=for-the-badge&labelColor=1E293B&color=3B82F6" alt="SmartSPJ"/>
 </p>
 
 <p align="center">
-  <strong>Aplikasi Pendamping ARKAS untuk Pengelolaan SPJ BOS</strong>
+  <strong>Aplikasi Pendamping ARKAS untuk Pengelolaan SPJ BOS</strong><br/>
+  <em>Desktop App untuk Bendahara Sekolah di Indonesia</em>
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-1.6.0-blue" alt="version"/>
-  <img src="https://img.shields.io/badge/platform-Windows-blue" alt="platform"/>
-  <img src="https://img.shields.io/badge/Electron-28-blueviolet" alt="electron"/>
-  <img src="https://img.shields.io/badge/React-18+-61DAFB" alt="react"/>
-  <img src="https://img.shields.io/badge/License-ISC-green" alt="license"/>
+  <img src="https://img.shields.io/badge/Windows-10%2B-0078D4?style=flat-square&logo=windows&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Electron-28-47848F?style=flat-square&logo=electron&logoColor=white"/>
+  <img src="https://img.shields.io/badge/React-18-61DAFB?style=flat-square&logo=react&logoColor=black"/>
+  <img src="https://img.shields.io/badge/Vite-5-646CFF?style=flat-square&logo=vite&logoColor=white"/>
+  <img src="https://img.shields.io/badge/License-Proprietary-red?style=flat-square"/>
+</p>
+
+<p align="center">
+  <a href="#fitur-utama">Fitur</a> &bull;
+  <a href="#arsitektur">Arsitektur</a> &bull;
+  <a href="#tech-stack">Tech Stack</a> &bull;
+  <a href="#keamanan">Keamanan</a> &bull;
+  <a href="#lisensi">Lisensi</a>
 </p>
 
 ---
 
-## 📋 Tentang
+## Tentang
 
-SmartSPJ adalah aplikasi desktop yang dirancang sebagai pendamping **ARKAS** (Aplikasi Rencana Kegiatan dan Anggaran Sekolah) untuk membantu bendahara sekolah mengelola **SPJ (Surat Pertanggungjawaban) BOS**. Aplikasi ini membaca database ARKAS secara read-only dan menyediakan fitur pengelolaan keuangan yang lengkap.
+**SmartSPJ** adalah aplikasi desktop yang dirancang sebagai pendamping **ARKAS** (Aplikasi Rencana Kegiatan dan Anggaran Sekolah) untuk membantu bendahara sekolah mengelola **SPJ BOS** (Surat Pertanggungjawaban Bantuan Operasional Sekolah).
 
-## ✨ Fitur Utama
+Aplikasi ini membaca database ARKAS secara **read-only** dan menyediakan fitur pengelolaan keuangan yang lengkap — dari dashboard analitik, buku kas, cetak kwitansi, hingga BA Rekonsiliasi dan SPTJM.
 
-### 📊 Dashboard & Analitik
-- Dashboard monitoring keuangan real-time dengan statistik perbandingan bulanan
+---
+
+## Fitur Utama
+
+### Dashboard & Analitik
+- Statistik keuangan real-time dengan perbandingan bulanan
 - Grafik revenue interaktif dengan garis Saldo Akhir
-- Pergerakan Kas Bulanan dengan saldo awal + running balance per sumber dana
-- Belanja per Kategori, Top 5 Pengeluaran, Belanja per Kegiatan — terfilter per sumber dana
-- Ringkasan sumber dana (BOS Reguler, BOS Kinerja, Dana Lainnya, SiLPA)
+- Pergerakan Kas Bulanan — running balance per sumber dana
+- Breakdown belanja per kategori, kegiatan, dan top 5 pengeluaran
+- Ringkasan sumber dana: BOS Reguler, BOS Kinerja, Dana Lainnya, SiLPA
 
-### 📖 Buku Kas & Pembantu
-- **Buku Kas Umum** — pencatatan transaksi lengkap dengan filter dan paginasi
-- **Buku Pembantu Bank** — rekening koran bank
+### Buku Kas & Pembantu
+- **Buku Kas Umum (BKU)** — transaksi lengkap dengan filter, search, dan paginasi
 - **Buku Pembantu Tunai** — arus kas tunai
-- **Buku Pembantu Pajak** — pajak pungut dan setor
+- **Buku Pembantu Bank** — rekening koran bank
+- **Buku Pembantu Pajak** — pajak pungut dan setor, termasuk input pajak manual
+- Export ke Excel dan PDF per bulan maupun 12 bulan sekaligus
+- Export All-in-One — satu file Excel multi-sheet
 
-### 🤝 BA Rekonsiliasi
-- Berita Acara Rekonsiliasi otomatis dari data ARKAS
-- Export ke **PDF**, **Excel**, dan **HTML**
-- Ringkasan per sumber dana (Reguler, Kinerja, Lainnya, SiLPA)
-- Rekap Saldo Bulanan (bulanan, triwulan, semester, tahunan)
-- Lembar BA dengan saldo awal, penerimaan, realisasi, dan saldo akhir
-
-### 🧾 Cetak & Export
-- Cetak A2 (Kwitansi) dan Bukti Pengeluaran
-- Cetak SPTJM dan Laporan K7/K7a
-- Export Semua Laporan — satu file Excel multi-sheet (BKU Umum, Tunai, Bank, Pajak)
-- Register Kas dengan filter tahun
-
-### 📝 Manajemen Transaksi
+### Cetak & Bukti Transaksi
+- Cetak Kwitansi A2 (satuan dan batch)
+- Cetak Bukti Pengeluaran (satuan dan batch)
 - Nota Group Manager — pengelompokan nota
-- Cetak Manual — input transaksi manual
-- Realisasi Belanja per kegiatan dengan progress bar
-- Scraping data otomatis dari sumber eksternal
+- Merge Transaksi — gabung beberapa transaksi jadi satu bukti
+- Preview kwitansi sebelum cetak
 
-### 💾 Backup & Restore
-- Backup data (JSON + localStorage)
-- Backup lengkap (seluruh folder data/)
-- Restore dari file backup (ZIP) dengan preview sebelum restore
+### Laporan
+- **BA Rekonsiliasi** — Berita Acara otomatis dari data ARKAS, export ke PDF/Excel/HTML
+- **SPTJM** — Surat Pertanggungjawaban Mutlak
+- **Laporan K7 / K7a** — Rekapitulasi per periode
+- **Register Kas** — Pecahan uang kas fisik
+- **Rekap Saldo Bulanan** — bulanan, triwulan, semester, tahunan
 
-### ⚙️ Pengaturan
-- Konfigurasi pejabat sekolah (Kepala Sekolah, Bendahara)
-- Integrasi database ARKAS (SQLCipher encrypted)
-- Tema terpusat untuk konsistensi visual
+### Backup & Restore
+- Backup konfigurasi (JSON)
+- Backup lengkap (full ZIP — seluruh folder data/)
+- Restore dengan preview isi backup sebelum restore
 
-## 🏗️ Arsitektur
+### Pengaturan & Sistem
+- Konfigurasi pejabat sekolah (Kepala Sekolah, Bendahara, NIP)
+- Konfigurasi penandatangan BA Rekonsiliasi
+- Auto-update dari GitHub Releases
+- Koneksi database ARKAS otomatis (auto-detect path + password)
+- Info versi aplikasi (Electron, Chrome, Node)
+
+---
+
+## Arsitektur
 
 ```
 SmartSPJ/
-├── electron/                  # Electron backend (compiled to .jsc bytecode)
-│   ├── main.js               # Main process
-│   ├── main-loader.js        # Bytecode loader
+├── electron/                  # Electron main process
+│   ├── main.js               # Entry point
+│   ├── main-loader.js        # App loader
+│   ├── preload.js            # Preload (context bridge)
 │   ├── handlers/             # IPC handlers
-│   │   ├── dashboard/        # Dashboard queries (advancedQueries, statsQueries, etc.)
-│   │   ├── reconciliationHandler.js
-│   │   ├── transactionHandler.js
-│   │   ├── exportHandler.js
+│   │   ├── dashboard/        #   Dashboard queries & analytics
+│   │   ├── reconciliationHandler.js  #   BA Rekonsiliasi
+│   │   ├── transactionHandler.js     #   Buku Kas Umum
+│   │   ├── exportHandler.js          #   Export Excel/PDF
+│   │   ├── printHandler.js           #   Cetak kwitansi/bukti
+│   │   ├── backupHandler.js          #   Backup & restore
 │   │   └── ...
-│   └── config/               # Tax rates, etc.
-├── src/                       # React frontend (Vite hot-reload)
-│   ├── components/            # React components
-│   │   ├── dashboard/v3/     # Dashboard analytics
-│   │   └── reconciliation/   # BA Rekonsiliasi components
-│   ├── pages/                # Page components
-│   ├── utils/                # Utility functions
-│   └── assets/               # Static assets
-├── scripts/                   # Build scripts (compile-bytecode.js)
-└── release/                   # Built installers
+│   └── config/               # Tax rates, reconciliation columns
+├── src/                       # React frontend
+│   ├── components/            #   Reusable components
+│   │   ├── dashboard/v3/     #     Dashboard analytics
+│   │   ├── reconciliation/   #     BA Rekonsiliasi
+│   │   ├── layout/           #     Sidebar, Header
+│   │   └── SplashScreen.jsx  #     Splash screen
+│   ├── pages/                #   Page components
+│   ├── utils/                #   Utility functions
+│   └── assets/               #   Static assets & logo
+├── scripts/                   # Build scripts
+├── docs/                      # Documentation
+└── release/                   # Built installers (gitignored)
 ```
 
-## 🛠️ Tech Stack
+---
+
+## Tech Stack
 
 | Teknologi | Kegunaan |
 |---|---|
 | **Electron 28** | Desktop app framework |
 | **React 18** | UI library |
 | **Vite 5** | Build tool & dev server |
-| **TailwindCSS** | Utility-first CSS |
-| **better-sqlite3-multiple-ciphers** | SQLCipher encrypted database |
-| **bytenode** | Source code protection (JS → JSC bytecode) |
-| **ExcelJS** | Excel export |
+| **TailwindCSS 3** | Utility-first CSS framework |
+| **better-sqlite3-multiple-ciphers** | SQLCipher encrypted database access |
+| **Chart.js 4** | Data visualization & grafik |
 | **jsPDF** | PDF generation |
-| **Chart.js** | Data visualization |
-| **dotenv** | Secure configuration |
+| **ExcelJS** | Excel export |
+| **pdfkit** | PDF generation (backend) |
+| **Lucide React** | Icon library |
+| **Electron Updater** | Auto-update dari GitHub |
 
-## 📦 Instalasi
+---
 
-### Prasyarat
+## Keamanan
 
-- **Node.js** 18+
-- **npm** 9+
-- **Windows** (target platform)
+| Layer | Proteksi |
+|---|---|
+| **Database** | SQLCipher encryption via better-sqlite3-multiple-ciphers |
+| **Source Code** | Bytenode compilation (`.js` → `.jsc` bytecode) |
+| **Credential Storage** | Electron safeStorage (OS-level encryption) |
+| **Configuration** | `.env` file untuk password, tidak hardcode |
+| **Access** | Read-only terhadap database ARKAS |
+| **License** | Ed25519 digital signature + hardware fingerprint binding |
 
-### Development
+---
 
-```bash
-# Clone repository
-git clone https://github.com/kevindoni/SMARTSPJ_APP_NEW.git
-cd SMARTSPJ_APP_NEW
+## Download
 
-# Install dependencies
-npm install
+Download installer terbaru dari **[GitHub Releases](https://github.com/kevindoni/SMARTSPJ_APP_NEW/releases)**.
 
-# Run development mode (Vite + Electron)
-npm run dev
-```
+> **Catatan Windows SmartScreen:** Karena repository bersifat private, code signing certificate tidak tersedia. Jika muncul peringatan SmartScreen, klik **"More info"** → **"Run anyway"**.
 
-### Build Production
+---
 
-```bash
-# 1. Build frontend
-npm run build
+## Dokumentasi
 
-# 2. Compile backend to bytecode
-npm run compile:bytecode
+| Dokumen | Keterangan |
+|---|---|
+| [Panduan Pengguna](docs/Panduan_Pengguna_SmartSPJ.md) | Panduan lengkap untuk pengguna akhir |
+| [Panduan Instalasi](docs/Panduan_Instalasi_Konfigurasi_Awal.md) | Instalasi dan konfigurasi awal |
+| [Sistem Lisensi](docs/Panduan_Sistem_Lisensi_SmartSPJ.md) | Arsitektur lisensi dan tier |
+| [Panduan Lengkap](docs/PANDUAN_LENGKAP.md) | Panduan teknis lengkap |
 
-# 3. Build installer
-npx electron-builder --win --publish never
-```
+---
 
-Atau satu perintah:
+## Lisensi
 
-```bash
-npm run build:electron
-```
+Hak cipta (c) 2024-2026 **KevinDoni**. Semua hak dilindungi.
 
-## 🔐 Keamanan
+Software ini dilisensikan di bawah **SmartSPJ Proprietary License** — lihat file [LICENSE](LICENSE) untuk detail lengkap. Penggunaan, reproduksi, dan distribusi tanpa izin tertulis dari pemilik hak cipta dilarang.
 
-- Source code backend dilindungi dengan **bytenode** — semua `.js` di folder `electron/` dikompilasi ke bytecode `.jsc`
-- Password database disimpan di file `.env` (tidak hardcode di source code)
-- Database ARKAS menggunakan **SQLCipher** encryption
-- Aplikasi membaca database ARKAS secara **read-only**
+---
 
-## 📥 Download
-
-Download installer terbaru dari [GitHub Releases](https://github.com/kevindoni/SMARTSPJ_APP_NEW/releases).
-
-> ⚠️ **Catatan Windows SmartScreen:** Karena repository bersifat private, code signing tidak tersedia. Klik "More info" → "Run anyway" pada peringatan SmartScreen.
-
-## 📄 Changelog
-
-Lihat [CHANGELOG.md](CHANGELOG.md) untuk riwayat perubahan lengkap.
-
-## 📜 License
-
-ISC License - lihat [LICENSE](LICENSE) untuk detail.
-
-## 👨‍💻 Author
-
-**Kevin Doni**
+<p align="center">
+  Dibuat dengan dedikasi untuk bendahara sekolah Indonesia
+</p>
