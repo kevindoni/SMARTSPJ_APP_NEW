@@ -119,6 +119,14 @@ const CHANGELOG = [
         type: 'imp',
         text: 'Pengaturan: Lokasi sekolah sekarang menampilkan Provinsi (sebelumnya hanya kecamatan + kabupaten)',
       },
+      {
+        type: 'fix',
+        text: 'Build: package.json terkorupsi (PNG) di dalam asar menyebabkan app crash saat diinstall — tambah package.json ke asarUnpack sebagai workaround',
+      },
+      {
+        type: 'imp',
+        text: 'Installer: auto-open SmartSPJ setelah instalasi selesai (runAfterFinish)',
+      },
     ],
   },
   {

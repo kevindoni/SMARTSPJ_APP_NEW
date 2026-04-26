@@ -79,7 +79,8 @@
     "asar": true,
     "asarUnpack": [
       "src/config/reconciliation_columns_full.json",
-      "electron/**/*.js"
+      "electron/**/*.js",
+      "package.json"
     ],
     "win": {
       "icon": "electron/logo.png",
@@ -88,7 +89,8 @@
     },
     "nsis": {
       "oneClick": true,
-      "allowToChangeInstallationDirectory": false
+      "allowToChangeInstallationDirectory": false,
+      "runAfterFinish": true
     },
     "publish": {
       "provider": "github",
