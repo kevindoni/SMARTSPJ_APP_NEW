@@ -21,6 +21,8 @@ import { theme } from '../theme';
 import { toast } from 'react-toastify';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useLicense } from '../context/LicenseContext';
+import { Lock } from 'lucide-react';
 
 // Smart Components
 import SmartReconciliationTable from '../components/SmartReconciliationTable';
@@ -31,6 +33,8 @@ import ReconciliationDocument from '../components/reconciliation/ReconciliationD
 
 export default function BAReconciliation() {
   const { year } = useFilter();
+  const { tier } = useLicense();
+  const canExport = tier !== 'free';
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [data, setData] = useState(null);
@@ -202,10 +206,10 @@ export default function BAReconciliation() {
         <div className="flex gap-2">
           {/* PDF Export - hidden for Fund Source tabs */}
           {!reconSources.some((s) => s.id === activeTab) && (
+            canExport ? (
             <button
               onClick={async () => {
                 try {
-                  // Logic Switch based on Tab
                   if (activeTab === 'lembar-ba') {
                     if (!data) {
                       toast.warning('Data belum siap. Mohon tunggu.');
@@ -220,11 +224,9 @@ export default function BAReconciliation() {
                       pajakData
                     );
                   } else if (activeTab === 'ba-rekons') {
-                    // NEW: Export detailed table for Main Tab
                     if (!smartTableData || smartTableData.length === 0)
                       throw new Error('Data Tabel belum dimuat');
 
-                    // Use Shared Config for consistent export
                     exportTableToPdf(
                       'smart-table',
                       { rows: smartTableData, columns: RECONCILIATION_COLUMNS },
@@ -254,7 +256,6 @@ export default function BAReconciliation() {
                       'Rekap Pajak'
                     );
                   } else {
-                    // Fund Source Tabs
                     const source = reconSources.find((s) => s.id === activeTab);
                     if (source) {
                       if (!fundDetailData) throw new Error('Data Sumber Dana belum dimuat');
@@ -278,8 +279,19 @@ export default function BAReconciliation() {
               <Printer size={16} />
               Download PDF
             </button>
+            ) : (
+            <button
+              disabled
+              className="flex items-center gap-2 px-3 py-2 bg-slate-200 text-slate-400 rounded-lg text-sm font-medium cursor-not-allowed"
+              title="Upgrade ke Basic untuk export PDF"
+            >
+              <Lock size={16} />
+              Download PDF
+            </button>
+            )
           )}
 
+          {canExport ? (
           <button
             onClick={async () => {
               try {
@@ -297,7 +309,6 @@ export default function BAReconciliation() {
                     pajakData
                   );
                 } else if (activeTab === 'ba-rekons') {
-                  // NEW: Export detailed table for Main Tab
                   if (!smartTableData || smartTableData.length === 0)
                     throw new Error('Data Tabel belum dimuat');
 
@@ -353,6 +364,16 @@ export default function BAReconciliation() {
             <Download size={16} />
             Export Excel
           </button>
+          ) : (
+          <button
+            disabled
+            className="flex items-center gap-2 px-4 py-2 bg-slate-200 text-slate-400 rounded-lg text-sm font-medium cursor-not-allowed"
+            title="Upgrade ke Basic untuk export Excel"
+          >
+            <Lock size={16} />
+            Export Excel
+          </button>
+          )}
         </div>
       </div>
 

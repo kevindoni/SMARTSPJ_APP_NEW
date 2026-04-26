@@ -9,7 +9,6 @@ const path = require('path');
 
 const ELECTRON_DIR = path.join(__dirname, '..', 'electron');
 
-// Daftar file yang akan dikompilasi ke bytecode
 const filesToCompile = ['main.js'];
 
 // Recursive function to get all .js files
@@ -53,6 +52,13 @@ const utilsDir = path.join(ELECTRON_DIR, 'utils');
 if (fs.existsSync(utilsDir)) {
   const allUtils = getAllJsFiles(utilsDir, [], ELECTRON_DIR);
   filesToCompile.push(...allUtils);
+}
+
+// License files (Recursive)
+const licenseDir = path.join(ELECTRON_DIR, 'license');
+if (fs.existsSync(licenseDir)) {
+  const allLicense = getAllJsFiles(licenseDir, [], ELECTRON_DIR);
+  filesToCompile.push(...allLicense);
 }
 
 console.log('🔐 Memulai kompilasi bytecode...\n');

@@ -1,0 +1,9 @@
+{
+  "name": "smartspj-license-service",
+  "version": "1.0.0",
+  "description": "SmartSPJ License Service - Midtrans + Vercel",
+  "dependencies": {
+    "@neondatabase/serverless": "^1.1.0",
+    "midtrans-client": "^1.3.1"
+  }
+}

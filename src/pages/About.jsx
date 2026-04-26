@@ -3,7 +3,86 @@ import { Heart, Calendar, ChevronDown, Sparkles, CheckCircle, ArrowRight, Bug } 
 
 const CHANGELOG = [
   {
-    version: '1.7.2',
+    version: '1.7.3',
+    date: '26 April 2026',
+    title: 'License System v2 — Short Key & Midtrans Production',
+    changes: [
+      {
+        type: 'new',
+        text: 'Format license key baru — SMARTSPJ-XXXXX-XXXXX-XXXXX-XXXX (short key), lebih mudah dibaca dan diketik',
+      },
+      {
+        type: 'new',
+        text: 'Halaman Lisensi terpusat — info tier, status, expiry, device ID, key, dan deactivate dalam satu halaman',
+      },
+      {
+        type: 'new',
+        text: 'Paket Lifetime — sekali bayar, berlaku selamanya tanpa perpanjangan tahunan',
+      },
+      {
+        type: 'new',
+        text: 'Upgrade license — dari Basic ke Pro, dari Pro ke Lifetime langsung dari app',
+      },
+      {
+        type: 'new',
+        text: 'Fitur "Lupa License Key?" — cari key berdasarkan NPSN dari server',
+      },
+      {
+        type: 'new',
+        text: 'Tampilan license key di status card — simpan/copy key untuk pindah device',
+      },
+      {
+        type: 'imp',
+        text: 'Midtrans production — pembayaran real via QRIS, transfer bank, e-wallet',
+      },
+      {
+        type: 'imp',
+        text: 'Server-side signing — signature diverifikasi client-side (offline-valid), private key tidak pernah keluar server',
+      },
+      {
+        type: 'imp',
+        text: 'Deactivate memanggil server — hardware_id di-clear, key bisa diaktifkan di device lain',
+      },
+      {
+        type: 'imp',
+        text: 'Email pembayaran otomatis — ambil dari email bendahara, email sekolah, atau email ARKAS',
+      },
+      {
+        type: 'imp',
+        text: 'Card license di Pengaturan dihapus — semua info license ada di halaman Lisensi',
+      },
+      {
+        type: 'imp',
+        text: 'UI license seragam dengan tema aplikasi — menggunakan theme tokens, card style, section headers',
+      },
+      {
+        type: 'fix',
+        text: 'License key terpotong saat parsing — format base64 panjang diganti short key',
+      },
+      {
+        type: 'fix',
+        text: 'Midtrans error "email format is invalid" — fallback email otomatis dari database ARKAS',
+      },
+      {
+        type: 'fix',
+        text: 'Badge AKTIF terpotong oleh overflow-hidden — card plan tanpa overflow, badge z-index diperbaiki',
+      },
+      {
+        type: 'fix',
+        text: 'Admin endpoint tanpa autentikasi — ditambah Bearer token auth pada semua admin API',
+      },
+      {
+        type: 'sec',
+        text: 'Private key di test-parse.js dihapus — file test dihapus dari working directory',
+      },
+      {
+        type: 'sec',
+        text: 'Hardcoded admin secret fallback dihapus — admin API hanya pakai env var',
+      },
+    ],
+  },
+  {
+    version: '1.7.3',
     date: '25 April 2026',
     title: 'Codebase Audit & Bug Fix Besar-Besaran',
     changes: [
@@ -349,6 +428,13 @@ const TYPE_META = {
     dot: 'bg-red-500',
     text: 'text-red-600',
     bg: 'bg-red-50 text-red-700 border border-red-100',
+  },
+  sec: {
+    icon: CheckCircle,
+    label: 'Keamanan',
+    dot: 'bg-violet-500',
+    text: 'text-violet-600',
+    bg: 'bg-violet-50 text-violet-700 border border-violet-100',
   },
 };
 

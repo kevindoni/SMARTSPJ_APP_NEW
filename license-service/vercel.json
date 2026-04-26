@@ -1,0 +1,11 @@
+{
+  "rewrites": [
+    { "source": "/api/create-transaction", "destination": "/api/create-transaction" },
+    { "source": "/api/midtrans-webhook", "destination": "/api/midtrans-webhook" },
+    { "source": "/api/license-status", "destination": "/api/license-status" },
+    { "source": "/api/deactivate", "destination": "/api/deactivate" },
+    { "source": "/api/admin/licenses", "destination": "/api/admin-licenses" },
+    { "source": "/api/activate-key", "destination": "/api/activate-key" },
+    { "source": "/api/admin/insert", "destination": "/api/admin-insert" }
+  ]
+}

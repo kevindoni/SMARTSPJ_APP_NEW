@@ -78,6 +78,19 @@ contextBridge.exposeInMainWorld('arkas', {
       ipcRenderer.invoke('arkas:get-transactions-by-nota', year, month),
   },
 
+  // ─── License APIs ───
+  getLicenseStatus: () => ipcRenderer.invoke('arkas:get-license-status'),
+  activateLicense: (key) => ipcRenderer.invoke('arkas:activate-license', key),
+  deactivateLicense: () => ipcRenderer.invoke('arkas:deactivate-license'),
+  checkLicenseFeature: (feature) => ipcRenderer.invoke('arkas:check-license-feature', feature),
+  incrementLicenseUsage: (feature) => ipcRenderer.invoke('arkas:increment-license-usage', feature),
+  getBlockedMenus: () => ipcRenderer.invoke('arkas:get-blocked-menus'),
+  getHardwareId: () => ipcRenderer.invoke('arkas:get-hardware-id'),
+  getStoredLicenseKey: () => ipcRenderer.invoke('arkas:get-stored-license-key'),
+  openPaymentPage: (tier) => ipcRenderer.invoke('arkas:open-payment-page', tier),
+  createPayment: (tier) => ipcRenderer.invoke('arkas:create-payment', tier),
+  checkServerLicense: () => ipcRenderer.invoke('arkas:check-server-license'),
+
   // ─── Updater APIs ───
   checkForUpdate: () => ipcRenderer.invoke('arkas:check-update'),
   downloadUpdate: () => ipcRenderer.invoke('arkas:download-update'),

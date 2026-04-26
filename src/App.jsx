@@ -1,4 +1,5 @@
 ﻿import React, { useState } from 'react';
+import { LicenseProvider, useLicense } from './context/LicenseContext';
 import { useArkasData } from './hooks/useArkasData';
 import MainLayout from './components/layout/MainLayout';
 import DashboardRedesigned from './components/dashboard/DashboardRedesigned';
@@ -18,8 +19,9 @@ import Pengaturan from './pages/Pengaturan';
 import BackupRestore from './pages/BackupRestore';
 import About from './pages/About';
 import SplashScreen from './components/SplashScreen';
+import LicenseScreen from './components/license/LicenseScreen';
 
-function App() {
+function AppContent() {
   const { dbStatus, stats, availableSources, availableYears } = useArkasData();
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -52,7 +54,16 @@ function App() {
       {activeTab === 'settings' && <Pengaturan />}
       {activeTab === 'backup-restore' && <BackupRestore />}
       {activeTab === 'about' && <About />}
+      {activeTab === 'license' && <LicenseScreen />}
     </MainLayout>
+  );
+}
+
+function App() {
+  return (
+    <LicenseProvider>
+      <AppContent />
+    </LicenseProvider>
   );
 }
 

@@ -495,6 +495,276 @@ ipcMain.handle('arkas:get-updater-token-status', async () => {
   }
 });
 
+// ─── License IPC Handlers ───
+const licenseManager = require('./license/licenseManager');
+const licenseEnforcer = require('./license/licenseEnforcer');
+
+const { net: electronNet } = require('electron');
+licenseManager.setNetFetch(electronNet.fetch);
+
+const LICENSE_API = 'https://project-11rt0.vercel.app';
+
+ipcMain.handle('arkas:get-license-status', async () => {
+  try {
+    return licenseManager.getStatus();
+  } catch (err) {
+    return { licensed: false, tier: 'free', error: err.message };
+  }
+});
+
+ipcMain.handle('arkas:activate-license', async (event, key) => {
+  try {
+    let npsn = '';
+    try {
+      const dbPath = getDbPath();
+      if (fs.existsSync(dbPath)) {
+        const db = new Database(dbPath, { readonly: true });
+        db.pragma("cipher='sqlcipher'");
+        db.pragma('legacy=4');
+        db.pragma(`key='${ARKAS_PASSWORD}'`);
+        const sekolah = getSchoolInfoWithOfficials(db);
+        if (sekolah) {
+          npsn = sekolah.npsn || sekolah.kode_instansi || '';
+        }
+        db.close();
+      }
+    } catch (dbErr) {
+      console.error('[activate-license] DB error:', dbErr.message);
+    }
+
+    if (!npsn && !licenseManager.isShortKey(key)) {
+      const parsed = licenseManager.parseLicenseKey(key);
+      if (parsed.valid && parsed.payload?.npsn) {
+        npsn = parsed.payload.npsn;
+      }
+    }
+
+    if (!npsn) return { success: false, error: 'NPSN tidak ditemukan. Pastikan database ARKAS terhubung.' };
+
+    return await licenseManager.activateLicense(key, npsn);
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+});
+
+ipcMain.handle('arkas:deactivate-license', async () => {
+  try {
+    return licenseManager.deactivateLicense();
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+});
+
+ipcMain.handle('arkas:check-license-feature', async (event, feature) => {
+  try {
+    return licenseEnforcer.canDoAction(feature);
+  } catch (err) {
+    return { can: false, error: err.message };
+  }
+});
+
+ipcMain.handle('arkas:increment-license-usage', async (event, feature) => {
+  try {
+    return licenseEnforcer.incrementUsage(feature);
+  } catch (err) {
+    return { error: err.message };
+  }
+});
+
+ipcMain.handle('arkas:get-blocked-menus', async () => {
+  try {
+    return licenseEnforcer.getBlockedMenus();
+  } catch {
+    return [];
+  }
+});
+
+ipcMain.handle('arkas:get-hardware-id', async () => {
+  try {
+    const { getShortId } = require('./license/fingerprint');
+    return { id: getShortId() };
+  } catch {
+    return { id: 'unknown' };
+  }
+});
+
+ipcMain.handle('arkas:get-stored-license-key', async () => {
+  try {
+    const license = licenseManager.getStoredLicense();
+    return { key: license?.key || '' };
+  } catch {
+    return { key: '' };
+  }
+});
+
+ipcMain.handle('arkas:open-payment-page', async (event, tier) => {
+  try {
+    const { shell } = require('electron');
+    await shell.openExternal(`${LICENSE_API}/buy?tier=${tier}`);
+    return { success: true };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+});
+
+ipcMain.handle('arkas:create-payment', async (event, tier) => {
+  try {
+    let npsn = '';
+    let schoolName = '';
+    let customerEmail = '';
+    try {
+      const dbPath = getDbPath();
+      if (fs.existsSync(dbPath)) {
+        const db = new Database(dbPath, { readonly: true });
+        db.pragma("cipher='sqlcipher'");
+        db.pragma('legacy=4');
+        db.pragma(`key='${ARKAS_PASSWORD}'`);
+        const sekolah = getSchoolInfoWithOfficials(db);
+        if (sekolah) {
+          npsn = sekolah.npsn || sekolah.kode_instansi || '';
+          schoolName = sekolah.nama_sekolah || '';
+        }
+        try {
+          const rows = db.prepare("SELECT varname, varvalue FROM app_config WHERE varvalue LIKE '%@%'").all();
+          console.log('[create-payment] All emails in app_config:', JSON.stringify(rows));
+          const priority = ['email_arkas', 'email_bendahara', 'user_email', 'email_sekolah', 'email'];
+          for (const p of priority) {
+            const found = rows.find(r => r.varname === p);
+            if (found && found.varvalue && found.varvalue.includes('@')) {
+              customerEmail = found.varvalue;
+              console.log('[create-payment] Using:', found.varname, '=', found.varvalue);
+              break;
+            }
+          }
+        } catch {}
+        if (!customerEmail) {
+          try {
+            const sekolahId = sekolah?.sekolah_id || sekolah?.instansi_id || sekolah?.npsn;
+            if (sekolahId) {
+              const ids = [sekolahId, sekolah?.instansi_id, sekolah?.npsn].filter(Boolean);
+              let penjab = null;
+              for (const id of ids) {
+                try {
+                  const row = db.prepare('SELECT * FROM sekolah_penjab WHERE sekolah_id = ? ORDER BY tahun DESC LIMIT 1').get(id);
+                  if (row) { penjab = row; break; }
+                } catch {}
+              }
+              if (penjab) {
+                const emailPriority = [
+                  { key: 'email_bendahara', label: 'Email Bendahara' },
+                  { key: 'nip_komite', label: 'Email Sekolah (komite)' },
+                  { key: 'email_ks', label: 'Email Kepala Sekolah' },
+                ];
+                for (const ep of emailPriority) {
+                  const val = (penjab[ep.key] || '').trim();
+                  if (val && val.includes('@')) {
+                    customerEmail = val;
+                    console.log('[create-payment] Using ' + ep.label + ':', customerEmail);
+                    break;
+                  }
+                }
+              }
+            }
+          } catch (e) { console.log('[create-payment] penjab lookup error:', e.message); }
+        }
+        if (!customerEmail) {
+          const sekolahEmail = (sekolah?.email_kepsek || '').trim();
+          if (sekolahEmail && sekolahEmail.includes('@')) {
+            customerEmail = sekolahEmail;
+            console.log('[create-payment] Using email_kepsek:', customerEmail);
+          }
+        }
+        if (!customerEmail) {
+          try {
+            const allCols = db.prepare("SELECT name FROM pragma_table_info(instansi) UNION SELECT name FROM pragma_table_info(mst_sekolah)").all();
+            const emailCols = allCols.filter(c => c.name.toLowerCase().includes('email')).map(c => c.name);
+            if (emailCols.length > 0) {
+              for (const col of emailCols) {
+                try {
+                  const row = db.prepare('SELECT ' + col + ' FROM instansi WHERE ' + col + ' IS NOT NULL LIMIT 1').get();
+                  if (row && row[col] && row[col].includes('@')) {
+                    customerEmail = row[col];
+                    console.log('[create-payment] Found email from instansi.' + col + ':', customerEmail);
+                    break;
+                  }
+                } catch {}
+                try {
+                  const row = db.prepare('SELECT ' + col + ' FROM mst_sekolah WHERE ' + col + ' IS NOT NULL LIMIT 1').get();
+                  if (row && row[col] && row[col].includes('@')) {
+                    customerEmail = row[col];
+                    console.log('[create-payment] Found email from mst_sekolah.' + col + ':', customerEmail);
+                    break;
+                  }
+                } catch {}
+              }
+            }
+          } catch {}
+        }
+        console.log('[create-payment] Final email:', customerEmail || '(none found)');
+        db.close();
+      }
+    } catch (dbErr) {
+      console.error('[create-payment] DB error:', dbErr.message);
+    }
+
+    if (!npsn) return { success: false, error: 'NPSN tidak ditemukan. Pastikan database ARKAS terhubung.' };
+
+    if (!customerEmail) customerEmail = `spj-${npsn}@smartspj.app`;
+
+    const { net } = require('electron');
+    const response = await net.fetch(`${LICENSE_API}/api/create-transaction`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        npsn,
+        tier,
+        customerName: schoolName || 'Bendahara BOS',
+        customerEmail,
+      }),
+    });
+
+    const data = await response.json();
+    if (data.success) {
+      const { shell } = require('electron');
+      await shell.openExternal(data.redirectUrl);
+      return { success: true, orderId: data.orderId, redirectUrl: data.redirectUrl, amount: data.amount };
+    }
+    return { success: false, error: data.error || 'Gagal membuat transaksi' };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+});
+
+ipcMain.handle('arkas:check-server-license', async () => {
+  try {
+    let npsn = '';
+    try {
+      const dbPath = getDbPath();
+      if (fs.existsSync(dbPath)) {
+        const db = new Database(dbPath, { readonly: true });
+        db.pragma("cipher='sqlcipher'");
+        db.pragma('legacy=4');
+        db.pragma(`key='${ARKAS_PASSWORD}'`);
+        const sekolah = getSchoolInfoWithOfficials(db);
+        if (sekolah) {
+          npsn = sekolah.npsn || sekolah.kode_instansi || '';
+        }
+        db.close();
+      }
+    } catch (dbErr) {
+      console.error('[check-server-license] DB error:', dbErr.message);
+    }
+
+    if (!npsn) return { active: false, status: 'no_npsn' };
+
+    const { net } = require('electron');
+    const response = await net.fetch(`${LICENSE_API}/api/license-status?npsn=${npsn}`);
+    return await response.json();
+  } catch (err) {
+    return { active: false, status: 'error', error: err.message };
+  }
+});
+
 app.whenReady().then(() => {
   loadSecurePassword();
   createWindow();

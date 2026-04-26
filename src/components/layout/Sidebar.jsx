@@ -15,13 +15,19 @@ import {
   Scale,
   Info,
   HardDrive,
+  Lock,
+  KeyRound,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useLicense } from '../../context/LicenseContext';
 
 const isElectron = typeof window !== 'undefined' && window.arkas;
 
 export default function Sidebar({ activeTab, setActiveTab }) {
   const [appVersion] = useState(__APP_VERSION__);
+  const { tier, licensed, trial } = useLicense();
+
+  const lockedMenus = { 'nota-groups': tier === 'free', 'bank-reconciliation': tier === 'free', sptjm: tier === 'free', 'k7-report': tier === 'free', 'register-kas': tier === 'free', 'backup-restore': tier === 'free' };
 
   const menuGroups = [
     {
@@ -59,6 +65,7 @@ export default function Sidebar({ activeTab, setActiveTab }) {
       title: 'LAINNYA',
       items: [
         { id: 'backup-restore', label: 'Backup & Restore', icon: HardDrive },
+        { id: 'license', label: 'Lisensi', icon: KeyRound },
         { id: 'settings', label: 'Pengaturan', icon: Settings },
         { id: 'about', label: 'Tentang Aplikasi', icon: Info },
       ],
@@ -97,11 +104,12 @@ export default function Sidebar({ activeTab, setActiveTab }) {
               {group.items.map((item) => {
                 const Icon = item.icon;
                 const isActive = activeTab === item.id;
+                const isLocked = lockedMenus[item.id];
                 return (
                   <button
                     key={item.id}
-                    onClick={() => setActiveTab(item.id)}
-                    className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium transition-all duration-200 group relative overflow-hidden ${isActive ? 'text-white shadow-lg shadow-blue-500/25 ring-1 ring-white/20' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'}`}
+                    onClick={() => !isLocked && setActiveTab(item.id)}
+                    className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium transition-all duration-200 group relative overflow-hidden ${isActive ? 'text-white shadow-lg shadow-blue-500/25 ring-1 ring-white/20' : isLocked ? 'text-slate-300 cursor-not-allowed' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'}`}
                   >
                     {isActive && (
                       <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 z-0" />
@@ -114,6 +122,9 @@ export default function Sidebar({ activeTab, setActiveTab }) {
                     <span className={`relative z-10 ${isActive ? 'font-semibold' : ''}`}>
                       {item.label}
                     </span>
+                    {isLocked && (
+                      <Lock size={12} className="relative z-10 ml-auto text-slate-300" />
+                    )}
                   </button>
                 );
               })}

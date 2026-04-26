@@ -50,3 +50,10 @@ version.txt
 
 # Debug/test scripts in electron/
 electron/test-*.js
+
+# License private key (NEVER commit)
+electron/license/privateKey.pem
+
+# License service
+license-service/node_modules/
+license-service/.env
