@@ -66,6 +66,7 @@
   "build": {
     "appId": "com.kevindoni.smartspj",
     "productName": "SmartSPJ",
+    "artifactName": "${productName} Setup ${version}",
     "directories": {
       "output": "release"
     },

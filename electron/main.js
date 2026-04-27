@@ -626,13 +626,11 @@ ipcMain.handle('arkas:create-payment', async (event, tier) => {
         }
         try {
           const rows = db.prepare("SELECT varname, varvalue FROM app_config WHERE varvalue LIKE '%@%'").all();
-          console.log('[create-payment] All emails in app_config:', JSON.stringify(rows));
           const priority = ['email_arkas', 'email_bendahara', 'user_email', 'email_sekolah', 'email'];
           for (const p of priority) {
             const found = rows.find(r => r.varname === p);
             if (found && found.varvalue && found.varvalue.includes('@')) {
               customerEmail = found.varvalue;
-              console.log('[create-payment] Using:', found.varname, '=', found.varvalue);
               break;
             }
           }
@@ -659,48 +657,19 @@ ipcMain.handle('arkas:create-payment', async (event, tier) => {
                   const val = (penjab[ep.key] || '').trim();
                   if (val && val.includes('@')) {
                     customerEmail = val;
-                    console.log('[create-payment] Using ' + ep.label + ':', customerEmail);
                     break;
                   }
                 }
               }
             }
-          } catch (e) { console.log('[create-payment] penjab lookup error:', e.message); }
+          } catch {}
         }
         if (!customerEmail) {
           const sekolahEmail = (sekolah?.email_kepsek || '').trim();
           if (sekolahEmail && sekolahEmail.includes('@')) {
             customerEmail = sekolahEmail;
-            console.log('[create-payment] Using email_kepsek:', customerEmail);
           }
         }
-        if (!customerEmail) {
-          try {
-            const allCols = db.prepare("SELECT name FROM pragma_table_info(instansi) UNION SELECT name FROM pragma_table_info(mst_sekolah)").all();
-            const emailCols = allCols.filter(c => c.name.toLowerCase().includes('email')).map(c => c.name);
-            if (emailCols.length > 0) {
-              for (const col of emailCols) {
-                try {
-                  const row = db.prepare('SELECT ' + col + ' FROM instansi WHERE ' + col + ' IS NOT NULL LIMIT 1').get();
-                  if (row && row[col] && row[col].includes('@')) {
-                    customerEmail = row[col];
-                    console.log('[create-payment] Found email from instansi.' + col + ':', customerEmail);
-                    break;
-                  }
-                } catch {}
-                try {
-                  const row = db.prepare('SELECT ' + col + ' FROM mst_sekolah WHERE ' + col + ' IS NOT NULL LIMIT 1').get();
-                  if (row && row[col] && row[col].includes('@')) {
-                    customerEmail = row[col];
-                    console.log('[create-payment] Found email from mst_sekolah.' + col + ':', customerEmail);
-                    break;
-                  }
-                } catch {}
-              }
-            }
-          } catch {}
-        }
-        console.log('[create-payment] Final email:', customerEmail || '(none found)');
         db.close();
       }
     } catch (dbErr) {
