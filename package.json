@@ -66,7 +66,7 @@
   "build": {
     "appId": "com.kevindoni.smartspj",
     "productName": "SmartSPJ",
-    "artifactName": "${productName} Setup ${version}",
+    "artifactName": "${productName}.Setup.${version}.${ext}",
     "directories": {
       "output": "release"
     },
@@ -87,6 +87,7 @@
     "asarUnpack": [
       "src/config/reconciliation_columns_full.json",
       "electron/**/*.js",
+      "electron/**/*.jsc",
       "package.json"
     ],
     "win": {
