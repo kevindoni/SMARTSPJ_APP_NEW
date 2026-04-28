@@ -517,14 +517,18 @@ ipcMain.handle('arkas:activate-license', async (event, key) => {
     let npsn = '';
     try {
       const dbPath = getDbPath();
+      console.log('[activate-license] dbPath:', dbPath, 'exists:', fs.existsSync(dbPath));
       if (fs.existsSync(dbPath)) {
         const db = new Database(dbPath, { readonly: true });
         db.pragma("cipher='sqlcipher'");
         db.pragma('legacy=4');
         db.pragma(`key='${ARKAS_PASSWORD}'`);
         const sekolah = getSchoolInfoWithOfficials(db);
+        console.log('[activate-license] sekolah:', JSON.stringify({
+          npsn: sekolah?.npsn, kode_instansi: sekolah?.kode_instansi, nama: sekolah?.nama
+        }));
         if (sekolah) {
-          npsn = sekolah.npsn || sekolah.kode_instansi || '';
+          npsn = String(sekolah.npsn || sekolah.kode_instansi || '').trim();
         }
         db.close();
       }

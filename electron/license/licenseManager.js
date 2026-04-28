@@ -301,6 +301,7 @@ function setNetFetch(fn) {
 }
 
 async function activateLicense(key, npsn) {
+  console.log('[activateLicense] key:', key, 'npsn:', JSON.stringify(npsn));
   if (isShortKey(key)) {
     const resolved = await resolveShortKey(key, getFingerprint());
     if (!resolved.valid) return { success: false, error: resolved.error };
@@ -309,8 +310,8 @@ async function activateLicense(key, npsn) {
     const sigCheck = verifySignature(payload, signature);
     if (!sigCheck.valid) return { success: false, error: sigCheck.error || 'Signature tidak valid' };
 
-    if (payload.npsn !== npsn) {
-      return { success: false, error: `License ini untuk NPSN ${payload.npsn}, bukan ${npsn}` };
+    if (String(payload.npsn) !== String(npsn)) {
+      return { success: false, error: `License ini untuk NPSN ${payload.npsn}, bukan ${npsn || '(kosong)'}. Pastikan database ARKAS terhubung.` };
     }
 
     const licenseRecord = {
@@ -345,8 +346,8 @@ async function activateLicense(key, npsn) {
     const sigCheck = verifySignature(payload, signature);
     if (!sigCheck.valid) return { success: false, error: sigCheck.error || 'Signature tidak valid' };
 
-    if (payload.npsn !== npsn) {
-      return { success: false, error: `License ini untuk NPSN ${payload.npsn}, bukan ${npsn}` };
+    if (String(payload.npsn) !== String(npsn)) {
+      return { success: false, error: `License ini untuk NPSN ${payload.npsn}, bukan ${npsn || '(kosong)'}. Pastikan database ARKAS terhubung.` };
     }
 
     const licenseRecord = {
