@@ -681,17 +681,37 @@ ipcMain.handle('arkas:create-payment', async (event, tier) => {
 
     if (!customerEmail) customerEmail = `spj-${npsn}@smartspj.app`;
 
-    const { net } = require('electron');
-    const response = await net.fetch(`${LICENSE_API}/api/create-transaction`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        npsn,
-        tier,
-        customerName: schoolName || 'Bendahara BOS',
-        customerEmail,
-      }),
-    });
+    const https = require('https');
+    let response;
+    try {
+      const { net } = require('electron');
+      response = await net.fetch(`${LICENSE_API}/api/create-transaction`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          npsn,
+          tier,
+          customerName: schoolName || 'Bendahara BOS',
+          customerEmail,
+        }),
+      });
+    } catch {
+      const body = JSON.stringify({ npsn, tier, customerName: schoolName || 'Bendahara BOS', customerEmail });
+      response = await new Promise((resolve, reject) => {
+        const urlObj = new URL(`${LICENSE_API}/api/create-transaction`);
+        const req = https.request({
+          hostname: urlObj.hostname, path: urlObj.pathname, method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+        }, (res) => {
+          let data = '';
+          res.on('data', (c) => { data += c; });
+          res.on('end', () => { resolve({ json: () => JSON.parse(data) }); });
+        });
+        req.on('error', reject);
+        req.write(body);
+        req.end();
+      });
+    }
 
     const data = await response.json();
     if (data.success) {
@@ -727,8 +747,21 @@ ipcMain.handle('arkas:check-server-license', async () => {
 
     if (!npsn) return { active: false, status: 'no_npsn' };
 
-    const { net } = require('electron');
-    const response = await net.fetch(`${LICENSE_API}/api/license-status?npsn=${npsn}`);
+    const https = require('https');
+    let response;
+    try {
+      const { net } = require('electron');
+      response = await net.fetch(`${LICENSE_API}/api/license-status?npsn=${npsn}`);
+    } catch {
+      response = await new Promise((resolve, reject) => {
+        const urlObj = new URL(`${LICENSE_API}/api/license-status?npsn=${npsn}`);
+        https.get({ hostname: urlObj.hostname, path: urlObj.pathname + urlObj.search }, (res) => {
+          let data = '';
+          res.on('data', (c) => { data += c; });
+          res.on('end', () => { resolve({ json: () => JSON.parse(data) }); });
+        }).on('error', reject);
+      });
+    }
     return await response.json();
   } catch (err) {
     return { active: false, status: 'error', error: err.message };

@@ -8,6 +8,34 @@ const { getTrialInfo } = require('./trialManager');
 const PUBLIC_KEY_PATH = path.join(__dirname, 'publicKey.pem');
 const OBFUSCATE_KEY = 'smrtspj_l1c_v2_2026';
 let fetch = globalThis.fetch;
+const https = require('https');
+
+function nodeHttpsFetch(url, options) {
+  return new Promise((resolve, reject) => {
+    const urlObj = new URL(url);
+    const reqOptions = {
+      hostname: urlObj.hostname,
+      path: urlObj.pathname + urlObj.search,
+      method: options.method || 'GET',
+      headers: options.headers || {},
+    };
+    const req = https.request(reqOptions, (res) => {
+      let body = '';
+      res.on('data', (chunk) => { body += chunk; });
+      res.on('end', () => {
+        resolve({
+          ok: res.statusCode >= 200 && res.statusCode < 300,
+          status: res.statusCode,
+          text: () => Promise.resolve(body),
+          json: () => Promise.resolve(JSON.parse(body)),
+        });
+      });
+    });
+    req.on('error', reject);
+    if (options.body) req.write(options.body);
+    req.end();
+  });
+}
 
 function getDataDir() {
   const p = path.join(os.homedir(), 'AppData', 'Roaming', 'smart-spj', 'data');
@@ -218,15 +246,37 @@ function parseLicenseKey(key) {
 
 async function resolveShortKey(key, hardwareId) {
   let resp;
-  try {
-    resp = await fetch(`${LICENSE_SERVICE_URL}/api/activate-key`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ key, hardwareId }),
-    });
-  } catch (e) {
-    console.error('[resolveShortKey] fetch error:', e.message, e.code);
-    return { valid: false, error: 'Tidak dapat terhubung ke server license. Periksa koneksi internet. (' + e.message + ')' };
+  const body = JSON.stringify({ key, hardwareId });
+  const url = `${LICENSE_SERVICE_URL}/api/activate-key`;
+  const fetchOptions = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body,
+  };
+
+  let lastError = null;
+  const fetchFns = [fetch, globalThis.fetch].filter(Boolean);
+
+  for (const fetchFn of fetchFns) {
+    try {
+      resp = await fetchFn(url, fetchOptions);
+      if (resp && resp.ok !== undefined) break;
+      resp = null;
+    } catch (e) {
+      lastError = e;
+    }
+  }
+
+  if (!resp) {
+    try {
+      resp = await nodeHttpsFetch(url, fetchOptions);
+    } catch (e) {
+      lastError = e;
+    }
+  }
+
+  if (!resp) {
+    return { valid: false, error: 'Tidak dapat terhubung ke server license. Periksa koneksi internet. (' + (lastError?.message || 'unknown') + ')' };
   }
 
   const text = await resp.text();
@@ -325,13 +375,16 @@ async function activateLicense(key, npsn) {
 async function deactivateLicense() {
   const license = getStoredLicense();
   if (license && isShortKey(license.key)) {
-    try {
-      await fetch(`${LICENSE_SERVICE_URL}/api/deactivate`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ npsn: license.npsn, licenseKey: license.key }),
-      });
-    } catch {}
+    const url = `${LICENSE_SERVICE_URL}/api/deactivate`;
+    const options = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ npsn: license.npsn, licenseKey: license.key }),
+    };
+    for (const fetchFn of [fetch, globalThis.fetch].filter(Boolean)) {
+      try { await fetchFn(url, options); break; } catch {}
+    }
+    try { await nodeHttpsFetch(url, options); } catch {}
   }
   removeLicense();
   return { success: true };
