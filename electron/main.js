@@ -701,7 +701,7 @@ ipcMain.handle('arkas:create-payment', async (event, tier) => {
         const urlObj = new URL(`${LICENSE_API}/api/create-transaction`);
         const req = https.request({
           hostname: urlObj.hostname, path: urlObj.pathname, method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json' }, family: 4, timeout: 15000,
         }, (res) => {
           let data = '';
           res.on('data', (c) => { data += c; });
@@ -755,7 +755,7 @@ ipcMain.handle('arkas:check-server-license', async () => {
     } catch {
       response = await new Promise((resolve, reject) => {
         const urlObj = new URL(`${LICENSE_API}/api/license-status?npsn=${npsn}`);
-        https.get({ hostname: urlObj.hostname, path: urlObj.pathname + urlObj.search }, (res) => {
+        https.get({ hostname: urlObj.hostname, path: urlObj.pathname + urlObj.search, family: 4, timeout: 15000 }, (res) => {
           let data = '';
           res.on('data', (c) => { data += c; });
           res.on('end', () => { resolve({ json: () => JSON.parse(data) }); });

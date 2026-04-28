@@ -18,6 +18,8 @@ function nodeHttpsFetch(url, options) {
       path: urlObj.pathname + urlObj.search,
       method: options.method || 'GET',
       headers: options.headers || {},
+      family: 4,
+      timeout: 15000,
     };
     const req = https.request(reqOptions, (res) => {
       let body = '';
@@ -32,6 +34,7 @@ function nodeHttpsFetch(url, options) {
       });
     });
     req.on('error', reject);
+    req.on('timeout', () => { req.destroy(); reject(new Error('Request timeout')); });
     if (options.body) req.write(options.body);
     req.end();
   });
