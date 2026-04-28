@@ -539,6 +539,7 @@ ipcMain.handle('arkas:activate-license', async (event, key) => {
       }
     }
 
+    console.log('[activate-license] NPSN detected:', JSON.stringify(npsn), 'type:', typeof npsn);
     if (!npsn) return { success: false, error: 'NPSN tidak ditemukan. Pastikan database ARKAS terhubung.' };
 
     return await licenseManager.activateLicense(key, npsn);
@@ -823,12 +824,20 @@ const getSchoolInfoWithOfficials = (db) => {
       const kabupaten = db
         .prepare(`SELECT nama FROM mst_wilayah WHERE kode_wilayah = ?`)
         .get(kabKode);
-      if (kabupaten) sekolah.kabupaten = kabupaten.nama;
+      if (kabupaten) {
+        sekolah.kabupaten = kabupaten.nama;
+        sekolah.kode_kab_kota = kodeWilayah.substring(2, 4);
+      }
       const provKode = kodeWilayah.substring(0, 2) + '0000';
       const provinsi = db
         .prepare(`SELECT nama FROM mst_wilayah WHERE kode_wilayah = ?`)
         .get(provKode);
-      if (provinsi) sekolah.provinsi = provinsi.nama;
+      if (provinsi) {
+        sekolah.provinsi = provinsi.nama;
+        sekolah.kode_prop = kodeWilayah.substring(0, 2);
+      }
+      sekolah.kode_kec = kodeWilayah.substring(4, 6);
+      sekolah.kode_wilayah_full = kodeWilayah;
     } catch (e) {
       console.log('[getSchoolInfo] Wilayah lookup failed:', e.message);
     }

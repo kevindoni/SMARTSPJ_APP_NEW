@@ -9,6 +9,7 @@ module.exports = async function handler(req, res) {
     }
 
     const ADMIN_SECRET = process.env.ADMIN_SECRET;
+    const auth = req.headers['authorization'];
     if (!ADMIN_SECRET || auth !== `Bearer ${ADMIN_SECRET}`) {
       return res.status(401).json({ error: 'Unauthorized' });
     }

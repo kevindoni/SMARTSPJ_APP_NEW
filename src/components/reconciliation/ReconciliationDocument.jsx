@@ -217,7 +217,7 @@ export default function ReconciliationDocument({
 
             return `${days[date.getDay()]} tanggal ${date.getDate()} bulan ${months[date.getMonth()].toLowerCase()} tahun ${date.getFullYear()}`;
           })()}
-          , bertempat di {signatoryData?.tempatRekonsiliasi || 'Kantor Dinas Pendidikan'}. Yang
+          , bertempat di {signatoryData?.tempatRekonsiliasi || '...................'}. Yang
           bertanda tangan di bawah ini:
         </p>
       </div>

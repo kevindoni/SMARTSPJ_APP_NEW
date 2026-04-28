@@ -207,7 +207,7 @@ export const exportBaRekonsToExcel = async (
 
   const periodText = getPeriodText(period, year);
 
-  textCell.value = `Pada hari ${dayName} tanggal ${dayDate} bulan ${monthName} tahun ${yearNum}, bertempat di ${signatoryData?.tempatRekonsiliasi || 'Kantor Dinas Pendidikan'}. Yang bertanda tangan di bawah ini menyatakan bahwa kami bertanggung jawab penuh atas kebenaran Laporan Realisasi Penggunaan Dana BOSP ${periodText} dengan rincian sebagai berikut:`;
+  textCell.value = `Pada hari ${dayName} tanggal ${dayDate} bulan ${monthName} tahun ${yearNum}, bertempat di ${signatoryData?.tempatRekonsiliasi || '...................'}. Yang bertanda tangan di bawah ini menyatakan bahwa kami bertanggung jawab penuh atas kebenaran Laporan Realisasi Penggunaan Dana BOSP ${periodText} dengan rincian sebagai berikut:`;
   textCell.alignment = { vertical: 'top', wrapText: true };
   textCell.font = fontNormal;
   r += 3;

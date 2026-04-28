@@ -225,7 +225,8 @@ async function resolveShortKey(key, hardwareId) {
       body: JSON.stringify({ key, hardwareId }),
     });
   } catch (e) {
-    return { valid: false, error: 'Tidak dapat terhubung ke server license. Periksa koneksi internet.' };
+    console.error('[resolveShortKey] fetch error:', e.message, e.code);
+    return { valid: false, error: 'Tidak dapat terhubung ke server license. Periksa koneksi internet. (' + e.message + ')' };
   }
 
   const text = await resp.text();

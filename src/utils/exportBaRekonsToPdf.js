@@ -223,7 +223,7 @@ export const exportBaRekonsToPdf = (
   const yearNum = dateObj.getFullYear();
   const formattedDateSimple = `${dayDate} ${monthName} ${yearNum}`;
 
-  const statementText = `Pada hari ${dayName} tanggal ${dayDate} bulan ${monthName} tahun ${yearNum}, bertempat di ${signatoryData?.tempatRekonsiliasi || 'Kantor Dinas Pendidikan'}. Yang bertanda tangan di bawah ini:`;
+  const statementText = `Pada hari ${dayName} tanggal ${dayDate} bulan ${monthName} tahun ${yearNum}, bertempat di ${signatoryData?.tempatRekonsiliasi || '...................'}. Yang bertanda tangan di bawah ini:`;
 
   const splitStatement = doc.splitTextToSize(statementText, contentWidth);
   doc.text(splitStatement, margin, cursorY);

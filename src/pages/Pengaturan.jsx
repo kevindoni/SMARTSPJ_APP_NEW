@@ -278,7 +278,7 @@ export default function Pengaturan() {
                   name="nomor_sk"
                   value={formData.nomor_sk}
                   onChange={handleChange}
-                  placeholder="Contoh: 11.30/SMP.NL/6/VII/2025"
+                  placeholder="Contoh: 11.30/SMP/6/VII/2025"
                   className={'w-full ' + theme.input.base}
                 />
               </div>
@@ -389,7 +389,7 @@ export default function Pengaturan() {
                 <input
                   value={sigData.header1}
                   onChange={(e) => handleSigChange('header1', e.target.value)}
-                  placeholder="PEMERINTAH KABUPATEN TEMANGGUNG"
+                  placeholder="PEMERINTAH KABUPATEN/KOTA"
                   className={'w-full ' + theme.input.base}
                 />
               </div>
@@ -419,7 +419,7 @@ export default function Pengaturan() {
                   <input
                     value={sigData.headerTelepon}
                     onChange={(e) => handleSigChange('headerTelepon', e.target.value)}
-                    placeholder="(0293) 491148"
+                    placeholder="(021) 12345678"
                     className={'w-full ' + theme.input.base}
                   />
                 </div>
@@ -430,7 +430,7 @@ export default function Pengaturan() {
                   <input
                     value={sigData.headerLaman}
                     onChange={(e) => handleSigChange('headerLaman', e.target.value)}
-                    placeholder="dindikpora.go.id"
+                    placeholder="dinaspendidikan.go.id"
                     className={'w-full ' + theme.input.base}
                   />
                 </div>

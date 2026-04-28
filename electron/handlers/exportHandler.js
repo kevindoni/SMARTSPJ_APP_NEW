@@ -561,7 +561,7 @@ function drawSignatureBlock(doc, startY, data, saldoAkhir) {
     namaKec = namaKec.replace(/^Kec\.?\s*/i, '');
     namaKec = 'Kec. ' + namaKec;
   } else {
-    namaKec = 'Kecamatan';
+    namaKec = 'Kec. .......................';
   }
 
   // Compact Closing Text
@@ -1812,7 +1812,7 @@ async function generateBuktiPengeluaranPdf(data, schoolInfo, filePath) {
     .stroke();
 
   // Bendahara
-  const bendaharaName = schoolInfo?.nama_bendahara || 'Bendahara';
+  const bendaharaName = schoolInfo?.nama_bendahara || schoolInfo?.bendahara || '.......................';
   doc
     .font('Helvetica-Bold')
     .fontSize(10)
@@ -1842,7 +1842,7 @@ async function generateBuktiPengeluaranPdf(data, schoolInfo, filePath) {
   }
 
   // Kepala Sekolah
-  const kepsekName = schoolInfo?.kepala_sekolah || 'Kepala Sekolah';
+  const kepsekName = schoolInfo?.kepala_sekolah || '.......................';
   doc
     .font('Helvetica-Bold')
     .fontSize(10)
