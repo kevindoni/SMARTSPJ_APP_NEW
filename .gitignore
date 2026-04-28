@@ -1,0 +1,52 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+release/
+
+# Bytecode compiled files
+electron/**/*.jsc
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Database files (local development data)
+data/*.sqlite
+data/*.db
+data/*.json
+
+# Temporary/debug scripts
+scripts/_*
+
+# Electron loader (generated)
+electron/main-loader.js
+
+# Temp/test files
+_*.js
+_*.txt
+_*.b64
+stderr.txt
+version.txt
+
+# Playwright MCP
+.playwright-mcp/
+
+# Debug/test scripts in electron/
+electron/test-*.js
