@@ -68,7 +68,7 @@ export const exportBaRekonsToExcel = async (
   const saldoAwalKinerja =
     (openingDetails.silpaKinerja?.bank || 0) + (openingDetails.silpaKinerja?.tunai || 0);
 
-  const saldoAwalKinerja2025 =
+  const saldoAwalKinerjaTahunBerjalan =
     (openingDetails.kinerja?.bank || 0) + (openingDetails.kinerja?.tunai || 0);
 
   const terimaReguler1 = income.regulerT1 || 0;
@@ -79,7 +79,7 @@ export const exportBaRekonsToExcel = async (
     saldoAwalLainnya +
     saldoAwalReguler +
     saldoAwalKinerja +
-    saldoAwalKinerja2025 +
+    saldoAwalKinerjaTahunBerjalan +
     terimaReguler1 +
     terimaReguler2 +
     terimaKinerja;
@@ -207,7 +207,7 @@ export const exportBaRekonsToExcel = async (
 
   const periodText = getPeriodText(period, year);
 
-  textCell.value = `Pada hari ${dayName} tanggal ${dayDate} bulan ${monthName} tahun ${yearNum}, bertempat di ${signatoryData?.tempatRekonsiliasi || 'Kantor Dinas Pendidikan'}. Yang bertanda tangan di bawah ini menyatakan bahwa kami bertanggung jawab penuh atas kebenaran Laporan Realisasi Penggunaan Dana BOSP ${periodText} dengan rincian sebagai berikut:`;
+  textCell.value = `Pada hari ${dayName} tanggal ${dayDate} bulan ${monthName} tahun ${yearNum}, bertempat di ${signatoryData?.tempatRekonsiliasi || schoolInfo?.kabupaten_kota || schoolInfo?.kabupaten || '-'}. Yang bertanda tangan di bawah ini menyatakan bahwa kami bertanggung jawab penuh atas kebenaran Laporan Realisasi Penggunaan Dana BOSP ${periodText} dengan rincian sebagai berikut:`;
   textCell.alignment = { vertical: 'top', wrapText: true };
   textCell.font = fontNormal;
   r += 3;
@@ -271,7 +271,7 @@ export const exportBaRekonsToExcel = async (
 
   addRow(`SiLPA Kinerja ${year - 1}`, saldoAwalKinerja, null, '', false, fillYellow);
 
-  addRow('BOSP Kinerja ' + year, saldoAwalKinerja2025, null, '', false, fillYellow);
+  addRow('BOSP Kinerja ' + year, saldoAwalKinerjaTahunBerjalan, null, '', false, fillYellow);
 
   // Row 2: Penerimaan
   sheet.getCell(`A${r}`).value = '2.';

@@ -75,7 +75,7 @@ export const exportBaRekonsToPdf = (
   const saldoAwalKinerja =
     (openingDetails.silpaKinerja?.bank || 0) + (openingDetails.silpaKinerja?.tunai || 0);
 
-  const saldoAwalKinerja2025 =
+  const saldoAwalKinerjaTahunBerjalan =
     (openingDetails.kinerja?.bank || 0) + (openingDetails.kinerja?.tunai || 0);
 
   const terimaReguler1 = income.regulerT1 || 0;
@@ -86,7 +86,7 @@ export const exportBaRekonsToPdf = (
     saldoAwalLainnya +
     saldoAwalReguler +
     saldoAwalKinerja +
-    saldoAwalKinerja2025 +
+    saldoAwalKinerjaTahunBerjalan +
     terimaReguler1 +
     terimaReguler2 +
     terimaKinerja;
@@ -223,7 +223,7 @@ export const exportBaRekonsToPdf = (
   const yearNum = dateObj.getFullYear();
   const formattedDateSimple = `${dayDate} ${monthName} ${yearNum}`;
 
-  const statementText = `Pada hari ${dayName} tanggal ${dayDate} bulan ${monthName} tahun ${yearNum}, bertempat di ${signatoryData?.tempatRekonsiliasi || 'Kantor Dinas Pendidikan'}. Yang bertanda tangan di bawah ini:`;
+  const statementText = `Pada hari ${dayName} tanggal ${dayDate} bulan ${monthName} tahun ${yearNum}, bertempat di ${signatoryData?.tempatRekonsiliasi || schoolInfo?.kabupaten_kota || schoolInfo?.kabupaten || '-'}. Yang bertanda tangan di bawah ini:`;
 
   const splitStatement = doc.splitTextToSize(statementText, contentWidth);
   doc.text(splitStatement, margin, cursorY);
@@ -311,7 +311,7 @@ export const exportBaRekonsToPdf = (
     [
       `BOSP Kinerja ${year}`,
       { content: 'Rp', styles: yellowStyle },
-      { content: formatRupiahLocal(saldoAwalKinerja2025), styles: yellowStyle },
+      { content: formatRupiahLocal(saldoAwalKinerjaTahunBerjalan), styles: yellowStyle },
       '',
       '',
     ],

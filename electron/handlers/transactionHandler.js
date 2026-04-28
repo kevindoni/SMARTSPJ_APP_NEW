@@ -12,7 +12,7 @@ const TAX_RATES = require('../config/tax-rates');
  * @returns {Array} List of transactions
  */
 function getTransactions(db, params, overrides = {}) {
-  const yearStr = (params.year || 2025).toString();
+  const yearStr = (params.year || new Date().getFullYear()).toString();
   const limit = params.limit || 50;
   const offset = params.offset || 0;
 

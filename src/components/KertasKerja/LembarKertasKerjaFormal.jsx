@@ -106,17 +106,13 @@ export default function LembarKertasKerjaFormal({
     }
   });
 
-  const kabupaten = schoolInfo?.kabupaten_kota || 'TEMANGGUNG';
+  const kabupaten = schoolInfo?.kabupaten_kota || schoolInfo?.kabupaten || '-';
   const npsn = schoolInfo?.npsn || '...';
   const sekolah = schoolInfo?.nama || '...';
 
-  // Construct Dynamic Region Code
-  // Format: "1.01 . [Prov].[Kab].[Kec]"
-  // If exact codes are missing, careful fallback logic is needed.
-  // Based on user: 03 (Prov), 23 (Kab), 09 (Kec)
-  const prov = schoolInfo?.kode_prop || schoolInfo?.propinsi_id || '03'; // Fallback to user example for now if missing
-  const kab = schoolInfo?.kode_kab_kota || schoolInfo?.kabupaten_kota_id || '23';
-  const kec = schoolInfo?.kode_kec || schoolInfo?.kecamatan_id || '09';
+  const prov = schoolInfo?.kode_prop || schoolInfo?.propinsi_id || '';
+  const kab = schoolInfo?.kode_kab_kota || schoolInfo?.kabupaten_kota_id || '';
+  const kec = schoolInfo?.kode_kec || schoolInfo?.kecamatan_id || '';
 
   // Ensure 2 digits if they are numbers
   const pad = (v) => String(v).padStart(2, '0');
@@ -143,7 +139,7 @@ export default function LembarKertasKerjaFormal({
               <th colSpan="3" className="border border-black p-2 text-center font-bold">
                 PEMERINTAH KAB. {kabupaten}
                 <br />
-                TAHUN ANGGARAN {year || '2025'}
+                TAHUN ANGGARAN {year || new Date().getFullYear()}
               </th>
             </tr>
             {/* Info Section Row */}

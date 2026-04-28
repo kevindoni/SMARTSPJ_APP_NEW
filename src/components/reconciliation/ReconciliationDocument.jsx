@@ -72,8 +72,7 @@ export default function ReconciliationDocument({
   const saldoAwalKinerja =
     (openingDetails.silpaKinerja?.bank || 0) + (openingDetails.silpaKinerja?.tunai || 0);
 
-  // Saldo awal BOSP Kinerja 2025 (diterima di semester sebelumnya)
-  const saldoAwalKinerja2025 =
+  const saldoAwalKinerjaTahunBerjalan =
     (openingDetails.kinerja?.bank || 0) + (openingDetails.kinerja?.tunai || 0);
 
   // Penerimaan
@@ -86,7 +85,7 @@ export default function ReconciliationDocument({
     saldoAwalDanaLainnya +
     saldoAwalReguler +
     saldoAwalKinerja +
-    saldoAwalKinerja2025 +
+    saldoAwalKinerjaTahunBerjalan +
     penerimaanRegulerT1 +
     penerimaanRegulerT2 +
     penerimaanKinerja;
@@ -217,7 +216,7 @@ export default function ReconciliationDocument({
 
             return `${days[date.getDay()]} tanggal ${date.getDate()} bulan ${months[date.getMonth()].toLowerCase()} tahun ${date.getFullYear()}`;
           })()}
-          , bertempat di {signatoryData?.tempatRekonsiliasi || 'Kantor Dinas Pendidikan'}. Yang
+          , bertempat di {signatoryData?.tempatRekonsiliasi || schoolInfo?.kabupaten_kota || schoolInfo?.kabupaten || '-'}. Yang
           bertanda tangan di bawah ini:
         </p>
       </div>
@@ -330,7 +329,7 @@ export default function ReconciliationDocument({
             <td className="border border-black px-2 py-1 pl-4">BOSP Kinerja {year}</td>
             <td className="border border-black px-1 py-1 text-center">Rp</td>
             <td className="border border-black px-1 py-1 text-right font-mono bg-yellow-50">
-              {formatRupiah(saldoAwalKinerja2025)}
+              {formatRupiah(saldoAwalKinerjaTahunBerjalan)}
             </td>
             <td className="border border-black px-1 py-1 text-center"></td>
                         <td className="border border-black px-1 py-1"></td>

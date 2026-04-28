@@ -146,7 +146,7 @@ async function exportLembarToExcel(data, metadata) {
   const { year, fundSource, schoolInfo } = metadata;
   const schoolName = schoolInfo?.nama_sekolah || schoolInfo?.nama || 'Sekolah';
   const npsn = schoolInfo?.npsn || '-';
-  const kabupaten = schoolInfo?.kabupaten_kota || 'TEMANGGUNG';
+  const kabupaten = schoolInfo?.kabupaten_kota || schoolInfo?.kabupaten || '-';
 
   const workbook = new ExcelJS.Workbook();
   workbook.creator = 'SmartSPJ';
@@ -764,8 +764,8 @@ export function exportToPDF(data, metadata) {
 
   const schoolName = schoolInfo?.nama_sekolah || schoolInfo?.nama || 'Sekolah';
   const npsn = schoolInfo?.npsn || '-';
-  const kabupaten = schoolInfo?.kabupaten_kota || 'TEMANGGUNG';
-  const alamat = schoolInfo?.alamat || 'Jl. Traji - Bandunggede Km 02';
+  const kabupaten = schoolInfo?.kabupaten_kota || schoolInfo?.kabupaten || '-';
+  const alamat = schoolInfo?.alamat || schoolInfo?.alamat_jalan || '-';
 
   const isLembar = (selectedFormat || '').toLowerCase().includes('lembar');
   const isQuarterly = (selectedFormat || '').toLowerCase().includes('triwulan') && !isLembar;
