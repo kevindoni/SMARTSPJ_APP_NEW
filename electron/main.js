@@ -739,39 +739,53 @@ ipcMain.handle('arkas:create-payment', async (event, tier) => {
 ipcMain.handle('arkas:check-server-license', async () => {
   try {
     let npsn = '';
+    let debugInfo = [];
     try {
       const dbPath = getDbPath();
-      if (fs.existsSync(dbPath)) {
+      const dbExists = fs.existsSync(dbPath);
+      debugInfo.push(`db: ${dbExists ? 'found' : 'NOT FOUND'}`);
+      debugInfo.push(`pwd: ${ARKAS_PASSWORD ? 'loaded ('+ARKAS_PASSWORD.length+')' : 'EMPTY'}`);
+      if (dbExists && ARKAS_PASSWORD) {
         const db = new Database(dbPath, { readonly: true });
         db.pragma("cipher='sqlcipher'");
         db.pragma('legacy=4');
         db.pragma(`key='${ARKAS_PASSWORD}'`);
         const sekolah = getSchoolInfoWithOfficials(db);
+        debugInfo.push(`sekolah: ${sekolah ? 'found' : 'null'}`);
         if (sekolah) {
-          npsn = sekolah.npsn || sekolah.kode_instansi || '';
+          npsn = String(sekolah.npsn || sekolah.kode_instansi || '').trim();
+          debugInfo.push(`npsn: ${JSON.stringify(npsn)}`);
         }
         db.close();
       }
     } catch (dbErr) {
-      console.error('[check-server-license] DB error:', dbErr.message);
+      debugInfo.push(`error: ${dbErr.message}`);
     }
 
-    if (!npsn) return { active: false, status: 'no_npsn' };
+    console.log('[check-server-license]', debugInfo.join(' | '));
+
+    if (!npsn) return { active: false, status: 'no_npsn', error: 'NPSN tidak ditemukan. Debug: ' + debugInfo.join(' | ') };
 
     const https = require('https');
     let response;
     try {
       const { net } = require('electron');
-      response = await net.fetch(`${LICENSE_API}/api/license-status?npsn=${npsn}`);
+      response = await net.fetch(`${LICENSE_API}/api/license-status?npsn=${encodeURIComponent(npsn)}`);
     } catch {
       response = await new Promise((resolve, reject) => {
-        const urlObj = new URL(`${LICENSE_API}/api/license-status?npsn=${npsn}`);
+        const urlObj = new URL(`${LICENSE_API}/api/license-status?npsn=${encodeURIComponent(npsn)}`);
         https.get({ hostname: urlObj.hostname, path: urlObj.pathname + urlObj.search, family: 4, timeout: 15000 }, (res) => {
           let data = '';
           res.on('data', (c) => { data += c; });
           res.on('end', () => { resolve({ json: () => JSON.parse(data) }); });
         }).on('error', reject);
       });
+    }
+    return await response.json();
+  } catch (err) {
+    return { active: false, status: 'error', error: err.message };
+  }
+});
     }
     return await response.json();
   } catch (err) {
