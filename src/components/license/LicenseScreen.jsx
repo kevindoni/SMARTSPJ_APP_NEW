@@ -135,12 +135,18 @@ export default function LicenseScreen() {
           setPendingOrderId(result.orderId);
           setPaymentStatus({ type: 'waiting', message: `Pembayaran Rp ${result.amount?.toLocaleString('id-ID')} dibuka di browser. Selesaikan pembayaran, lalu klik "Cek Status Pembayaran".`, amount: result.amount, orderId: result.orderId });
           startPolling();
-        } else { setError(result.error || 'Gagal membuat transaksi'); setPaymentStatus(null); }
+        } else {
+          window.open(`${API_BASE}/buy?tier=${buyTier}`, '_blank');
+          setPaymentStatus({ type: 'waiting', message: 'Selesaikan pembayaran di browser, lalu masukkan license key yang diberikan.' });
+        }
       } else {
         window.open(`${API_BASE}/buy?tier=${buyTier}`, '_blank');
         setPaymentStatus({ type: 'waiting', message: 'Selesaikan pembayaran di browser, lalu masukkan license key yang diberikan.' });
       }
-    } catch (err) { setError('Gagal membuka pembayaran: ' + err.message); setPaymentStatus(null); }
+    } catch (err) {
+      window.open(`${API_BASE}/buy?tier=${buyTier}`, '_blank');
+      setPaymentStatus({ type: 'waiting', message: 'Selesaikan pembayaran di browser, lalu masukkan license key yang diberikan.' });
+    }
     finally { setCheckingPayment(false); }
   };
 
