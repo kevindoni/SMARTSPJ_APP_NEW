@@ -145,30 +145,39 @@ function loadSecurePassword() {
       const { safeStorage } = require('electron');
       if (safeStorage.isEncryptionAvailable()) {
         const encrypted = fs.readFileSync(keyPath);
-        ARKAS_PASSWORD = safeStorage.decryptString(Buffer.from(encrypted)).toString();
-        return;
+        const decrypted = safeStorage.decryptString(Buffer.from(encrypted)).toString();
+        if (decrypted && decrypted.trim()) {
+          ARKAS_PASSWORD = decrypted;
+          // Don't return yet — still try .env below if decrypted password is empty
+        } else {
+          console.log('[loadSecurePassword] .arkas-key decrypted to empty string, will try .env');
+          // Remove corrupted .arkas-key so we don't keep trying it
+          try { fs.unlinkSync(keyPath); } catch {}
+        }
       }
     } catch (e) {
-      // safeStorage not available yet (before app ready) or decrypt failed
+      console.log('[loadSecurePassword] .arkas-key decrypt failed:', e.message);
     }
   }
 
   // 2. Fallback: read from .env (dev mode or first run)
-  const envPaths = [
-    // In packaged app, .env is unpacked to app.asar.unpacked/.env
-    path.join(process.resourcesPath, 'app.asar.unpacked', '.env'),
-    path.join(process.resourcesPath, '.env'),
-    path.join(__dirname, '../.env'),
-    path.join(path.dirname(app.getPath('exe')), '.env'),
-  ];
-  for (const envPath of envPaths) {
-    if (fs.existsSync(envPath)) {
-      console.log('[loadSecurePassword] Found .env at:', envPath);
-      require('dotenv').config({ path: envPath });
-      break;
+  if (!ARKAS_PASSWORD) {
+    const envPaths = [
+      path.join(process.resourcesPath, 'app.asar.unpacked', '.env'),
+      path.join(process.resourcesPath, '.env'),
+      path.join(__dirname, '../.env'),
+      path.join(path.dirname(app.getPath('exe')), '.env'),
+    ];
+    for (const envPath of envPaths) {
+      if (fs.existsSync(envPath)) {
+        console.log('[loadSecurePassword] Found .env at:', envPath);
+        require('dotenv').config({ path: envPath });
+        break;
+      }
     }
+    ARKAS_PASSWORD = process.env.ARKAS_PASSWORD || '';
   }
-  ARKAS_PASSWORD = process.env.ARKAS_PASSWORD || '';
+
   console.log('[loadSecurePassword] ARKAS_PASSWORD:', ARKAS_PASSWORD ? 'loaded (' + ARKAS_PASSWORD.length + ' chars)' : 'EMPTY');
 
   // 3. If we got the password, migrate to encrypted storage
