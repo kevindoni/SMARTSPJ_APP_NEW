@@ -515,26 +515,30 @@ ipcMain.handle('arkas:get-license-status', async () => {
 ipcMain.handle('arkas:activate-license', async (event, key) => {
   try {
     let npsn = '';
+    let debugInfo = [];
     try {
       const dbPath = getDbPath();
-      console.log('[activate-license] dbPath:', dbPath, 'exists:', fs.existsSync(dbPath));
-      if (fs.existsSync(dbPath)) {
+      const dbExists = fs.existsSync(dbPath);
+      debugInfo.push(`db: ${dbExists ? 'found' : 'NOT FOUND'} at ${dbPath}`);
+      debugInfo.push(`pwd: ${ARKAS_PASSWORD ? 'loaded (' + ARKAS_PASSWORD.length + ' chars)' : 'EMPTY'}`);
+      if (dbExists && ARKAS_PASSWORD) {
         const db = new Database(dbPath, { readonly: true });
         db.pragma("cipher='sqlcipher'");
         db.pragma('legacy=4');
         db.pragma(`key='${ARKAS_PASSWORD}'`);
         const sekolah = getSchoolInfoWithOfficials(db);
-        console.log('[activate-license] sekolah:', JSON.stringify({
-          npsn: sekolah?.npsn, kode_instansi: sekolah?.kode_instansi, nama: sekolah?.nama
-        }));
+        debugInfo.push(`sekolah: ${sekolah ? 'found' : 'null'}`);
         if (sekolah) {
+          debugInfo.push(`npsn: ${JSON.stringify(sekolah.npsn)}, kode: ${JSON.stringify(sekolah.kode_instansi)}`);
           npsn = String(sekolah.npsn || sekolah.kode_instansi || '').trim();
         }
         db.close();
       }
     } catch (dbErr) {
-      console.error('[activate-license] DB error:', dbErr.message);
+      debugInfo.push(`error: ${dbErr.message}`);
     }
+
+    console.log('[activate-license]', debugInfo.join(' | '));
 
     if (!npsn && !licenseManager.isShortKey(key)) {
       const parsed = licenseManager.parseLicenseKey(key);
@@ -543,8 +547,7 @@ ipcMain.handle('arkas:activate-license', async (event, key) => {
       }
     }
 
-    console.log('[activate-license] NPSN detected:', JSON.stringify(npsn), 'type:', typeof npsn);
-    if (!npsn) return { success: false, error: 'NPSN tidak ditemukan. Pastikan database ARKAS terhubung.' };
+    if (!npsn) return { success: false, error: 'NPSN tidak ditemukan. Debug: ' + debugInfo.join(' | ') };
 
     return await licenseManager.activateLicense(key, npsn);
   } catch (err) {
