@@ -3,12 +3,22 @@ import { Heart, Calendar, ChevronDown, Sparkles, CheckCircle, ArrowRight, Bug } 
 
 const CHANGELOG = [
   {
+    version: '1.7.6',
+    date: '29 April 2026',
+    title: 'Fix .arkas-key Empty Password After Upgrade',
+    changes: [
+      { type: 'fix', text: '.arkas-key kosong/rusak dari v1.7.3 dihapus otomatis, fallback ke .env' },
+      { type: 'fix', text: 'loadSecurePassword() tidak return early jika .arkas-key decrypt hasil kosong' },
+      { type: 'fix', text: 'Debug logging untuk license activation dan check-server-license' },
+    ],
+  },
+  {
     version: '1.7.5',
     date: '29 April 2026',
     title: 'Quick Fix: .env Path in Packaged App',
     changes: [
       { type: 'fix', text: '.env tidak terbaca di packaged app — path salah ke app.asar.unpacked/.env' },
-      { type: 'fix', text: 'Tambah debug logging di loadSecurePassword() untuk diagnose' },
+      { type: 'fix', text: 'Tambah debug logging di loadSecurePassword() untuk diagnosis' },
     ],
   },
   {
