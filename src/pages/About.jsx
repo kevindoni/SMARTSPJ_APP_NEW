@@ -3,6 +3,15 @@ import { Heart, Calendar, ChevronDown, Sparkles, CheckCircle, ArrowRight, Bug } 
 
 const CHANGELOG = [
   {
+    version: '1.7.5',
+    date: '29 April 2026',
+    title: 'Quick Fix: .env Path in Packaged App',
+    changes: [
+      { type: 'fix', text: '.env tidak terbaca di packaged app — path salah ke app.asar.unpacked/.env' },
+      { type: 'fix', text: 'Tambah debug logging di loadSecurePassword() untuk diagnose' },
+    ],
+  },
+  {
     version: '1.7.4',
     date: '29 April 2026',
     title: 'Fix License Activation & Dynamic School Data',
