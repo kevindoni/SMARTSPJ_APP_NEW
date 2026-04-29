@@ -736,6 +736,47 @@ ipcMain.handle('arkas:create-payment', async (event, tier) => {
   }
 });
 
+ipcMain.handle('arkas:get-license-debug', async () => {
+  try {
+    const dbPath = getDbPath();
+    const dbExists = fs.existsSync(dbPath);
+    const keyPath = getSecurePasswordPath();
+    const keyExists = fs.existsSync(keyPath);
+    let safeStorageAvailable = false;
+    try {
+      const { safeStorage } = require('electron');
+      safeStorageAvailable = safeStorage.isEncryptionAvailable();
+    } catch {}
+    const envPaths = [
+      path.join(process.resourcesPath, 'app.asar.unpacked', '.env'),
+      path.join(process.resourcesPath, '.env'),
+      path.join(__dirname, '../.env'),
+      path.join(path.dirname(app.getPath('exe')), '.env'),
+    ];
+    const foundEnv = envPaths.find(p => fs.existsSync(p));
+    let npsn = '';
+    try {
+      if (dbExists && ARKAS_PASSWORD) {
+        const db = new Database(dbPath, { readonly: true });
+        db.pragma("cipher='sqlcipher'");
+        db.pragma('legacy=4');
+        db.pragma(`key='${ARKAS_PASSWORD}'`);
+        const sekolah = getSchoolInfoWithOfficials(db);
+        if (sekolah) npsn = String(sekolah.npsn || sekolah.kode_instansi || '').trim();
+        db.close();
+      }
+    } catch {}
+    return {
+      dbPath, dbExists, keyPath, keyExists, safeStorageAvailable,
+      envPaths, foundEnv,
+      arkaspwd: ARKAS_PASSWORD ? `${ARKAS_PASSWORD.length} chars` : 'EMPTY',
+      npsn,
+    };
+  } catch (e) {
+    return { error: e.message };
+  }
+});
+
 ipcMain.handle('arkas:check-server-license', async () => {
   try {
     let npsn = '';
@@ -780,12 +821,6 @@ ipcMain.handle('arkas:check-server-license', async () => {
           res.on('end', () => { resolve({ json: () => JSON.parse(data) }); });
         }).on('error', reject);
       });
-    }
-    return await response.json();
-  } catch (err) {
-    return { active: false, status: 'error', error: err.message };
-  }
-});
     }
     return await response.json();
   } catch (err) {
