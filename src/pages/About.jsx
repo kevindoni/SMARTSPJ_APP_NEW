@@ -3,10 +3,16 @@ import { Heart, Calendar, ChevronDown, Sparkles, CheckCircle, ArrowRight, Bug } 
 
 const CHANGELOG = [
   {
-    version: '1.7.6',
+    version: '1.7.5',
     date: '29 April 2026',
-    title: 'Fix .arkas-key Empty Password After Upgrade',
+    title: 'Fix License Activation in Packaged App',
     changes: [
+      { type: 'fix', text: '.env path fixed — app now reads from app.asar.unpacked/.env' },
+      { type: 'fix', text: '.arkas-key kosong/rusak dari upgrade v1.7.3 otomatis dihapus, fallback ke .env' },
+      { type: 'fix', text: 'loadSecurePassword() gagal return early saat .arkas-key decrypt hasil kosong' },
+      { type: 'imp', text: 'Debug logging di activate-license dan check-server-license' },
+    ],
+  },
       { type: 'fix', text: '.arkas-key kosong/rusak dari v1.7.3 dihapus otomatis, fallback ke .env' },
       { type: 'fix', text: 'loadSecurePassword() tidak return early jika .arkas-key decrypt hasil kosong' },
       { type: 'fix', text: 'Debug logging untuk license activation dan check-server-license' },
