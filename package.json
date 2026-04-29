@@ -89,6 +89,7 @@
       "electron/**/*.js",
       "electron/**/*.jsc",
       "electron/**/*.pem",
+      ".env",
       "package.json"
     ],
     "win": {
