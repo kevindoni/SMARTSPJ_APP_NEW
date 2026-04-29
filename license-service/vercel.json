@@ -1,5 +1,6 @@
 {
   "rewrites": [
+    { "source": "/", "destination": "/api/index" },
     { "source": "/buy", "destination": "/api/buy" },
     { "source": "/api/create-transaction", "destination": "/api/create-transaction" },
     { "source": "/api/midtrans-webhook", "destination": "/api/midtrans-webhook" },
