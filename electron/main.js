@@ -155,17 +155,21 @@ function loadSecurePassword() {
 
   // 2. Fallback: read from .env (dev mode or first run)
   const envPaths = [
-    path.join(__dirname, '../.env'),
+    // In packaged app, .env is unpacked to app.asar.unpacked/.env
+    path.join(process.resourcesPath, 'app.asar.unpacked', '.env'),
     path.join(process.resourcesPath, '.env'),
+    path.join(__dirname, '../.env'),
     path.join(path.dirname(app.getPath('exe')), '.env'),
   ];
   for (const envPath of envPaths) {
     if (fs.existsSync(envPath)) {
+      console.log('[loadSecurePassword] Found .env at:', envPath);
       require('dotenv').config({ path: envPath });
       break;
     }
   }
   ARKAS_PASSWORD = process.env.ARKAS_PASSWORD || '';
+  console.log('[loadSecurePassword] ARKAS_PASSWORD:', ARKAS_PASSWORD ? 'loaded (' + ARKAS_PASSWORD.length + ' chars)' : 'EMPTY');
 
   // 3. If we got the password, migrate to encrypted storage
   if (ARKAS_PASSWORD) {
