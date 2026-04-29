@@ -3,9 +3,48 @@ import { Heart, Calendar, ChevronDown, Sparkles, CheckCircle, ArrowRight, Bug } 
 
 const CHANGELOG = [
   {
-    version: '1.7.3',
-    date: '26 April 2026',
-    title: 'License System v2 — Short Key & Midtrans Production',
+    version: '1.7.4',
+    date: '29 April 2026',
+    title: 'Fix License Activation & Dynamic School Data',
+    changes: [
+      {
+        type: 'fix',
+        text: 'Aktivasi license gagal di packaged app — .env tidak terbaca karena terkunci di dalam ASAR archive',
+      },
+      {
+        type: 'fix',
+        text: 'Koneksi license server ETIMEDOUT — force IPv4 untuk semua network request',
+      },
+      {
+        type: 'fix',
+        text: 'electron.net.fetch gagal di packaged app — fallback ke Node.js https module',
+      },
+      {
+        type: 'fix',
+        text: 'NPSN comparison gagal (type mismatch) — String() cast di perbandingan',
+      },
+      {
+        type: 'fix',
+        text: 'admin-insert.js selalu 401 Unauthorized — fix variabel auth undefined',
+      },
+      {
+        type: 'imp',
+        text: 'Semua hardcoded value spesifik sekolah dihapus — aplikasi 100% dinamis',
+      },
+      {
+        type: 'imp',
+        text: 'Kode wilayah dinamis (kode_prop, kode_kab_kota, kode_kec) dari database',
+      },
+      {
+        type: 'imp',
+        text: 'Placeholder Pengaturan generik — tidak lagi menampilkan data sekolah tertentu',
+      },
+      {
+        type: 'new',
+        text: 'Changelog hanya menampilkan 3 versi terakhir + tombol tampilkan semua',
+      },
+    ],
+  },
     changes: [
       {
         type: 'new',
@@ -457,7 +496,9 @@ export default function About() {
   const [appVersion] = useState(__APP_VERSION__);
   const [expanded, setExpanded] = useState({ 0: true });
   const [filter, setFilter] = useState('all');
+  const [showAll, setShowAll] = useState(false);
   const toggle = (i) => setExpanded((p) => ({ ...p, [i]: !p[i] }));
+  const VISIBLE_COUNT = 3;
   const filtered = useMemo(() => {
     if (filter === 'all') return CHANGELOG;
     return CHANGELOG.map((r) => ({
@@ -465,6 +506,8 @@ export default function About() {
       changes: r.changes.filter((c) => c.type === filter),
     })).filter((r) => r.changes.length > 0);
   }, [filter]);
+  const displayed = showAll ? filtered : filtered.slice(0, VISIBLE_COUNT);
+  const hasMore = !showAll && filtered.length > VISIBLE_COUNT;
 
   return (
     <div className="space-y-5 animate-in fade-in zoom-in-95 duration-300">
@@ -552,7 +595,7 @@ export default function About() {
         </div>
 
         <div className="p-4 space-y-3">
-          {filtered.map((rel, ri) => {
+          {displayed.map((rel, ri) => {
             const open = expanded[ri];
             const latest = rel.version === CHANGELOG[0].version;
             const nc = rel.changes.filter((c) => c.type === 'new').length;
@@ -573,8 +616,19 @@ export default function About() {
                         className={`text-lg font-black tracking-tight ${latest ? 'text-indigo-600' : 'text-slate-700'}`}
                       >
                         {rel.version}
-                      </div>
-                    </div>
+        </div>
+
+        {hasMore && (
+          <div className="px-4 pb-4">
+            <button
+              onClick={() => setShowAll(true)}
+              className="w-full py-2.5 rounded-xl border border-dashed border-slate-300 text-xs font-semibold text-slate-400 hover:text-slate-600 hover:border-slate-400 transition-colors"
+            >
+              Tampilkan semua ({filtered.length - VISIBLE_COUNT} versi lainnya)
+            </button>
+          </div>
+        )}
+      </div>
                     <div
                       className={`w-px h-10 rounded-full shrink-0 ${latest ? 'bg-indigo-200' : 'bg-slate-200'}`}
                     />
