@@ -171,7 +171,16 @@ function loadSecurePassword() {
     for (const envPath of envPaths) {
       if (fs.existsSync(envPath)) {
         console.log('[loadSecurePassword] Found .env at:', envPath);
-        require('dotenv').config({ path: envPath });
+        try {
+          const content = fs.readFileSync(envPath, 'utf8');
+          const match = content.match(/^ARKAS_PASSWORD=(.*)$/m);
+          if (match) {
+            process.env.ARKAS_PASSWORD = match[1].trim();
+            console.log('[loadSecurePassword] ARKAS_PASSWORD from .env:', process.env.ARKAS_PASSWORD ? 'yes' : 'empty');
+          }
+        } catch (e) {
+          console.log('[loadSecurePassword] Error reading .env:', e.message);
+        }
         break;
       }
     }
