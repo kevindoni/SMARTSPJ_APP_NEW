@@ -1,10 +1,10 @@
 {
   "name": "smart-spj",
-  "version": "1.7.5",
+  "version": "1.7.6",
   "description": "Aplikasi Pendamping ARKAS untuk Pengelolaan SPJ",
   "main": "electron/main-loader.js",
   "scripts": {
-    "dev": "concurrently \"vite\" \"wait-on tcp:3847 && electron .\"",
+    "dev": "concurrently \"vite\" \"wait-on tcp:3847 && node scripts/electron-dev.js\"",
     "build": "vite build",
     "preview": "vite preview",
     "build:electron": "npm run build && electron-builder"

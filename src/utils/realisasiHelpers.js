@@ -32,13 +32,13 @@ export const REALISASI_MONTHS = [
 export const parsePlannedMonths = (rawPlanned, rawRealized, unitPrice = 0) => {
   const planMap = (rawPlanned || '').split(',').filter(Boolean).reduce((acc, item) => {
     const [id_periode, vol] = item.split(':');
-    acc[Number(id_periode)] = Number(vol);
+    acc[Math.round(Number(id_periode))] = Math.round(Number(vol));
     return acc;
   }, {});
 
   const realMap = (rawRealized || '').split(',').filter(Boolean).reduce((acc, item) => {
     const [mStr, val] = item.split(':');
-    acc[Number(mStr)] = Number(val);
+    acc[Math.round(Number(mStr))] = Math.round(Number(val));
     return acc;
   }, {});
 

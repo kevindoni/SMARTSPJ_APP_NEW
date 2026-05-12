@@ -1,7 +1,8 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
-const Database = require('better-sqlite3-multiple-ciphers');
 const fs = require('fs');
+const { openDatabase } = require('./lib/db-helper');
+const { fr, calcPPN, calcPPN_DPP, calcPPh21, calcPPh23, calcSSPD, TAX } = require('./lib/financial-utils');
 let autoUpdater;
 try {
   autoUpdater = require('electron-updater').autoUpdater;
@@ -152,7 +153,9 @@ function loadSecurePassword() {
         } else {
           console.log('[loadSecurePassword] .arkas-key decrypted to empty string, will try .env');
           // Remove corrupted .arkas-key so we don't keep trying it
-          try { fs.unlinkSync(keyPath); } catch {}
+          try {
+            fs.unlinkSync(keyPath);
+          } catch {}
         }
       }
     } catch (e) {
@@ -176,7 +179,10 @@ function loadSecurePassword() {
           const match = content.match(/^ARKAS_PASSWORD=(.*)$/m);
           if (match) {
             process.env.ARKAS_PASSWORD = match[1].trim();
-            console.log('[loadSecurePassword] ARKAS_PASSWORD from .env:', process.env.ARKAS_PASSWORD ? 'yes' : 'empty');
+            console.log(
+              '[loadSecurePassword] ARKAS_PASSWORD from .env:',
+              process.env.ARKAS_PASSWORD ? 'yes' : 'empty'
+            );
           }
         } catch (e) {
           console.log('[loadSecurePassword] Error reading .env:', e.message);
@@ -187,7 +193,10 @@ function loadSecurePassword() {
     ARKAS_PASSWORD = process.env.ARKAS_PASSWORD || '';
   }
 
-  console.log('[loadSecurePassword] ARKAS_PASSWORD:', ARKAS_PASSWORD ? 'loaded (' + ARKAS_PASSWORD.length + ' chars)' : 'EMPTY');
+  console.log(
+    '[loadSecurePassword] ARKAS_PASSWORD:',
+    ARKAS_PASSWORD ? 'loaded (' + ARKAS_PASSWORD.length + ' chars)' : 'EMPTY'
+  );
 
   // 3. If we got the password, migrate to encrypted storage
   if (ARKAS_PASSWORD) {
@@ -285,6 +294,22 @@ function createWindow() {
   } else {
     mainWindow.loadFile(path.join(__dirname, '../dist/index.html'));
   }
+
+  mainWindow.setMenu(null);
+
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    const { BrowserWindow } = require('electron');
+    const childWin = new BrowserWindow({
+      width: 480,
+      height: 700,
+      autoHideMenuBar: true,
+      parent: mainWindow || undefined,
+      webPreferences: { nodeIntegration: false, contextIsolation: true },
+    });
+    childWin.setMenu(null);
+    childWin.loadURL(url);
+    return { action: 'deny' };
+  });
 
   // Open DevTools in Dev Mode
   // if (isDev) mainWindow.webContents.openDevTools();
@@ -542,16 +567,17 @@ ipcMain.handle('arkas:activate-license', async (event, key) => {
       const dbPath = getDbPath();
       const dbExists = fs.existsSync(dbPath);
       debugInfo.push(`db: ${dbExists ? 'found' : 'NOT FOUND'} at ${dbPath}`);
-      debugInfo.push(`pwd: ${ARKAS_PASSWORD ? 'loaded (' + ARKAS_PASSWORD.length + ' chars)' : 'EMPTY'}`);
+      debugInfo.push(
+        `pwd: ${ARKAS_PASSWORD ? 'loaded (' + ARKAS_PASSWORD.length + ' chars)' : 'EMPTY'}`
+      );
       if (dbExists && ARKAS_PASSWORD) {
-        const db = new Database(dbPath, { readonly: true });
-        db.pragma("cipher='sqlcipher'");
-        db.pragma('legacy=4');
-        db.pragma(`key='${ARKAS_PASSWORD}'`);
+        const db = openDatabase(dbPath, true, ARKAS_PASSWORD);
         const sekolah = getSchoolInfoWithOfficials(db);
         debugInfo.push(`sekolah: ${sekolah ? 'found' : 'null'}`);
         if (sekolah) {
-          debugInfo.push(`npsn: ${JSON.stringify(sekolah.npsn)}, kode: ${JSON.stringify(sekolah.kode_instansi)}`);
+          debugInfo.push(
+            `npsn: ${JSON.stringify(sekolah.npsn)}, kode: ${JSON.stringify(sekolah.kode_instansi)}`
+          );
           npsn = String(sekolah.npsn || sekolah.kode_instansi || '').trim();
         }
         db.close();
@@ -569,7 +595,8 @@ ipcMain.handle('arkas:activate-license', async (event, key) => {
       }
     }
 
-    if (!npsn) return { success: false, error: 'NPSN tidak ditemukan. Debug: ' + debugInfo.join(' | ') };
+    if (!npsn)
+      return { success: false, error: 'NPSN tidak ditemukan. Debug: ' + debugInfo.join(' | ') };
 
     return await licenseManager.activateLicense(key, npsn);
   } catch (err) {
@@ -629,8 +656,19 @@ ipcMain.handle('arkas:get-stored-license-key', async () => {
 
 ipcMain.handle('arkas:open-payment-page', async (event, tier) => {
   try {
-    const { shell } = require('electron');
-    await shell.openExternal(`${LICENSE_API}/buy?tier=${tier}`);
+    const { BrowserWindow } = require('electron');
+    const payWin = new BrowserWindow({
+      width: 480,
+      height: 680,
+      resizable: true,
+      autoHideMenuBar: true,
+      title: 'Beli License SmartSPJ',
+      parent: mainWindow || undefined,
+      webPreferences: { nodeIntegration: false, contextIsolation: true },
+    });
+    payWin.setMenu(null);
+    payWin.loadURL(`${LICENSE_API}/buy?tier=${tier}`);
+    payWin.on('closed', () => { if (mainWindow) mainWindow.webContents.send('payment-window-closed'); });
     return { success: true };
   } catch (err) {
     return { success: false, error: err.message };
@@ -645,20 +683,25 @@ ipcMain.handle('arkas:create-payment', async (event, tier) => {
     try {
       const dbPath = getDbPath();
       if (fs.existsSync(dbPath)) {
-        const db = new Database(dbPath, { readonly: true });
-        db.pragma("cipher='sqlcipher'");
-        db.pragma('legacy=4');
-        db.pragma(`key='${ARKAS_PASSWORD}'`);
+        const db = openDatabase(dbPath, true, ARKAS_PASSWORD);
         const sekolah = getSchoolInfoWithOfficials(db);
         if (sekolah) {
           npsn = sekolah.npsn || sekolah.kode_instansi || '';
           schoolName = sekolah.nama_sekolah || '';
         }
         try {
-          const rows = db.prepare("SELECT varname, varvalue FROM app_config WHERE varvalue LIKE '%@%'").all();
-          const priority = ['email_arkas', 'email_bendahara', 'user_email', 'email_sekolah', 'email'];
+          const rows = db
+            .prepare("SELECT varname, varvalue FROM app_config WHERE varvalue LIKE '%@%'")
+            .all();
+          const priority = [
+            'email_arkas',
+            'email_bendahara',
+            'user_email',
+            'email_sekolah',
+            'email',
+          ];
           for (const p of priority) {
-            const found = rows.find(r => r.varname === p);
+            const found = rows.find((r) => r.varname === p);
             if (found && found.varvalue && found.varvalue.includes('@')) {
               customerEmail = found.varvalue;
               break;
@@ -673,8 +716,15 @@ ipcMain.handle('arkas:create-payment', async (event, tier) => {
               let penjab = null;
               for (const id of ids) {
                 try {
-                  const row = db.prepare('SELECT * FROM sekolah_penjab WHERE sekolah_id = ? ORDER BY tahun DESC LIMIT 1').get(id);
-                  if (row) { penjab = row; break; }
+                  const row = db
+                    .prepare(
+                      'SELECT * FROM sekolah_penjab WHERE sekolah_id = ? ORDER BY tahun DESC LIMIT 1'
+                    )
+                    .get(id);
+                  if (row) {
+                    penjab = row;
+                    break;
+                  }
                 } catch {}
               }
               if (penjab) {
@@ -706,7 +756,8 @@ ipcMain.handle('arkas:create-payment', async (event, tier) => {
       console.error('[create-payment] DB error:', dbErr.message);
     }
 
-    if (!npsn) return { success: false, error: 'NPSN tidak ditemukan. Pastikan database ARKAS terhubung.' };
+    if (!npsn)
+      return { success: false, error: 'NPSN tidak ditemukan. Pastikan database ARKAS terhubung.' };
 
     if (!customerEmail) customerEmail = `spj-${npsn}@smartspj.app`;
 
@@ -725,17 +776,33 @@ ipcMain.handle('arkas:create-payment', async (event, tier) => {
         }),
       });
     } catch {
-      const body = JSON.stringify({ npsn, tier, customerName: schoolName || 'Bendahara BOS', customerEmail });
+      const body = JSON.stringify({
+        npsn,
+        tier,
+        customerName: schoolName || 'Bendahara BOS',
+        customerEmail,
+      });
       response = await new Promise((resolve, reject) => {
         const urlObj = new URL(`${LICENSE_API}/api/create-transaction`);
-        const req = https.request({
-          hostname: urlObj.hostname, path: urlObj.pathname, method: 'POST',
-          headers: { 'Content-Type': 'application/json' }, family: 4, timeout: 15000,
-        }, (res) => {
-          let data = '';
-          res.on('data', (c) => { data += c; });
-          res.on('end', () => { resolve({ json: () => JSON.parse(data) }); });
-        });
+        const req = https.request(
+          {
+            hostname: urlObj.hostname,
+            path: urlObj.pathname,
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            family: 4,
+            timeout: 15000,
+          },
+          (res) => {
+            let data = '';
+            res.on('data', (c) => {
+              data += c;
+            });
+            res.on('end', () => {
+              resolve({ json: () => JSON.parse(data) });
+            });
+          }
+        );
         req.on('error', reject);
         req.write(body);
         req.end();
@@ -744,9 +811,25 @@ ipcMain.handle('arkas:create-payment', async (event, tier) => {
 
     const data = await response.json();
     if (data.success) {
-      const { shell } = require('electron');
-      await shell.openExternal(data.redirectUrl);
-      return { success: true, orderId: data.orderId, redirectUrl: data.redirectUrl, amount: data.amount };
+      const { BrowserWindow } = require('electron');
+      const payWin = new BrowserWindow({
+        width: 480,
+        height: 700,
+        resizable: true,
+        autoHideMenuBar: true,
+        title: 'Pembayaran SmartSPJ',
+        parent: mainWindow || undefined,
+        webPreferences: { nodeIntegration: false, contextIsolation: true },
+      });
+      payWin.setMenu(null);
+      payWin.loadURL(data.redirectUrl);
+      payWin.on('closed', () => { if (mainWindow) mainWindow.webContents.send('payment-window-closed'); });
+      return {
+        success: true,
+        orderId: data.orderId,
+        redirectUrl: data.redirectUrl,
+        amount: data.amount,
+      };
     }
     return { success: false, error: data.error || 'Gagal membuat transaksi' };
   } catch (err) {
@@ -771,22 +854,24 @@ ipcMain.handle('arkas:get-license-debug', async () => {
       path.join(__dirname, '../.env'),
       path.join(path.dirname(app.getPath('exe')), '.env'),
     ];
-    const foundEnv = envPaths.find(p => fs.existsSync(p));
+    const foundEnv = envPaths.find((p) => fs.existsSync(p));
     let npsn = '';
     try {
       if (dbExists && ARKAS_PASSWORD) {
-        const db = new Database(dbPath, { readonly: true });
-        db.pragma("cipher='sqlcipher'");
-        db.pragma('legacy=4');
-        db.pragma(`key='${ARKAS_PASSWORD}'`);
+        const db = openDatabase(dbPath, true, ARKAS_PASSWORD);
         const sekolah = getSchoolInfoWithOfficials(db);
         if (sekolah) npsn = String(sekolah.npsn || sekolah.kode_instansi || '').trim();
         db.close();
       }
     } catch {}
     return {
-      dbPath, dbExists, keyPath, keyExists, safeStorageAvailable,
-      envPaths, foundEnv,
+      dbPath,
+      dbExists,
+      keyPath,
+      keyExists,
+      safeStorageAvailable,
+      envPaths,
+      foundEnv,
       arkaspwd: ARKAS_PASSWORD ? `${ARKAS_PASSWORD.length} chars` : 'EMPTY',
       npsn,
     };
@@ -803,12 +888,9 @@ ipcMain.handle('arkas:check-server-license', async () => {
       const dbPath = getDbPath();
       const dbExists = fs.existsSync(dbPath);
       debugInfo.push(`db: ${dbExists ? 'found' : 'NOT FOUND'}`);
-      debugInfo.push(`pwd: ${ARKAS_PASSWORD ? 'loaded ('+ARKAS_PASSWORD.length+')' : 'EMPTY'}`);
+      debugInfo.push(`pwd: ${ARKAS_PASSWORD ? 'loaded (' + ARKAS_PASSWORD.length + ')' : 'EMPTY'}`);
       if (dbExists && ARKAS_PASSWORD) {
-        const db = new Database(dbPath, { readonly: true });
-        db.pragma("cipher='sqlcipher'");
-        db.pragma('legacy=4');
-        db.pragma(`key='${ARKAS_PASSWORD}'`);
+        const db = openDatabase(dbPath, true, ARKAS_PASSWORD);
         const sekolah = getSchoolInfoWithOfficials(db);
         debugInfo.push(`sekolah: ${sekolah ? 'found' : 'null'}`);
         if (sekolah) {
@@ -823,21 +905,44 @@ ipcMain.handle('arkas:check-server-license', async () => {
 
     console.log('[check-server-license]', debugInfo.join(' | '));
 
-    if (!npsn) return { active: false, status: 'no_npsn', error: 'NPSN tidak ditemukan. Debug: ' + debugInfo.join(' | ') };
+    if (!npsn)
+      return {
+        active: false,
+        status: 'no_npsn',
+        error: 'NPSN tidak ditemukan. Debug: ' + debugInfo.join(' | '),
+      };
 
     const https = require('https');
     let response;
     try {
       const { net } = require('electron');
-      response = await net.fetch(`${LICENSE_API}/api/license-status?npsn=${encodeURIComponent(npsn)}`);
+      response = await net.fetch(
+        `${LICENSE_API}/api/license-status?npsn=${encodeURIComponent(npsn)}`
+      );
     } catch {
       response = await new Promise((resolve, reject) => {
-        const urlObj = new URL(`${LICENSE_API}/api/license-status?npsn=${encodeURIComponent(npsn)}`);
-        https.get({ hostname: urlObj.hostname, path: urlObj.pathname + urlObj.search, family: 4, timeout: 15000 }, (res) => {
-          let data = '';
-          res.on('data', (c) => { data += c; });
-          res.on('end', () => { resolve({ json: () => JSON.parse(data) }); });
-        }).on('error', reject);
+        const urlObj = new URL(
+          `${LICENSE_API}/api/license-status?npsn=${encodeURIComponent(npsn)}`
+        );
+        https
+          .get(
+            {
+              hostname: urlObj.hostname,
+              path: urlObj.pathname + urlObj.search,
+              family: 4,
+              timeout: 15000,
+            },
+            (res) => {
+              let data = '';
+              res.on('data', (c) => {
+                data += c;
+              });
+              res.on('end', () => {
+                resolve({ json: () => JSON.parse(data) });
+              });
+            }
+          )
+          .on('error', reject);
       });
     }
     return await response.json();
@@ -1011,21 +1116,22 @@ const getSchoolInfoWithOfficials = (db) => {
 ipcMain.handle('arkas:check-connection', async () => {
   try {
     const dbPath = getDbPath();
+
     if (!fs.existsSync(dbPath))
-      return { success: false, error: 'File database ARKAS tidak ditemukan.' };
+      return { success: false, error: 'File database ARKAS tidak ditemukan di: ' + dbPath, message: 'File database ARKAS tidak ditemukan di: ' + dbPath };
 
-    const db = new Database(dbPath, { readonly: true });
-    db.pragma("cipher='sqlcipher'");
-    db.pragma('legacy=4');
-    db.pragma(`key='${ARKAS_PASSWORD}'`);
+    const db = openDatabase(dbPath, true, ARKAS_PASSWORD);
 
-    // Simple test query
-    db.prepare('SELECT 1').get();
+    try {
+      const tables = db.prepare("SELECT name FROM sqlite_master WHERE type='table'").all();
+      console.log('[check-connection] OK —', tables.length, 'tables');
+    } catch (e) {}
 
     db.close();
-    return { success: true };
+    return { success: true, message: 'Terhubung Dengan Arkas' };
   } catch (err) {
-    return { success: false, error: err.message };
+    console.error('[check-connection] ERROR:', err.message);
+    return { success: false, error: err.message, message: err.message };
   }
 });
 
@@ -1041,13 +1147,8 @@ ipcMain.handle('arkas:get-app-version', async () => {
 ipcMain.handle('arkas:get-school-info', async () => {
   try {
     const dbPath = getDbPath();
-    const db = new Database(dbPath, { readonly: true });
-    db.pragma("cipher='sqlcipher'");
-    db.pragma('legacy=4');
-    db.pragma(`key='${ARKAS_PASSWORD}'`);
-
+    const db = openDatabase(dbPath, true, ARKAS_PASSWORD);
     const sekolah = getSchoolInfoWithOfficials(db);
-
     db.close();
     return { success: true, data: sekolah };
   } catch (err) {
@@ -1077,10 +1178,7 @@ ipcMain.handle('arkas:save-school-info', async (event, data) => {
 ipcMain.handle('arkas:reload-school-data', async () => {
   try {
     const dbPath = getDbPath();
-    const db = new Database(dbPath, { readonly: true });
-    db.pragma("cipher='sqlcipher'");
-    db.pragma('legacy=4');
-    db.pragma(`key='${ARKAS_PASSWORD}'`);
+    const db = openDatabase(dbPath, true, ARKAS_PASSWORD);
 
     const sekolah = getSchoolInfoWithOfficials(db);
 
@@ -1094,10 +1192,7 @@ ipcMain.handle('arkas:reload-school-data', async () => {
 ipcMain.handle('arkas:get-fund-sources', async (event, year) => {
   try {
     const dbPath = getDbPath();
-    const db = new Database(dbPath, { readonly: true });
-    db.pragma("cipher='sqlcipher'");
-    db.pragma('legacy=4');
-    db.pragma(`key='${ARKAS_PASSWORD}'`);
+    const db = openDatabase(dbPath, true, ARKAS_PASSWORD);
     const sources = db
       .prepare(
         `SELECT DISTINCT sd.nama_sumber_dana FROM anggaran a JOIN ref_sumber_dana sd ON a.id_ref_sumber_dana = sd.id_ref_sumber_dana WHERE a.tahun_anggaran = ? AND a.soft_delete = 0 ORDER BY sd.nama_sumber_dana`
@@ -1116,10 +1211,7 @@ ipcMain.handle('arkas:get-available-years', async () => {
     if (!fs.existsSync(dbPath))
       return { success: true, data: [2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030, 2031] };
 
-    const db = new Database(dbPath, { readonly: true });
-    db.pragma("cipher='sqlcipher'");
-    db.pragma('legacy=4');
-    db.pragma(`key='${ARKAS_PASSWORD}'`);
+    const db = openDatabase(dbPath, true, ARKAS_PASSWORD);
 
     const years = db
       .prepare(
@@ -1172,10 +1264,7 @@ ipcMain.handle('arkas:get-budget-realization', async (event, year, fundSource, m
 ipcMain.handle('arkas:get-transactions', async (event, params) => {
   try {
     const dbPath = getDbPath();
-    const db = new Database(dbPath, { readonly: true });
-    db.pragma("cipher='sqlcipher'");
-    db.pragma('legacy=4');
-    db.pragma(`key='${ARKAS_PASSWORD}'`);
+    const db = openDatabase(dbPath, true, ARKAS_PASSWORD);
 
     // Load Virtual Overrides
     const localConfig = loadLocalConfig();
@@ -1193,10 +1282,7 @@ ipcMain.handle('arkas:get-transactions', async (event, params) => {
 
 ipcMain.handle('arkas:export-bku', async (event, frontendTransactions, params) => {
   try {
-    const db = new Database(getDbPath(), { readonly: true });
-    db.pragma("cipher='sqlcipher'");
-    db.pragma('legacy=4');
-    db.pragma(`key='${ARKAS_PASSWORD}'`);
+    const db = openDatabase(getDbPath(), true, ARKAS_PASSWORD);
 
     // 1. Get School Info (using shared function)
     const schoolInfo = getSchoolInfoWithOfficials(db);
@@ -1315,10 +1401,10 @@ ipcMain.handle('arkas:export-bku', async (event, frontendTransactions, params) =
         };
 
         // Calculate running balance for each row (starting from opening balance)
-        let runningBal = openingBalance;
+        let runningBal = fr(openingBalance);
         rows.forEach((tx) => {
           const isDebit = isPenerimaan(tx);
-          const nominal = Math.abs(tx.signed_amount || tx.nominal || 0);
+          const nominal = fr(Math.abs(tx.signed_amount || tx.nominal || 0));
 
           if (isDebit) {
             runningBal += nominal;
@@ -1489,10 +1575,7 @@ ipcMain.handle('arkas:export-bku', async (event, frontendTransactions, params) =
 ipcMain.handle('arkas:print-kwitansi', async (event, transaction, year) => {
   let db;
   try {
-    db = new Database(getDbPath(), { readonly: true });
-    db.pragma("cipher='sqlcipher'");
-    db.pragma('legacy=4');
-    db.pragma(`key='${ARKAS_PASSWORD}'`);
+    db = openDatabase(getDbPath(), true, ARKAS_PASSWORD);
 
     // Use the shared helper to get school info with officials
     const schoolInfo = getSchoolInfoWithOfficials(db);
@@ -1558,10 +1641,7 @@ ipcMain.handle(
   async (event, idList, customNoBukti, customUraian, year) => {
     let db;
     try {
-      db = new Database(getDbPath(), { readonly: true });
-      db.pragma("cipher='sqlcipher'");
-      db.pragma('legacy=4');
-      db.pragma(`key='${ARKAS_PASSWORD}'`);
+      db = openDatabase(getDbPath(), true, ARKAS_PASSWORD);
 
       // Reuse helper to get school info
       const schoolInfo = getSchoolInfoWithOfficials(db);
@@ -1656,10 +1736,7 @@ ipcMain.handle(
 ipcMain.handle('arkas:print-bukti-autosave', async (event, idList, noBuktiList, year) => {
   let db;
   try {
-    db = new Database(getDbPath(), { readonly: true });
-    db.pragma("cipher='sqlcipher'");
-    db.pragma('legacy=4');
-    db.pragma(`key='${ARKAS_PASSWORD}'`);
+    db = openDatabase(getDbPath(), true, ARKAS_PASSWORD);
 
     const schoolInfo = getSchoolInfoWithOfficials(db);
 
@@ -1716,7 +1793,7 @@ ipcMain.handle('arkas:print-bukti-autosave', async (event, idList, noBuktiList, 
 
     // If no PPN found from DB, calculate from total nominal (DPP method)
     if (actualPPN === 0 && items[0]?.is_badan_usaha) {
-      actualPPN = Math.round((totalNominal / 1.11) * 0.11);
+      actualPPN = calcPPN_DPP(totalNominal);
     }
 
     const vendorName = items[0]?.nama_toko || 'Bukti Belanja';
@@ -1764,10 +1841,7 @@ ipcMain.handle('arkas:print-bukti-autosave', async (event, idList, noBuktiList, 
 ipcMain.handle('arkas:print-a2-autosave', async (event, idList, noBuktiList, year) => {
   let db;
   try {
-    db = new Database(getDbPath(), { readonly: true });
-    db.pragma("cipher='sqlcipher'");
-    db.pragma('legacy=4');
-    db.pragma(`key='${ARKAS_PASSWORD}'`);
+    db = openDatabase(getDbPath(), true, ARKAS_PASSWORD);
 
     const schoolInfo = getSchoolInfoWithOfficials(db);
 
@@ -1901,22 +1975,14 @@ ipcMain.handle(
   ) => {
     let db;
     try {
-      db = new Database(getDbPath(), { readonly: true });
-      db.pragma("cipher='sqlcipher'");
-      db.pragma('legacy=4');
-      db.pragma(`key='${ARKAS_PASSWORD}'`);
-
-      const nominal = transactionNominal || 0;
+      db = openDatabase(getDbPath(), true, ARKAS_PASSWORD);
 
       // Calculate expected tax amounts with tolerance for rounding
       // PPN 11%: DPP = Nominal / 1.11, PPN = DPP * 0.11
-      const expectedPPN = Math.round((nominal / 1.11) * 0.11);
-      // PPh 21: 5% of nominal (honor simplicity)
-      const expectedPPh21 = Math.round(nominal * 0.05);
-      // PPh 23: 2% of nominal
-      const expectedPPh23 = Math.round(nominal * 0.02);
-      // Pajak Daerah (SSPD): 10% of nominal
-      const expectedSSPD = Math.round(nominal * 0.1);
+      const expectedPPN = calcPPN_DPP(nominal);
+      const expectedPPh21 = calcPPh21(nominal);
+      const expectedPPh23 = calcPPh23(nominal);
+      const expectedSSPD = calcSSPD(nominal);
 
       // Query all Terima entries on the same date
       const query = `
@@ -2045,10 +2111,7 @@ ipcMain.handle('nota-groups:get-by-id', async (event, groupId) => {
 ipcMain.handle('arkas:get-transactions-by-nota', async (event, year, month) => {
   let db;
   try {
-    db = new Database(getDbPath(), { readonly: true });
-    db.pragma("cipher='sqlcipher'");
-    db.pragma('legacy=4');
-    db.pragma(`key='${ARKAS_PASSWORD}'`);
+    db = openDatabase(getDbPath(), true, ARKAS_PASSWORD);
 
     let dateFilter = `${year}-%`;
     if (month) {
@@ -2133,7 +2196,7 @@ ipcMain.handle('arkas:get-transactions-by-nota', async (event, year, month) => {
     // Calculate PPN for each group
     Object.values(notaGroups).forEach((group) => {
       if (group.hasPPN || group.isSiplah) {
-        group.calculatedPPN = Math.round((group.totalNominal / 1.11) * 0.11);
+        group.calculatedPPN = calcPPN_DPP(group.totalNominal);
       } else {
         group.calculatedPPN = 0;
       }
@@ -2194,10 +2257,7 @@ ipcMain.handle('arkas:merge-transactions', async (event, idList, targetNoBukti) 
 ipcMain.handle('arkas:get-reconciliation-data', async (event, year) => {
   let db;
   try {
-    db = new Database(getDbPath(), { readonly: true });
-    db.pragma("cipher='sqlcipher'");
-    db.pragma('legacy=4');
-    db.pragma(`key='${ARKAS_PASSWORD}'`);
+    db = openDatabase(getDbPath(), true, ARKAS_PASSWORD);
 
     const data = reconciliationHandler.getReconciliationData(db, year);
 
@@ -2402,10 +2462,7 @@ ipcMain.handle('arkas:get-reconciliation-data', async (event, year) => {
 ipcMain.handle('arkas:get-reconciliation-fund-sources', async (event, year) => {
   let db;
   try {
-    db = new Database(getDbPath(), { readonly: true });
-    db.pragma("cipher='sqlcipher'");
-    db.pragma('legacy=4');
-    db.pragma(`key='${ARKAS_PASSWORD}'`);
+    db = openDatabase(getDbPath(), true, ARKAS_PASSWORD);
 
     const sources = reconciliationHandler.getAvailableFundSources(db, year);
 
@@ -2422,10 +2479,7 @@ ipcMain.handle('arkas:get-reconciliation-fund-sources', async (event, year) => {
 ipcMain.handle('arkas:get-fund-source-detail', async (event, year, fundSourceId) => {
   let db;
   try {
-    db = new Database(getDbPath(), { readonly: true });
-    db.pragma("cipher='sqlcipher'");
-    db.pragma('legacy=4');
-    db.pragma(`key='${ARKAS_PASSWORD}'`);
+    db = openDatabase(getDbPath(), true, ARKAS_PASSWORD);
 
     const data = reconciliationHandler.getFundSourceDetail(db, year, fundSourceId);
 
@@ -2442,10 +2496,7 @@ ipcMain.handle('arkas:get-fund-source-detail', async (event, year, fundSourceId)
 ipcMain.handle('arkas:get-bunga-detail', async (event, year) => {
   let db;
   try {
-    db = new Database(getDbPath(), { readonly: true });
-    db.pragma("cipher='sqlcipher'");
-    db.pragma('legacy=4');
-    db.pragma(`key='${ARKAS_PASSWORD}'`);
+    db = openDatabase(getDbPath(), true, ARKAS_PASSWORD);
 
     // Get bunga detail data
     const data = reconciliationHandler.getBungaDetail(db, year);
@@ -2462,10 +2513,7 @@ ipcMain.handle('arkas:get-bunga-detail', async (event, year) => {
 ipcMain.handle('arkas:get-pajak-detail', async (event, year) => {
   let db;
   try {
-    db = new Database(getDbPath(), { readonly: true });
-    db.pragma("cipher='sqlcipher'");
-    db.pragma('legacy=4');
-    db.pragma(`key='${ARKAS_PASSWORD}'`);
+    db = openDatabase(getDbPath(), true, ARKAS_PASSWORD);
 
     const data = reconciliationHandler.getPajakDetail(db, year);
 
@@ -2677,10 +2725,7 @@ ipcMain.handle('arkas:save-signatory-data', async (event, data) => {
 ipcMain.handle('arkas:get-bank-reconciliation', async (event, year) => {
   let db;
   try {
-    db = new Database(getDbPath(), { readonly: true });
-    db.pragma("cipher='sqlcipher'");
-    db.pragma('legacy=4');
-    db.pragma(`key='${ARKAS_PASSWORD}'`);
+    db = openDatabase(getDbPath(), true, ARKAS_PASSWORD);
 
     const data = bankReconciliationHandler.getBankReconciliationData(db, year);
 
@@ -2734,10 +2779,7 @@ ipcMain.handle('arkas:get-ba-audit-data', async (event, year) => {
     if (!fs.existsSync(getDbPath())) {
       return { success: false, error: 'Database ARKAS tidak ditemukan.' };
     }
-    const db = new Database(getDbPath(), { readonly: true });
-    db.pragma("cipher='sqlcipher'");
-    db.pragma('legacy=4');
-    db.pragma(`key='${ARKAS_PASSWORD}'`);
+    db = openDatabase(getDbPath(), true, ARKAS_PASSWORD);
     const data = reconciliationHandler.getBaAuditData(db, year);
     db.close();
     return { success: true, data };
@@ -2752,10 +2794,7 @@ ipcMain.handle('arkas:get-sptjm-data', async (event, year, semester, fundType) =
     if (!fs.existsSync(getDbPath())) {
       return { success: false, message: 'Database ARKAS tidak ditemukan.' };
     }
-    const db = new Database(getDbPath(), { readonly: true });
-    db.pragma("cipher='sqlcipher'");
-    db.pragma('legacy=4');
-    db.pragma(`key='${ARKAS_PASSWORD}'`);
+    const db = openDatabase(getDbPath(), true, ARKAS_PASSWORD);
 
     const yearStr = year.toString();
 
@@ -2895,10 +2934,7 @@ ipcMain.handle(
       if (!fs.existsSync(getDbPath())) {
         return { success: false, message: 'Database ARKAS tidak ditemukan.' };
       }
-      const db = new Database(getDbPath(), { readonly: true });
-      db.pragma("cipher='sqlcipher'");
-      db.pragma('legacy=4');
-      db.pragma(`key='${ARKAS_PASSWORD}'`);
+      const db = openDatabase(getDbPath(), true, ARKAS_PASSWORD);
 
       const yearStr = year.toString();
       let startMonth, endMonth, openingMonth;
@@ -3270,10 +3306,7 @@ ipcMain.handle('arkas:show-open-dialog', async (event, options) => {
 // IPC: EXPORT ALL BKU REPORTS (Batch Multi-Sheet Excel)
 ipcMain.handle('arkas:export-all-bku', async (event, params) => {
   try {
-    const db = new Database(getDbPath(), { readonly: true });
-    db.pragma("cipher='sqlcipher'");
-    db.pragma('legacy=4');
-    db.pragma(`key='${ARKAS_PASSWORD}'`);
+    const db = openDatabase(getDbPath(), true, ARKAS_PASSWORD);
 
     const schoolInfo = getSchoolInfoWithOfficials(db);
 
@@ -3359,7 +3392,7 @@ ipcMain.handle('arkas:export-all-bku', async (event, params) => {
 
         rows.forEach((tx) => {
           const isDebit = isPenerimaan(tx);
-          const nominal = Math.abs(tx.signed_amount || tx.nominal || 0);
+          const nominal = fr(Math.abs(tx.signed_amount || tx.nominal || 0));
           if (isDebit) runningBal += nominal;
           else runningBal -= nominal;
 

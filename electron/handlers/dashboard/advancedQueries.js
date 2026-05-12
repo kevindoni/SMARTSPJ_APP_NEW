@@ -23,7 +23,8 @@ function getRapbsAndKegiatanCount(db, yearStr, fundSource, anggaranScope) {
       if (fundSource === 'BOS Reguler') {
         fundWhere = `AND (sd.nama_sumber_dana NOT LIKE '%Kinerja%' OR sd.nama_sumber_dana IS NULL)`;
       } else {
-        fundWhere = `AND sd.nama_sumber_dana LIKE '%${fundSource}%'`;
+        const safeFund = String(fundSource).replace(/'/g, "''");
+        fundWhere = `AND sd.nama_sumber_dana LIKE '%${safeFund}%'`;
       }
     }
 
@@ -94,7 +95,8 @@ function getBelanjaKategori(db, yearStr, fundSource, anggaranScope) {
       if (fundSource === 'BOS Reguler') {
         fundWhereAnggaran = `AND (sd.nama_sumber_dana NOT LIKE '%Kinerja%' OR sd.nama_sumber_dana IS NULL)`;
       } else {
-        fundWhereAnggaran = `AND sd.nama_sumber_dana LIKE '%${fundSource}%'`;
+        const safeFundA = String(fundSource).replace(/'/g, "''");
+        fundWhereAnggaran = `AND sd.nama_sumber_dana LIKE '%${safeFundA}%'`;
       }
     }
 
@@ -335,7 +337,8 @@ function getBelanjaKegiatan(db, yearStr, fundSource, anggaranScope) {
       if (fundSource === 'BOS Reguler') {
         fundWhereKeg = `AND (sd.nama_sumber_dana NOT LIKE '%Kinerja%' OR sd.nama_sumber_dana IS NULL)`;
       } else {
-        fundWhereKeg = `AND sd.nama_sumber_dana LIKE '%${fundSource}%'`;
+        const safeFundK = String(fundSource).replace(/'/g, "''");
+        fundWhereKeg = `AND sd.nama_sumber_dana LIKE '%${safeFundK}%'`;
       }
     }
 
@@ -488,8 +491,9 @@ function getPengeluaranTerbaru(db, yearStr, fundSource, anggaranScope) {
  */
 function getRingkasanSumberDana(db, yearStr, fundSource) {
   try {
+    const safeFundR = fundSource && fundSource !== 'SEMUA' ? String(fundSource).replace(/'/g, "''") : '';
     const fundFilter =
-      fundSource && fundSource !== 'SEMUA' ? `AND sd.nama_sumber_dana LIKE '%${fundSource}%'` : '';
+      fundSource && fundSource !== 'SEMUA' ? `AND sd.nama_sumber_dana LIKE '%${safeFundR}%'` : '';
     const query = `
       SELECT 
         sd.nama_sumber_dana,

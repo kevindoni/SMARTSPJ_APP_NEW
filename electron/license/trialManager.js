@@ -1,15 +1,17 @@
 const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
-const os = require('os');
+const { app } = require('electron');
+
+const isDev = !app.isPackaged;
+const DATA_DIR = isDev ? path.join(__dirname, '../../data') : path.join(app.getPath('userData'), 'data');
 
 const TRIAL_DAYS = 30;
 const SALT = 'smrtspj2026x';
 
 function getDataDir() {
-  const p = path.join(os.homedir(), 'AppData', 'Roaming', 'smart-spj', 'data');
-  if (!fs.existsSync(p)) fs.mkdirSync(p, { recursive: true });
-  return p;
+  if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+  return DATA_DIR;
 }
 
 function getTrialFilePath() {

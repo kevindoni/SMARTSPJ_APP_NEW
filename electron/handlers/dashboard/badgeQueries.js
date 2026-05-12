@@ -77,10 +77,11 @@ function getLatestTransfer(db, yearStr, fundSource) {
     try {
         let transferFilter = '';
         if (fundSource && fundSource !== 'SEMUA') {
+            const safeFund = String(fundSource).replace(/'/g, "''");
             transferFilter = `AND id_anggaran IN (
         SELECT a.id_anggaran FROM anggaran a
         JOIN ref_sumber_dana sd ON a.id_ref_sumber_dana = sd.id_ref_sumber_dana
-        WHERE sd.nama_sumber_dana = '${fundSource}'
+        WHERE sd.nama_sumber_dana = '${safeFund}'
       )`;
         }
 
@@ -142,9 +143,10 @@ function calculatePaguSisa(db, yearStr, fundSource, revisiNum, year) {
     try {
         let paguFilter = '';
         if (fundSource && fundSource !== 'SEMUA') {
+            const safeFundP = String(fundSource).replace(/'/g, "''");
             paguFilter = `AND id_ref_sumber_dana = (
         SELECT id_ref_sumber_dana FROM ref_sumber_dana 
-        WHERE nama_sumber_dana = '${fundSource}' LIMIT 1
+        WHERE nama_sumber_dana = '${safeFundP}' LIMIT 1
       )`;
         }
 

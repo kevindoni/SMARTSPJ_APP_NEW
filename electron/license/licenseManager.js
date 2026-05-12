@@ -1,9 +1,14 @@
 const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
-const os = require('os');
+const { app } = require('electron');
 const { getFingerprint } = require('./fingerprint');
 const { getTrialInfo } = require('./trialManager');
+
+const isDev = !app.isPackaged;
+const DATA_DIR = isDev
+  ? path.join(__dirname, '../../data')
+  : path.join(app.getPath('userData'), 'data');
 
 const PUBLIC_KEY_PATH = path.join(__dirname, 'publicKey.pem');
 const OBFUSCATE_KEY = 'smrtspj_l1c_v2_2026';
@@ -23,7 +28,9 @@ function nodeHttpsFetch(url, options) {
     };
     const req = https.request(reqOptions, (res) => {
       let body = '';
-      res.on('data', (chunk) => { body += chunk; });
+      res.on('data', (chunk) => {
+        body += chunk;
+      });
       res.on('end', () => {
         resolve({
           ok: res.statusCode >= 200 && res.statusCode < 300,
@@ -34,16 +41,18 @@ function nodeHttpsFetch(url, options) {
       });
     });
     req.on('error', reject);
-    req.on('timeout', () => { req.destroy(); reject(new Error('Request timeout')); });
+    req.on('timeout', () => {
+      req.destroy();
+      reject(new Error('Request timeout'));
+    });
     if (options.body) req.write(options.body);
     req.end();
   });
 }
 
 function getDataDir() {
-  const p = path.join(os.homedir(), 'AppData', 'Roaming', 'smart-spj', 'data');
-  if (!fs.existsSync(p)) fs.mkdirSync(p, { recursive: true });
-  return p;
+  if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+  return DATA_DIR;
 }
 
 function getLicenseFilePath() {
@@ -209,31 +218,52 @@ function saveLicense(licenseData) {
   const encoded = xorEncode(JSON.stringify(storeData), OBFUSCATE_KEY);
   fs.writeFileSync(getLicenseFilePath(), encoded, 'utf-8');
 
-  const backup = { ...storeData, hash: crypto.createHash('sha256').update(JSON.stringify(storeData) + OBFUSCATE_KEY + '_bak').digest('hex').substring(0, 32) };
-  fs.writeFileSync(getLicenseBackupPath(), xorEncode(JSON.stringify(backup), OBFUSCATE_KEY + '_bak'), 'utf-8');
+  const backup = {
+    ...storeData,
+    hash: crypto
+      .createHash('sha256')
+      .update(JSON.stringify(storeData) + OBFUSCATE_KEY + '_bak')
+      .digest('hex')
+      .substring(0, 32),
+  };
+  fs.writeFileSync(
+    getLicenseBackupPath(),
+    xorEncode(JSON.stringify(backup), OBFUSCATE_KEY + '_bak'),
+    'utf-8'
+  );
 }
 
 function removeLicense() {
-  [getLicenseFilePath(), getLicenseBackupPath(), path.join(getDataDir(), 'license.json')].forEach((p) => {
-    if (fs.existsSync(p)) fs.unlinkSync(p);
-  });
+  [getLicenseFilePath(), getLicenseBackupPath(), path.join(getDataDir(), 'license.json')].forEach(
+    (p) => {
+      if (fs.existsSync(p)) fs.unlinkSync(p);
+    }
+  );
 }
 
 const LICENSE_SERVICE_URL = 'https://project-11rt0.vercel.app';
 
 function isShortKey(key) {
   const cleaned = key.trim().toUpperCase();
-  return /^SMARTSPJ-[A-HJ-NP-Z2-9]{5}-[A-HJ-NP-Z2-9]{5}-[A-HJ-NP-Z2-9]{5}-[A-HJ-NP-Z2-9]{4}$/.test(cleaned);
+  return /^SMARTSPJ-[A-HJ-NP-Z2-9]{5}-[A-HJ-NP-Z2-9]{5}-[A-HJ-NP-Z2-9]{5}-[A-HJ-NP-Z2-9]{4}$/.test(
+    cleaned
+  );
 }
 
 function isLegacyKey(key) {
-  const cleaned = key.trim().replace(/^SMARTSPJ-/i, '').replace(/[-\s]/g, '');
+  const cleaned = key
+    .trim()
+    .replace(/^SMARTSPJ-/i, '')
+    .replace(/[-\s]/g, '');
   return cleaned.length > 30;
 }
 
 function parseLicenseKey(key) {
   try {
-    const cleaned = key.trim().replace(/^SMARTSPJ-/i, '').replace(/[-\s]/g, '');
+    const cleaned = key
+      .trim()
+      .replace(/^SMARTSPJ-/i, '')
+      .replace(/[-\s]/g, '');
     const decoded = Buffer.from(cleaned, 'base64').toString('utf-8');
     const parsed = JSON.parse(decoded);
 
@@ -279,7 +309,13 @@ async function resolveShortKey(key, hardwareId) {
   }
 
   if (!resp) {
-    return { valid: false, error: 'Tidak dapat terhubung ke server license. Periksa koneksi internet. (' + (lastError?.message || 'unknown') + ')' };
+    return {
+      valid: false,
+      error:
+        'Tidak dapat terhubung ke server license. Periksa koneksi internet. (' +
+        (lastError?.message || 'unknown') +
+        ')',
+    };
   }
 
   const text = await resp.text();
@@ -287,7 +323,10 @@ async function resolveShortKey(key, hardwareId) {
   try {
     data = JSON.parse(text);
   } catch {
-    return { valid: false, error: 'Server license belum siap. Pastikan endpoint /api/activate-key sudah di-deploy.' };
+    return {
+      valid: false,
+      error: 'Server license belum siap. Pastikan endpoint /api/activate-key sudah di-deploy.',
+    };
   }
 
   if (!data.success) {
@@ -301,17 +340,21 @@ function setNetFetch(fn) {
 }
 
 async function activateLicense(key, npsn) {
-  console.log('[activateLicense] key:', key, 'npsn:', JSON.stringify(npsn));
+  console.log('[activateLicense] npsn:', JSON.stringify(npsn));
   if (isShortKey(key)) {
     const resolved = await resolveShortKey(key, getFingerprint());
     if (!resolved.valid) return { success: false, error: resolved.error };
 
     const { payload, signature } = resolved;
     const sigCheck = verifySignature(payload, signature);
-    if (!sigCheck.valid) return { success: false, error: sigCheck.error || 'Signature tidak valid' };
+    if (!sigCheck.valid)
+      return { success: false, error: sigCheck.error || 'Signature tidak valid' };
 
     if (String(payload.npsn) !== String(npsn)) {
-      return { success: false, error: `License ini untuk NPSN ${payload.npsn}, bukan ${npsn || '(kosong)'}. Pastikan database ARKAS terhubung.` };
+      return {
+        success: false,
+        error: `License ini untuk NPSN ${payload.npsn}, bukan ${npsn || '(kosong)'}. Pastikan database ARKAS terhubung.`,
+      };
     }
 
     const licenseRecord = {
@@ -344,10 +387,14 @@ async function activateLicense(key, npsn) {
     const { payload, signature } = parsed;
 
     const sigCheck = verifySignature(payload, signature);
-    if (!sigCheck.valid) return { success: false, error: sigCheck.error || 'Signature tidak valid' };
+    if (!sigCheck.valid)
+      return { success: false, error: sigCheck.error || 'Signature tidak valid' };
 
     if (String(payload.npsn) !== String(npsn)) {
-      return { success: false, error: `License ini untuk NPSN ${payload.npsn}, bukan ${npsn || '(kosong)'}. Pastikan database ARKAS terhubung.` };
+      return {
+        success: false,
+        error: `License ini untuk NPSN ${payload.npsn}, bukan ${npsn || '(kosong)'}. Pastikan database ARKAS terhubung.`,
+      };
     }
 
     const licenseRecord = {
@@ -373,7 +420,10 @@ async function activateLicense(key, npsn) {
     };
   }
 
-  return { success: false, error: 'Format key tidak dikenali. Gunakan format SMARTSPJ-XXXXX-XXXXX-XXXXX-XXXXX.' };
+  return {
+    success: false,
+    error: 'Format key tidak dikenali. Gunakan format SMARTSPJ-XXXXX-XXXXX-XXXXX-XXXXX.',
+  };
 }
 
 async function deactivateLicense() {
@@ -386,9 +436,14 @@ async function deactivateLicense() {
       body: JSON.stringify({ npsn: license.npsn, licenseKey: license.key }),
     };
     for (const fetchFn of [fetch, globalThis.fetch].filter(Boolean)) {
-      try { await fetchFn(url, options); break; } catch {}
+      try {
+        await fetchFn(url, options);
+        break;
+      } catch {}
     }
-    try { await nodeHttpsFetch(url, options); } catch {}
+    try {
+      await nodeHttpsFetch(url, options);
+    } catch {}
   }
   removeLicense();
   return { success: true };
@@ -401,8 +456,13 @@ function getStatus() {
     const sigResult = verifySignature(license.payload, license.signature);
     if (!sigResult.valid) {
       return {
-        licensed: false, tier: 'free', expiry: null, npsn: null,
-        expired: true, trialActive: false, trial: getTrialInfo(),
+        licensed: false,
+        tier: 'free',
+        expiry: null,
+        npsn: null,
+        expired: true,
+        trialActive: false,
+        trial: getTrialInfo(),
         error: 'License tidak valid (signature mismatch)',
       };
     }
@@ -420,8 +480,13 @@ function getStatus() {
       };
     } else {
       return {
-        licensed: false, tier: 'free', expiry: null, npsn: null,
-        expired: true, trialActive: false, trial: getTrialInfo(),
+        licensed: false,
+        tier: 'free',
+        expiry: null,
+        npsn: null,
+        expired: true,
+        trialActive: false,
+        trial: getTrialInfo(),
         error: validation.error,
       };
     }

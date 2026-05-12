@@ -5,7 +5,7 @@
  * All query logic is in the ./dashboard/ subfolder.
  */
 
-const Database = require('better-sqlite3-multiple-ciphers');
+const { openDatabase } = require('../lib/db-helper');
 const {
   buildAnggaranScope,
   buildFundFilters,
@@ -33,24 +33,13 @@ const {
 // Inject Advanced V3 Queries
 const advancedQueries = require('./dashboard/advancedQueries');
 
-/**
- * Open database connection with SQLCipher
- */
-function openDatabase(dbPath, password) {
-  const db = new Database(dbPath, { readonly: true });
-  db.pragma("cipher='sqlcipher'");
-  db.pragma('legacy=4');
-  db.pragma(`key='${password}'`);
-  return db;
-}
-
 module.exports = {
   /**
    * Get all dashboard statistics
    */
   getDashboardStats: async (dbPath, password, year, fundSource) => {
     try {
-      const db = openDatabase(dbPath, password);
+      const db = openDatabase(dbPath, true, password);
       const yearStr = year.toString();
 
       // Dynamic Kinerja amount
@@ -238,13 +227,14 @@ module.exports = {
    */
   getDashboardBadges: async (dbPath, password, year, fundSource) => {
     try {
-      const db = openDatabase(dbPath, password);
+      const db = openDatabase(dbPath, true, password);
       const yearStr = year.toString();
 
       // Build fund filter for anggaran
+      const safeFundB = fundSource && fundSource !== 'SEMUA' ? String(fundSource).replace(/'/g, "''") : '';
       const fundFilterAnggaran =
         fundSource && fundSource !== 'SEMUA'
-          ? `AND sd.nama_sumber_dana LIKE '%${fundSource}%'`
+          ? `AND sd.nama_sumber_dana LIKE '%${safeFundB}%'`
           : '';
 
       // Get all badge data
@@ -279,7 +269,7 @@ module.exports = {
   getClosingBalances: async (dbPath, password, year, month, fundSource) => {
     let db;
     try {
-      db = openDatabase(dbPath, password);
+      db = openDatabase(dbPath, true, password);
       const yearStr = year.toString();
       const monthStr = month.toString().padStart(2, '0');
 
@@ -331,9 +321,10 @@ module.exports = {
       const penerimaanMurni = penerimaanRow?.total || 0;
 
       // B. Realisasi Belanja (Up to Date)
+      const safeFundC = fundSource && fundSource !== 'SEMUA' ? String(fundSource).replace(/'/g, "''") : '';
       let fundWhere =
         fundSource && fundSource !== 'SEMUA'
-          ? `AND sd.nama_sumber_dana LIKE '%${fundSource}%'`
+          ? `AND sd.nama_sumber_dana LIKE '%${safeFundC}%'`
           : '';
       const belanjaRow = db
         .prepare(

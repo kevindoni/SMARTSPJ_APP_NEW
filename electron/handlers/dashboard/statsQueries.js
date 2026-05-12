@@ -109,10 +109,10 @@ function getSaldoAwalTahun(db, yearStr, fundFilterRealisasi, fundSource) {
  * Uses proper JOINs through rapbs_periode -> rapbs -> anggaran -> ref_sumber_dana
  */
 function getRealisasiBelanja(db, yearStr, fundFilterBelanja, fundSource) {
-  // Build WHERE clause for fund source filtering
   let fundWhere = '';
   if (fundSource && fundSource !== 'SEMUA') {
-    fundWhere = `AND sd.nama_sumber_dana LIKE '%${fundSource}%'`;
+    const safeFund = String(fundSource).replace(/'/g, "''");
+    fundWhere = `AND sd.nama_sumber_dana LIKE '%${safeFund}%'`;
   }
 
   const result = db
@@ -207,7 +207,8 @@ function getPajak(db, yearStr, fundFilterRealisasi, fundSource) {
       LEFT JOIN anggaran a ON r.id_anggaran = a.id_anggaran
       LEFT JOIN ref_sumber_dana sd ON a.id_ref_sumber_dana = sd.id_ref_sumber_dana
     `;
-    fundWhere = `AND sd.nama_sumber_dana LIKE '%${fundSource}%'`;
+    const safeFundP = String(fundSource).replace(/'/g, "''");
+    fundWhere = `AND sd.nama_sumber_dana LIKE '%${safeFundP}%'`;
   }
 
   const result = db

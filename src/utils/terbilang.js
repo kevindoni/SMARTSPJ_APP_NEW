@@ -1,19 +1,6 @@
 export function terbilang(angka) {
-  angka = Math.abs(angka);
-  const bilne = [
-    '',
-    'Satu',
-    'Dua',
-    'Tiga',
-    'Empat',
-    'Lima',
-    'Enam',
-    'Tujuh',
-    'Delapan',
-    'Sembilan',
-    'Sepuluh',
-    'Sebelas',
-  ];
+  angka = Math.abs(Math.round(Number(angka) || 0));
+  const bilne = ['', 'Satu', 'Dua', 'Tiga', 'Empat', 'Lima', 'Enam', 'Tujuh', 'Delapan', 'Sembilan', 'Sepuluh', 'Sebelas'];
   let hasil = '';
 
   if (angka < 12) {
@@ -40,9 +27,10 @@ export function terbilang(angka) {
 }
 
 export function formatRupiah(number) {
+  const safe = Math.round(Number(number) || 0);
   return new Intl.NumberFormat('id-ID', {
     style: 'currency',
     currency: 'IDR',
     minimumFractionDigits: 0,
-  }).format(number);
+  }).format(safe);
 }

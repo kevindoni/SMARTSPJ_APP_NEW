@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Shield, Crown, Zap, Lock, CheckCircle, AlertCircle, Key, ExternalLink, Loader2, KeyRound } from 'lucide-react';
+import { Shield, Crown, Zap, Lock, CheckCircle, AlertCircle, Key, ExternalLink, Loader2, KeyRound, AlertTriangle } from 'lucide-react';
 import { useLicense } from '../../context/LicenseContext';
 import { theme } from '../../theme';
 
@@ -90,6 +90,7 @@ export default function LicenseScreen() {
   const [licenseKey, setLicenseKey] = useState('');
   const [activating, setActivating] = useState(false);
   const [deactivating, setDeactivating] = useState(false);
+  const [showDeactivateModal, setShowDeactivateModal] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const [paymentStatus, setPaymentStatus] = useState(null);
@@ -309,11 +310,7 @@ export default function LicenseScreen() {
               <div className="flex items-end">
                 {licensed && (
                   <button
-                    onClick={async () => {
-                      if (!confirm('Yakin ingin menonaktifkan license? Anda perlu memasukkan key lagi untuk menggunakan fitur berbayar.')) return;
-                      setDeactivating(true);
-                      try { await deactivate(); } finally { setDeactivating(false); }
-                    }}
+                    onClick={() => setShowDeactivateModal(true)}
                     disabled={deactivating}
                     className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold text-red-600 bg-red-50 border border-red-200 hover:bg-red-100 transition disabled:opacity-50"
                   >
@@ -558,8 +555,48 @@ export default function LicenseScreen() {
       </div>
 
       <div className="text-center text-[10px] text-slate-400 pt-1 pb-4">
-        SmartSPJ v1.7.3 · License perangkat (1 key = 1 device)
+        SmartSPJ v{__APP_VERSION__} · License perangkat (1 key = 1 device)
       </div>
+
+      {showDeactivateModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div
+            className="absolute inset-0 bg-slate-900/40 backdrop-blur-[3px] animate-in fade-in duration-200"
+            onClick={() => setShowDeactivateModal(false)}
+          />
+          <div className="relative bg-white rounded-2xl shadow-2xl shadow-slate-900/20 border border-slate-200 w-full max-w-sm mx-4 overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-2 duration-250">
+            <div className="p-6 text-center">
+              <div className="mx-auto w-14 h-14 rounded-full bg-gradient-to-br from-red-50 to-orange-50 border border-red-100 flex items-center justify-center mb-4">
+                <AlertTriangle size={26} className="text-red-500" strokeWidth={1.8} />
+              </div>
+              <h3 className="text-base font-bold text-slate-800 mb-1.5">Nonaktifkan Lisensi?</h3>
+              <p className="text-xs text-slate-500 leading-relaxed">
+                Anda perlu memasukkan license key lagi untuk menggunakan fitur berbayar setelah ini.
+              </p>
+            </div>
+            <div className="flex border-t border-slate-100 divide-x divide-slate-100">
+              <button
+                onClick={() => setShowDeactivateModal(false)}
+                className="flex-1 py-3 text-xs font-bold text-slate-500 hover:bg-slate-50 hover:text-slate-700 transition-colors"
+              >
+                Batal
+              </button>
+              <button
+                onClick={async () => {
+                  setShowDeactivateModal(false);
+                  setDeactivating(true);
+                  try { await deactivate(); } finally { setDeactivating(false); }
+                }}
+                disabled={deactivating}
+                className="flex-1 py-3 text-xs font-bold text-red-600 hover:bg-red-50 transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5"
+              >
+                {deactivating ? <Loader2 size={12} className="animate-spin" /> : <AlertCircle size={12} />}
+                Ya, Nonaktifkan
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

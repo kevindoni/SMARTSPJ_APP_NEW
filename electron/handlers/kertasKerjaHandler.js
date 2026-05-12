@@ -1,6 +1,6 @@
 const { ipcMain } = require('electron');
-const Database = require('better-sqlite3-multiple-ciphers');
 const path = require('path');
+const { openDatabase } = require('../lib/db-helper');
 
 /**
  * Smart Match Transactions - Redistributes transactions for items with same uraian
@@ -151,23 +151,19 @@ const kertasKerjaHandler = {
   getKertasKerja: (dbPath, dbAuth, year, fundSource) => {
     let db;
     try {
-      db = new Database(dbPath, { readonly: true });
-      db.pragma("cipher='sqlcipher'");
-      db.pragma('legacy=4');
-      db.pragma("key='" + dbAuth + "'");
-
+      db = openDatabase(dbPath, true, dbAuth);
       const yearStr = String(year);
 
       const budgetQuery = `
-        SELECT id_anggaran 
+        SELECT id_anggaran
         FROM anggaran a
-        WHERE tahun_anggaran = ? 
-          AND is_approve = 1 
+        WHERE tahun_anggaran = ?
+          AND is_approve = 1
           AND soft_delete = 0
           AND is_revisi = (
-                SELECT MAX(is_revisi) 
-                FROM anggaran a2 
-                WHERE a2.tahun_anggaran = a.tahun_anggaran 
+                SELECT MAX(is_revisi)
+                FROM anggaran a2
+                WHERE a2.tahun_anggaran = a.tahun_anggaran
                   AND a2.id_ref_sumber_dana = a.id_ref_sumber_dana
                   AND a2.soft_delete = 0
                   AND a2.is_approve = 1
@@ -238,10 +234,7 @@ const kertasKerjaHandler = {
   getBudgetRealization: (dbPath, dbAuth, year, fundSource, selectedMonth) => {
     let db;
     try {
-      db = new Database(dbPath, { readonly: true });
-      db.pragma("cipher='sqlcipher'");
-      db.pragma('legacy=4');
-      db.pragma("key='" + dbAuth + "'");
+      db = openDatabase(dbPath, true, dbAuth);
 
       const yearStr = String(year);
       const yearNum = Number(year);

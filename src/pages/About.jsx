@@ -3,6 +3,22 @@ import { Heart, Calendar, ChevronDown, Sparkles, CheckCircle, ArrowRight, Bug } 
 
 const CHANGELOG = [
   {
+    version: '1.7.6',
+    date: '12 Mei 2026',
+    title: 'Security Audit & Financial Precision Fix',
+    changes: [
+      { type: 'sec', text: 'SQL Injection — 17 lokasi di queryBuilders, transactionHandler, advancedQueries, chartQueries, statsQueries, badgeQueries, dashboardHandler' },
+      { type: 'sec', text: 'Credential leak — password dan license key dihapus dari console.log / hardcoded script' },
+      { type: 'fix', text: 'Financial precision — financial-utils.js terpusat, semua kalkulasi pajak (PPN, PPh 21/23, SSPD) menggunakan Math.round() coercion' },
+      { type: 'fix', text: 'Tax rate hardcoded di ReceiptPreviewModal & exportHandler diganti konstanta terpusat' },
+      { type: 'fix', text: 'PPN DPP formula di Bukti Pengeluaran PDF — calcPPN() menggantikan manual (11/111)' },
+      { type: 'fix', text: 'Versi di LicenseScreen hardcoded v1.7.3 → dinamis dari package.json' },
+      { type: 'imp', text: 'openDatabase() terpusat di db-helper.js dengan SQL injection-safe key escaping' },
+      { type: 'imp', text: 'Payment page dibuka di Electron BrowserWindow tanpa menu bar' },
+      { type: 'imp', text: 'Custom deactivate modal menggantikan browser confirm() di LicenseScreen' },
+    ],
+  },
+  {
     version: '1.7.5',
     date: '29 April 2026',
     title: 'Fix License Activation in Packaged App',

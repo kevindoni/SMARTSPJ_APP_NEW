@@ -34,8 +34,9 @@ function getTransactions(db, params, overrides = {}) {
       budgetSourceFilter = `AND sd.nama_sumber_dana LIKE '%Lainnya%'`;
       transactionSourceFilter = `AND (sd.nama_sumber_dana LIKE '%Lainnya%' OR k.kode_rekening LIKE '03.05.%')`;
     } else {
-      budgetSourceFilter = `AND sd.nama_sumber_dana LIKE '%${params.fundSource}%'`;
-      transactionSourceFilter = `AND sd.nama_sumber_dana LIKE '%${params.fundSource}%'`;
+      const safeFund = String(params.fundSource).replace(/'/g, "''");
+      budgetSourceFilter = `AND sd.nama_sumber_dana LIKE '%${safeFund}%'`;
+      transactionSourceFilter = `AND sd.nama_sumber_dana LIKE '%${safeFund}%'`;
     }
   }
 
@@ -68,7 +69,7 @@ function getTransactions(db, params, overrides = {}) {
   // Build Search Filter
   let searchFilter = '';
   if (params.search) {
-    const term = params.search.replace(/'/g, "''"); // Escape single quotes
+    const term = String(params.search).replace(/'/g, "''").replace(/\\/g, '\\\\');
     searchFilter = `AND (
             k.uraian LIKE '%${term}%' OR 
             k.no_bukti LIKE '%${term}%' OR

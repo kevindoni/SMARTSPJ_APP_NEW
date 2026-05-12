@@ -9,12 +9,12 @@
  * @returns {string} Formatted currency string
  */
 export const formatRupiah = (number) => {
-  if (number === null || number === undefined || isNaN(number) || !isFinite(number)) return 'Rp 0';
+  const safe = Math.round(Number(number) || 0);
   return new Intl.NumberFormat('id-ID', {
     style: 'currency',
     currency: 'IDR',
     minimumFractionDigits: 0,
-  }).format(number);
+  }).format(safe);
 };
 
 /**

@@ -54,6 +54,13 @@ if (fs.existsSync(utilsDir)) {
   filesToCompile.push(...allUtils);
 }
 
+// Lib files (Recursive)
+const libDir = path.join(ELECTRON_DIR, 'lib');
+if (fs.existsSync(libDir)) {
+  const allLib = getAllJsFiles(libDir, [], ELECTRON_DIR);
+  filesToCompile.push(...allLib);
+}
+
 // License files (Recursive)
 const licenseDir = path.join(ELECTRON_DIR, 'license');
 if (fs.existsSync(licenseDir)) {
@@ -91,13 +98,12 @@ filesToCompile.forEach((file) => {
 const loaderContent = `
 'use strict';
 
-require('bytenode');
-
 const { app } = require('electron');
 
 if (!app.isPackaged) {
   require('./main.js');
 } else {
+  require('bytenode');
   require('./main.jsc');
 }
 `;

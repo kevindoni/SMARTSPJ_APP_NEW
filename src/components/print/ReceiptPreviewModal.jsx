@@ -82,36 +82,37 @@ export default function ReceiptPreviewModal({ transaction, schoolInfo, year, onC
   const displayYear = customDate
     ? new Date(customDate).getFullYear()
     : year || new Date().getFullYear();
-  const nominal = transaction.nominal || 0;
+  const nominal = Math.round(Number(transaction.nominal) || 0);
   const schoolName = schoolInfo?.nama || schoolInfo?.nama_sekolah || '';
 
-  // Calculate taxes - prioritize BKU entries (relatedTaxes), fallback to flags
+  const fr = (n) => Math.round(Number(n) || 0);
+  const TAX_RATE = { PPN: 0.11, PPH21: 0.05, PPH23: 0.02, PAJAK_DAERAH: 0.10 };
   const ppn =
-    relatedTaxes.ppn > 0
-      ? relatedTaxes.ppn
+    fr(relatedTaxes.ppn) > 0
+      ? fr(relatedTaxes.ppn)
       : transaction.is_ppn === 1
-        ? Math.round(nominal * 0.11)
+        ? fr(nominal * TAX_RATE.PPN)
         : 0;
   const pph21 =
-    relatedTaxes.pph21 > 0
-      ? relatedTaxes.pph21
+    fr(relatedTaxes.pph21) > 0
+      ? fr(relatedTaxes.pph21)
       : transaction.is_pph_21 === 1
-        ? Math.round(nominal * 0.05)
+        ? fr(nominal * TAX_RATE.PPH21)
         : 0;
   const pph23 =
-    relatedTaxes.pph23 > 0
-      ? relatedTaxes.pph23
+    fr(relatedTaxes.pph23) > 0
+      ? fr(relatedTaxes.pph23)
       : transaction.is_pph_23 === 1
-        ? Math.round(nominal * 0.02)
+        ? fr(nominal * TAX_RATE.PPH23)
         : 0;
   const pajakDaerah =
-    relatedTaxes.sspd > 0
-      ? relatedTaxes.sspd
+    fr(relatedTaxes.sspd) > 0
+      ? fr(relatedTaxes.sspd)
       : transaction.is_sspd === 1
-        ? Math.round(nominal * 0.1)
+        ? fr(nominal * TAX_RATE.PAJAK_DAERAH)
         : 0;
-  const totalPajak = ppn + pph21 + pph23 + pajakDaerah;
-  const jumlahBersih = nominal - totalPajak;
+  const totalPajak = fr(ppn + pph21 + pph23 + pajakDaerah);
+  const jumlahBersih = fr(nominal - totalPajak);
 
   const handlePrint = () => {
     if (onPrint) {

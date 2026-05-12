@@ -28,7 +28,7 @@ function buildAnggaranScope(fundSource) {
     id_anggaran IN (
       SELECT id_anggaran FROM anggaran a
       JOIN ref_sumber_dana sd ON a.id_ref_sumber_dana = sd.id_ref_sumber_dana
-      WHERE sd.nama_sumber_dana LIKE '%${fundSource}%'
+      WHERE sd.nama_sumber_dana LIKE '%` + String(fundSource).replace(/'/g, "''") + `%'
     )
   `;
 }
@@ -45,9 +45,10 @@ function buildFundFilters(fundSource, anggaranScope, kinerjaAmount = 0) {
 
   if (fundSource && fundSource !== 'SEMUA') {
     if (fundSource === 'BOS Reguler') {
-      fundFilterAnggaran = `AND sd.nama_sumber_dana LIKE '%Reguler%'`;
+      fundFilterAnggaran = `AND sd.nama_sumber_dana LIKE '%` + String(fundSource).replace(/'/g, "''") + `%'`;
     } else {
-      fundFilterAnggaran = `AND sd.nama_sumber_dana LIKE '%${fundSource}%'`;
+      const safeFund = String(fundSource).replace(/'/g, "''");
+      fundFilterAnggaran = `AND sd.nama_sumber_dana LIKE '%${safeFund}%'`;
     }
 
     // Income criteria WITHOUT Bunga (Ref 26)

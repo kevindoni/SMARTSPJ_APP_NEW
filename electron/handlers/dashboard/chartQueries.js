@@ -44,8 +44,9 @@ function getChartData(db, yearStr, chartConfig, fundSource) {
 
     // FIX: For tunai_masuk/keluar, we need to include transactions even if they don't have a fund source
     // BPU transactions (cash expenses) should always be counted
+    const safeFundC = String(fundSource).replace(/'/g, "''");
     fundWhere = `AND (
-      sd.nama_sumber_dana LIKE '%${fundSource}%' 
+      sd.nama_sumber_dana LIKE '%${safeFundC}%' 
       ${incomeFilter}
       OR (k.no_bukti LIKE 'BPU%' AND sd.nama_sumber_dana IS NULL)
       OR k.id_ref_bku = 3
@@ -111,7 +112,8 @@ function getComposition(db, yearStr, fundFilterBelanja, fundSource) {
       LEFT JOIN anggaran a ON r.id_anggaran = a.id_anggaran
       LEFT JOIN ref_sumber_dana sd ON a.id_ref_sumber_dana = sd.id_ref_sumber_dana
     `;
-    fundWhere = `AND sd.nama_sumber_dana LIKE '%${fundSource}%'`;
+    const safeFundComp = String(fundSource).replace(/'/g, "''");
+    fundWhere = `AND sd.nama_sumber_dana LIKE '%${safeFundComp}%'`;
   }
 
   const composition = db

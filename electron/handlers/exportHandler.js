@@ -7,6 +7,7 @@ const PdfTable = require('pdfkit-table');
 const { dialog } = require('electron');
 const fs = require('fs');
 const path = require('path');
+const { TAX, calcPPN, calcPPh21, calcPPh23, calcSSPD } = require('../lib/financial-utils');
 
 // Color scheme
 const COLORS = {
@@ -1236,7 +1237,7 @@ async function generateKwitansiPdf(transaction, schoolInfo, filePath) {
         actualTax.ppn > 0
           ? actualTax.ppn
           : transaction.is_ppn
-            ? Math.round(transaction.nominal * 0.11)
+            ? calcPPN(transaction.nominal)
             : 0,
     },
     {
@@ -1245,7 +1246,7 @@ async function generateKwitansiPdf(transaction, schoolInfo, filePath) {
         actualTax.pph21 > 0
           ? actualTax.pph21
           : transaction.is_pph_21
-            ? Math.round(transaction.nominal * 0.05)
+            ? calcPPh21(transaction.nominal)
             : 0,
     },
     {
@@ -1254,7 +1255,7 @@ async function generateKwitansiPdf(transaction, schoolInfo, filePath) {
         actualTax.pph23 > 0
           ? actualTax.pph23
           : transaction.is_pph_23
-            ? Math.round(transaction.nominal * 0.02)
+            ? calcPPh23(transaction.nominal)
             : 0,
     },
     {
@@ -1263,7 +1264,7 @@ async function generateKwitansiPdf(transaction, schoolInfo, filePath) {
         actualTax.sspd > 0
           ? actualTax.sspd
           : transaction.is_sspd
-            ? Math.round(transaction.nominal * 0.1)
+            ? calcSSPD(transaction.nominal)
             : 0,
     },
   ];
@@ -1746,11 +1747,11 @@ async function generateBuktiPengeluaranPdf(data, schoolInfo, filePath) {
   currentY += 20;
 
   // PPN Row (if applicable)
-  const ppn = data.calculatedPPN || Math.round((totalNominal * 11) / 111);
+  const ppn = data.calculatedPPN || calcPPN(totalNominal);
   if (data.hasPPN) {
     doc.font('Helvetica');
     doc.rect(MARGIN, currentY, CONTENT_WIDTH, 18).stroke();
-    doc.text('PPN (11%)', colNoBukti - 50, currentY + 5, { width: 60, align: 'right' });
+    doc.text(`PPN (${Math.round(TAX.PPN * 100)}%)`, colNoBukti - 50, currentY + 5, { width: 60, align: 'right' });
     doc
       .fillColor('#16a34a')
       .text(formatRp(ppn), colNominal - 10, currentY + 5, { width: 80, align: 'right' });
