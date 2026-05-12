@@ -321,9 +321,28 @@ function createWindow() {
 
 let isCheckingUpdate = false;
 
+function cleanupOldUpdaterFiles() {
+  try {
+    const updaterDir = path.join(process.env.LOCALAPPDATA || '', 'smart-spj-updater');
+    if (!fs.existsSync(updaterDir)) return;
+    const files = fs.readdirSync(updaterDir);
+    let cleaned = 0;
+    for (const file of files) {
+      if (file.endsWith('.exe') || file.endsWith('.exe.blockmap')) {
+        try {
+          fs.unlinkSync(path.join(updaterDir, file));
+          cleaned++;
+        } catch (_) {}
+      }
+    }
+    if (cleaned > 0) console.log(`[Updater] Cleaned ${cleaned} old installer file(s)`);
+  } catch (_) {}
+}
+
 function setupAutoUpdater() {
   autoUpdater.autoDownload = false;
   autoUpdater.autoInstallOnAppQuit = false;
+  cleanupOldUpdaterFiles();
 
   // Load GitHub token from encrypted storage (auto-migrates from updater.json)
   const githubToken = loadSecureGithubToken();
