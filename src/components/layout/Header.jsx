@@ -8,11 +8,105 @@ import {
   CheckCircle,
   Zap,
   Sparkles,
+  X,
+  ArrowRight,
+  Bug,
+  Shield,
+  Rocket,
 } from 'lucide-react';
 import { useFilter } from '../../context/FilterContext';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 const isElectron = typeof window !== 'undefined' && window.arkas;
+
+function parseReleaseNotes(notes) {
+  if (!notes) return [];
+  if (typeof notes === 'string') {
+    return notes.split('\n').filter((l) => l.trim().startsWith('- ') || l.trim().startsWith('* ')).map((l) => l.replace(/^[\-\*\s]+/, '').trim());
+  }
+  if (Array.isArray(notes)) {
+    return notes.map((n) => (typeof n === 'string' ? n : n.note || '')).filter(Boolean);
+  }
+  return [];
+}
+
+function getChangeIcon(text) {
+  const lower = text.toLowerCase();
+  if (lower.includes('sql injection') || lower.includes('credential') || lower.includes('keamanan') || lower.includes('security')) return { icon: Shield, color: 'violet' };
+  if (lower.includes('fix') || lower.includes('perbaikan') || lower.includes('bug') || lower.includes('gagal') || lower.includes('precision')) return { icon: Bug, color: 'emerald' };
+  if (lower.includes('new') || lower.includes('baru') || lower.includes('tambah')) return { icon: Sparkles, color: 'blue' };
+  return { icon: ArrowRight, color: 'amber' };
+}
+
+function UpdateNotificationModal({ version, releaseNotes, onDownload, onDismiss, currentVersion }) {
+  const changes = parseReleaseNotes(releaseNotes);
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onClick={onDismiss} />
+      <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+        <div className="relative bg-gradient-to-br from-indigo-600 via-violet-600 to-purple-700 px-6 py-5">
+          <div className="absolute inset-0 overflow-hidden">
+            <div className="absolute -top-8 -right-8 w-32 h-32 bg-white/10 rounded-full" />
+            <div className="absolute bottom-0 left-1/4 w-20 h-20 bg-white/[0.06] rounded-full" />
+          </div>
+          <button onClick={onDismiss} className="absolute top-3 right-3 w-7 h-7 flex items-center justify-center rounded-lg bg-white/10 hover:bg-white/20 text-white/70 hover:text-white transition-colors">
+            <X size={14} />
+          </button>
+          <div className="relative z-10">
+            <div className="flex items-center gap-2 mb-2">
+              <Rocket size={16} className="text-white/80" />
+              <span className="text-[10px] font-bold uppercase tracking-widest text-white/60">Update Tersedia</span>
+            </div>
+            <h2 className="text-xl font-extrabold text-white">SmartSPJ v{version}</h2>
+            <p className="text-xs text-white/60 mt-1">Versi saat ini: v{currentVersion}</p>
+          </div>
+        </div>
+
+        {changes.length > 0 && (
+          <div className="px-6 py-4 max-h-56 overflow-y-auto">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-3">Yang Baru</p>
+            <div className="space-y-2">
+              {changes.map((change, i) => {
+                const { icon: Icon, color } = getChangeIcon(change);
+                const colorMap = {
+                  violet: 'bg-violet-50 text-violet-600',
+                  emerald: 'bg-emerald-50 text-emerald-600',
+                  blue: 'bg-blue-50 text-blue-600',
+                  amber: 'bg-amber-50 text-amber-600',
+                };
+                return (
+                  <div key={i} className="flex items-start gap-2.5">
+                    <div className={`w-5 h-5 rounded-md flex items-center justify-center shrink-0 mt-0.5 ${colorMap[color]}`}>
+                      <Icon size={11} />
+                    </div>
+                    <p className="text-xs text-slate-600 leading-relaxed">{change}</p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center gap-3">
+          <button
+            onClick={onDownload}
+            className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-colors shadow-sm shadow-indigo-200"
+          >
+            <Download size={14} />
+            Download Update
+          </button>
+          <button
+            onClick={onDismiss}
+            className="px-4 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-500 transition-colors"
+          >
+            Nanti
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function Header({ dbStatus, availableSources, availableYears }) {
   const { year, setYear, fundSource, setFundSource } = useFilter();
@@ -23,6 +117,8 @@ export default function Header({ dbStatus, availableSources, availableYears }) {
   const [appVersion, setAppVersion] = useState(null);
   const [updateError, setUpdateError] = useState(null);
   const [downloadSpeed, setDownloadSpeed] = useState(0);
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const autoCheckRef = useRef(false);
 
   // Fetch app version
   useEffect(() => {
@@ -31,6 +127,11 @@ export default function Header({ dbStatus, availableSources, availableYears }) {
       .getAppVersion()
       .then((v) => setAppVersion(v.appVersion))
       .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    const t = setTimeout(() => { autoCheckRef.current = true; }, 3000);
+    return () => clearTimeout(t);
   }, []);
 
   // Listen for auto-update events from main process (cleanup on unmount)
@@ -46,6 +147,9 @@ export default function Header({ dbStatus, availableSources, availableYears }) {
           setUpdateInfo(info);
           setUpdateStatus('available');
           setUpdateError(null);
+          if (autoCheckRef.current) {
+            setShowUpdateModal(true);
+          }
         })
       );
     }
@@ -105,6 +209,7 @@ export default function Header({ dbStatus, availableSources, availableYears }) {
       if (result.hasUpdate) {
         setUpdateInfo({ version: result.version, releaseNotes: result.releaseNotes });
         setUpdateStatus('available');
+        setShowUpdateModal(true);
       } else {
         setUpdateStatus('not-available');
       }
@@ -286,6 +391,19 @@ export default function Header({ dbStatus, availableSources, availableYears }) {
           </>
         )}
       </div>
+
+      {showUpdateModal && updateInfo && updateStatus === 'available' && (
+        <UpdateNotificationModal
+          version={updateInfo.version}
+          releaseNotes={updateInfo.releaseNotes}
+          currentVersion={appVersion}
+          onDownload={() => {
+            setShowUpdateModal(false);
+            handleDownload();
+          }}
+          onDismiss={() => setShowUpdateModal(false)}
+        />
+      )}
     </header>
   );
 }
