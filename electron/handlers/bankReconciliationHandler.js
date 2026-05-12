@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const { MONTHS } = require('../config/constants');
 
 let DATA_DIR = path.join(__dirname, '../../data');
 
@@ -11,21 +12,6 @@ function initBankReconStorage(dir) {
 function getReconFilePath() {
   return path.join(DATA_DIR, 'bank-reconciliation.json');
 }
-
-const MONTHS = [
-  'Januari',
-  'Februari',
-  'Maret',
-  'April',
-  'Mei',
-  'Juni',
-  'Juli',
-  'Agustus',
-  'September',
-  'Oktober',
-  'November',
-  'Desember',
-];
 
 function loadLocalData() {
   try {

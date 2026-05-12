@@ -14,20 +14,7 @@
  * - SILPA (prior year remaining funds)
  */
 
-const MONTHS = [
-  'Januari',
-  'Februari',
-  'Maret',
-  'April',
-  'Mei',
-  'Juni',
-  'Juli',
-  'Agustus',
-  'September',
-  'Oktober',
-  'November',
-  'Desember',
-];
+const { MONTHS, safeInList } = require('../config/constants');
 
 // Signatory storage directory (initialized by main.js)
 let signatoryStorageDir = null;
@@ -636,11 +623,11 @@ function getCashFlow(db, year, month) {
                 LEFT JOIN ref_sumber_dana sd ON a.id_ref_sumber_dana = sd.id_ref_sumber_dana
                 WHERE ${dateFilter}
                   AND k.soft_delete = 0
-                  AND (k.id_ref_bku IN (${ids}) OR LOWER(k.uraian) REGEXP '${keywords}')
-                  AND sd.id_ref_sumber_dana IN (${sourceIdList.join(',')})
+                  AND (k.id_ref_bku IN (${ids}) OR LOWER(k.uraian) REGEXP ?)
+                  AND sd.id_ref_sumber_dana IN (${safeInList(sourceIdList)})
             `
           )
-          .get()?.total || 0
+          .get(keywords)?.total || 0
       );
     } else {
       return 0;
@@ -1511,68 +1498,50 @@ function getPajakDetail(db, year) {
   ];
 
   const monthlyData = [];
-  let currentDebt = 0; // Saldo Akhir (Hutang Pajak)
+  let currentDebt = 0;
+
+  const taxRows = db.prepare(`
+    SELECT strftime('%m', tanggal_transaksi) as month,
+      SUM(CASE WHEN (id_ref_bku IN (5,10,33) OR LOWER(uraian) LIKE '%pungut%') AND (is_ppn = 1 OR LOWER(uraian) LIKE '%ppn%') THEN saldo ELSE 0 END) as ppn_pungut,
+      SUM(CASE WHEN (id_ref_bku IN (6,7,11,25) OR LOWER(uraian) LIKE '%setor%') AND (is_ppn = 1 OR LOWER(uraian) LIKE '%ppn%') THEN saldo ELSE 0 END) as ppn_setor,
+      SUM(CASE WHEN (id_ref_bku IN (5,10,33) OR LOWER(uraian) LIKE '%pungut%') AND (is_pph_21 = 1 OR LOWER(uraian) LIKE '%pph_21%') THEN saldo ELSE 0 END) as pph21_pungut,
+      SUM(CASE WHEN (id_ref_bku IN (6,7,11,25) OR LOWER(uraian) LIKE '%setor%') AND (is_pph_21 = 1 OR LOWER(uraian) LIKE '%pph_21%') THEN saldo ELSE 0 END) as pph21_setor,
+      SUM(CASE WHEN (id_ref_bku IN (5,10,33) OR LOWER(uraian) LIKE '%pungut%') AND (is_pph_22 = 1 OR LOWER(uraian) LIKE '%pph_22%') THEN saldo ELSE 0 END) as pph22_pungut,
+      SUM(CASE WHEN (id_ref_bku IN (6,7,11,25) OR LOWER(uraian) LIKE '%setor%') AND (is_pph_22 = 1 OR LOWER(uraian) LIKE '%pph_22%') THEN saldo ELSE 0 END) as pph22_setor,
+      SUM(CASE WHEN (id_ref_bku IN (5,10,33) OR LOWER(uraian) LIKE '%pungut%') AND (is_pph_23 = 1 OR LOWER(uraian) LIKE '%pph_23%') THEN saldo ELSE 0 END) as pph23_pungut,
+      SUM(CASE WHEN (id_ref_bku IN (6,7,11,25) OR LOWER(uraian) LIKE '%setor%') AND (is_pph_23 = 1 OR LOWER(uraian) LIKE '%pph_23%') THEN saldo ELSE 0 END) as pph23_setor,
+      SUM(CASE WHEN (id_ref_bku IN (5,10,33) OR LOWER(uraian) LIKE '%pungut%') AND (is_pph_4 = 1 OR LOWER(uraian) LIKE '%pajak_daerah%') THEN saldo ELSE 0 END) as pajakDaerah_pungut,
+      SUM(CASE WHEN (id_ref_bku IN (6,7,11,25) OR LOWER(uraian) LIKE '%setor%') AND (is_pph_4 = 1 OR LOWER(uraian) LIKE '%pajak_daerah%') THEN saldo ELSE 0 END) as pajakDaerah_setor
+    FROM kas_umum
+    WHERE strftime('%Y', tanggal_transaksi) = ? AND soft_delete = 0
+    GROUP BY strftime('%m', tanggal_transaksi)
+  `).all(yearStr);
+
+  const taxMap = {};
+  for (const row of taxRows) taxMap[row.month] = row;
 
   for (let m = 1; m <= 12; m++) {
     const monthStr = m.toString().padStart(2, '0');
-
-    const getTaxValue = (taxType, direction) => {
-      let typePattern = '';
-      let colFlag = '';
-
-      if (taxType === 'ppn') {
-        typePattern = '%ppn%';
-        colFlag = 'is_ppn';
-      } else if (taxType === 'pph21') {
-        typePattern = '%pph_21%';
-        colFlag = 'is_pph_21';
-      } else if (taxType === 'pph22') {
-        typePattern = '%pph_22%';
-        colFlag = 'is_pph_22';
-      } else if (taxType === 'pph23') {
-        typePattern = '%pph_23%';
-        colFlag = 'is_pph_23';
-      } else if (taxType === 'pajakDaerah') {
-        typePattern = '%pajak_daerah%';
-        colFlag = 'is_pph_4';
-      } // Assuming PPh 4 or generic region tax
-
-      const idList = direction === 'pungut' ? '5, 10, 33' : '6, 7, 11, 25';
-      const uraianKey = direction === 'pungut' ? 'pungut' : 'setor';
-
-      // Query
-      const res = db
-        .prepare(
-          `
-                SELECT SUM(saldo) as total FROM kas_umum
-                WHERE strftime('%Y', tanggal_transaksi) = ? AND strftime('%m', tanggal_transaksi) = ?
-                AND soft_delete = 0
-                AND (id_ref_bku IN (${idList}) OR LOWER(uraian) LIKE '%${uraianKey}%')
-                AND (${colFlag} = 1 OR LOWER(uraian) LIKE '${typePattern}')
-             `
-        )
-        .get(yearStr, monthStr);
-
-      return res?.total || 0;
-    };
-
+    const row = taxMap[monthStr] || {};
     const taxTypes = ['ppn', 'pph21', 'pph22', 'pph23', 'pajakDaerah'];
     const values = {
-      pungut: {}, // Income
-      setor: {}, // Expense
+      pungut: {
+        ppn: row.ppn_pungut || 0,
+        pph21: row.pph21_pungut || 0,
+        pph22: row.pph22_pungut || 0,
+        pph23: row.pph23_pungut || 0,
+        pajakDaerah: row.pajakDaerah_pungut || 0,
+      },
+      setor: {
+        ppn: row.ppn_setor || 0,
+        pph21: row.pph21_setor || 0,
+        pph22: row.pph22_setor || 0,
+        pph23: row.pph23_setor || 0,
+        pajakDaerah: row.pajakDaerah_setor || 0,
+      },
     };
-
-    let totalPungut = 0;
-    let totalSetor = 0;
-
-    taxTypes.forEach((t) => {
-      const vPungut = getTaxValue(t, 'pungut');
-      const vSetor = getTaxValue(t, 'setor');
-      values.pungut[t] = vPungut;
-      values.setor[t] = vSetor;
-      totalPungut += vPungut;
-      totalSetor += vSetor;
-    });
+    const totalPungut = taxTypes.reduce((s, t) => s + (values.pungut[t] || 0), 0);
+    const totalSetor = taxTypes.reduce((s, t) => s + (values.setor[t] || 0), 0);
 
     const prevDebt = currentDebt;
     currentDebt = currentDebt + totalPungut - totalSetor;
@@ -1827,51 +1796,40 @@ function getBaAuditData(db, year) {
     .all(yearStr);
 
   // Monthly Summary
+  const auditSums = db.prepare(`
+    SELECT strftime('%m', tanggal_transaksi) as month,
+      SUM(CASE WHEN no_bukti LIKE 'BBU%' THEN saldo ELSE 0 END) as total_penerimaan,
+      SUM(CASE WHEN (no_bukti LIKE 'BNU%' OR no_bukti LIKE 'BPU%') AND kode_rekening LIKE '5.%' THEN saldo ELSE 0 END) as total_pengeluaran
+    FROM kas_umum
+    WHERE strftime('%Y', tanggal_transaksi) = ? AND soft_delete = 0
+    GROUP BY strftime('%m', tanggal_transaksi)
+  `).all(yearStr);
+
+  const auditCounts = db.prepare(`
+    SELECT strftime('%m', tanggal_transaksi) as month,
+      SUM(CASE WHEN no_bukti LIKE 'BBU%' THEN 1 ELSE 0 END) as cnt_penerimaan,
+      SUM(CASE WHEN (no_bukti LIKE 'BNU%' OR no_bukti LIKE 'BPU%') AND kode_rekening LIKE '5.%' THEN 1 ELSE 0 END) as cnt_pengeluaran
+    FROM kas_umum
+    WHERE strftime('%Y', tanggal_transaksi) = ? AND soft_delete = 0
+    GROUP BY strftime('%m', tanggal_transaksi)
+  `).all(yearStr);
+
+  const sumMap = {};
+  for (const r of auditSums) sumMap[r.month] = r;
+  const cntMap = {};
+  for (const r of auditCounts) cntMap[r.month] = r;
+
   for (let m = 1; m <= 12; m++) {
     const ms = m.toString().padStart(2, '0');
-    const p = db
-      .prepare(
-        `
-            SELECT SUM(saldo) as total FROM kas_umum
-            WHERE strftime('%Y', tanggal_transaksi) = ? AND strftime('%m', tanggal_transaksi) = ?
-              AND soft_delete = 0 AND no_bukti LIKE 'BBU%'
-        `
-      )
-      .get(yearStr, ms);
-    const e = db
-      .prepare(
-        `
-            SELECT SUM(saldo) as total FROM kas_umum
-            WHERE strftime('%Y', tanggal_transaksi) = ? AND strftime('%m', tanggal_transaksi) = ?
-              AND soft_delete = 0 AND (no_bukti LIKE 'BNU%' OR no_bukti LIKE 'BPU%') AND kode_rekening LIKE '5.%'
-        `
-      )
-      .get(yearStr, ms);
-    const cp = db
-      .prepare(
-        `
-            SELECT COUNT(*) as cnt FROM kas_umum
-            WHERE strftime('%Y', tanggal_transaksi) = ? AND strftime('%m', tanggal_transaksi) = ?
-              AND soft_delete = 0 AND no_bukti LIKE 'BBU%'
-        `
-      )
-      .get(yearStr, ms);
-    const ce = db
-      .prepare(
-        `
-            SELECT COUNT(*) as cnt FROM kas_umum
-            WHERE strftime('%Y', tanggal_transaksi) = ? AND strftime('%m', tanggal_transaksi) = ?
-              AND soft_delete = 0 AND (no_bukti LIKE 'BNU%' OR no_bukti LIKE 'BPU%') AND kode_rekening LIKE '5.%'
-        `
-      )
-      .get(yearStr, ms);
+    const s = sumMap[ms] || {};
+    const c = cntMap[ms] || {};
     result.monthly.push({
       month: m,
       monthName: MONTHS[m - 1],
-      penerimaan: p?.total || 0,
-      pengeluaran: e?.total || 0,
-      countPenerimaan: cp?.cnt || 0,
-      countPengeluaran: ce?.cnt || 0,
+      penerimaan: s.total_penerimaan || 0,
+      pengeluaran: s.total_pengeluaran || 0,
+      countPenerimaan: c.cnt_penerimaan || 0,
+      countPengeluaran: c.cnt_pengeluaran || 0,
     });
   }
   return result;

@@ -1,6 +1,7 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const fs = require('fs');
+const { safeInList } = require('./config/constants');
 const { openDatabase } = require('./lib/db-helper');
 const { fr, calcPPN, calcPPN_DPP, calcPPh21, calcPPh23, calcSSPD, TAX } = require('./lib/financial-utils');
 let autoUpdater;
@@ -195,7 +196,7 @@ function loadSecurePassword() {
 
   console.log(
     '[loadSecurePassword] ARKAS_PASSWORD:',
-    ARKAS_PASSWORD ? 'loaded (' + ARKAS_PASSWORD.length + ' chars)' : 'EMPTY'
+    ARKAS_PASSWORD ? 'loaded' : 'EMPTY'
   );
 
   // 3. If we got the password, migrate to encrypted storage
@@ -587,7 +588,7 @@ ipcMain.handle('arkas:activate-license', async (event, key) => {
       const dbExists = fs.existsSync(dbPath);
       debugInfo.push(`db: ${dbExists ? 'found' : 'NOT FOUND'} at ${dbPath}`);
       debugInfo.push(
-        `pwd: ${ARKAS_PASSWORD ? 'loaded (' + ARKAS_PASSWORD.length + ' chars)' : 'EMPTY'}`
+        `pwd: ${ARKAS_PASSWORD ? 'loaded' : 'EMPTY'}`
       );
       if (dbExists && ARKAS_PASSWORD) {
         const db = openDatabase(dbPath, true, ARKAS_PASSWORD);
@@ -907,7 +908,7 @@ ipcMain.handle('arkas:check-server-license', async () => {
       const dbPath = getDbPath();
       const dbExists = fs.existsSync(dbPath);
       debugInfo.push(`db: ${dbExists ? 'found' : 'NOT FOUND'}`);
-      debugInfo.push(`pwd: ${ARKAS_PASSWORD ? 'loaded (' + ARKAS_PASSWORD.length + ')' : 'EMPTY'}`);
+      debugInfo.push(`pwd: ${ARKAS_PASSWORD ? 'loaded' : 'EMPTY'}`);
       if (dbExists && ARKAS_PASSWORD) {
         const db = openDatabase(dbPath, true, ARKAS_PASSWORD);
         const sekolah = getSchoolInfoWithOfficials(db);
@@ -2794,6 +2795,7 @@ ipcMain.handle('arkas:get-signatory-data', async (event) => {
 
 // BA Rekonsiliasi - Get Audit Data for cross-check
 ipcMain.handle('arkas:get-ba-audit-data', async (event, year) => {
+  let db;
   try {
     if (!fs.existsSync(getDbPath())) {
       return { success: false, error: 'Database ARKAS tidak ditemukan.' };
@@ -2803,6 +2805,7 @@ ipcMain.handle('arkas:get-ba-audit-data', async (event, year) => {
     db.close();
     return { success: true, data };
   } catch (error) {
+    if (db) try { db.close(); } catch (_) {}
     return { success: false, error: error.message };
   }
 });
@@ -2835,7 +2838,7 @@ ipcMain.handle('arkas:get-sptjm-data', async (event, year, semester, fundType) =
       db.close();
       return { success: false, message: 'Sumber dana tidak ditemukan: ' + fundType };
     }
-    const sourceIdStr = sourceIds.join(',');
+    const sourceIdStr = safeInList(sourceIds);
 
     // Get Saldo Awal (Opening Balance for the semester)
     const openingMonth = semester === 1 ? '01' : '07';
@@ -2989,7 +2992,7 @@ ipcMain.handle(
         db.close();
         return { success: false, message: 'Sumber dana tidak ditemukan: ' + fundType };
       }
-      const sourceIdStr = sourceIds.join(',');
+      const sourceIdStr = safeInList(sourceIds);
 
       // TWO-PASS APPROACH to avoid JOIN duplicates:
       // Pass 1: Get expenditure data with correct filter (no rapbs JOIN to avoid duplicates)

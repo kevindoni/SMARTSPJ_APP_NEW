@@ -87,8 +87,7 @@ filesToCompile.forEach((file) => {
     });
     console.log(`✅ Kompilasi: ${file} → ${file.replace('.js', '.jsc')}`);
 
-    // Hapus file JS asli (opsional - bisa di-comment jika mau tetap simpan)
-    // fs.unlinkSync(srcPath);
+    fs.unlinkSync(srcPath);
   } catch (err) {
     console.error(`❌ Gagal kompilasi ${file}:`, err.message);
   }

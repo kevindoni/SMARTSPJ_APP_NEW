@@ -4,6 +4,7 @@
  */
 const path = require('path');
 const TAX_RATES = require('../config/tax-rates');
+const { safeInList } = require('../config/constants');
 
 /**
  * Fetch transactions with complex filtering and calculations
@@ -62,7 +63,7 @@ function getTransactions(db, params, overrides = {}) {
     .all(yearStr)
     .map((r) => r.id_anggaran);
 
-  const idList = validBudgetIds.length > 0 ? validBudgetIds.map((id) => `'${id}'`).join(',') : "''";
+  const idList = safeInList(validBudgetIds);
   const allowNullBudget =
     !params.fundSource || params.fundSource === 'SEMUA' || params.fundSource === 'BOS Reguler';
 

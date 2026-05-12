@@ -8,6 +8,7 @@ const { dialog } = require('electron');
 const fs = require('fs');
 const path = require('path');
 const { TAX, calcPPN, calcPPh21, calcPPh23, calcSSPD } = require('../lib/financial-utils');
+const { MONTHS } = require('../config/constants');
 
 // Color scheme
 const COLORS = {
@@ -18,22 +19,6 @@ const COLORS = {
   white: 'FFFFFFFF',
   gray: 'FFF5F5F5',
 };
-
-const MONTHS = [
-  '',
-  'Januari',
-  'Februari',
-  'Maret',
-  'April',
-  'Mei',
-  'Juni',
-  'Juli',
-  'Agustus',
-  'September',
-  'Oktober',
-  'November',
-  'Desember',
-];
 
 /**
  * Main Export Function
