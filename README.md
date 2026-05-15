@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/SmartSPJ-v1.7.2-0F172A?style=for-the-badge&labelColor=1E293B&color=3B82F6" alt="SmartSPJ"/>
+  <img src="https://img.shields.io/badge/SmartSPJ-v1.7.9-0F172A?style=for-the-badge&labelColor=1E293B&color=3B82F6" alt="SmartSPJ"/>
 </p>
 
 <p align="center">

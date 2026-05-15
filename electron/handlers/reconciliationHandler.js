@@ -1202,7 +1202,7 @@ function getFundSourceDetail(db, year, fundSourceId) {
   const realizationMap = {};
   const realizedCodes = new Set();
   realizationRows.forEach((row) => {
-    const m = parseInt(row.month);
+    const m = parseInt(row.month) || 0;
     if (!realizationMap[m]) realizationMap[m] = {};
     realizationMap[m][row.kode_rekening] = row.total;
     if (row.total > 0) realizedCodes.add(row.kode_rekening);

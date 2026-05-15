@@ -90,6 +90,19 @@ export default function Pengaturan() {
 
   const handleSave = async (e) => {
     e.preventDefault();
+    if (!formData.kepala_sekolah?.trim() && !formData.bendahara?.trim()) {
+      setMessage({ type: 'error', text: 'Minimal isi nama Kepala Sekolah atau Bendahara.' });
+      return;
+    }
+    const nipPattern = /^\d{0,25}$/;
+    if (formData.nip_kepala && !nipPattern.test(formData.nip_kepala.replace(/\s/g, ''))) {
+      setMessage({ type: 'error', text: 'NIP Kepala Sekolah hanya boleh berisi angka.' });
+      return;
+    }
+    if (formData.nip_bendahara && !nipPattern.test(formData.nip_bendahara.replace(/\s/g, ''))) {
+      setMessage({ type: 'error', text: 'NIP Bendahara hanya boleh berisi angka.' });
+      return;
+    }
     setSaving(true);
     setMessage(null);
     try {

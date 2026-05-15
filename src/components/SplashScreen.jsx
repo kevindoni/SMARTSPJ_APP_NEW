@@ -18,6 +18,7 @@ const SplashScreen = ({ onComplete }) => {
 
   useEffect(() => {
     let frame;
+    let timeoutId;
     let start = null;
     const totalDuration = LOADING_STEPS.reduce((s, step) => s + step.duration, 0);
 
@@ -43,14 +44,17 @@ const SplashScreen = ({ onComplete }) => {
       } else {
         setStepIndex(LOADING_STEPS.length - 1);
         setFadeOut(true);
-        setTimeout(() => {
+        timeoutId = setTimeout(() => {
           if (onComplete) onComplete();
         }, 300);
       }
     };
 
     frame = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(frame);
+    return () => {
+      cancelAnimationFrame(frame);
+      if (timeoutId) clearTimeout(timeoutId);
+    };
   }, [onComplete]);
 
   const currentText = LOADING_STEPS[stepIndex]?.text || LOADING_STEPS[0].text;

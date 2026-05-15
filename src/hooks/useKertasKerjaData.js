@@ -13,37 +13,40 @@ export function useKertasKerjaData(selectedFormat, selectedMonth, searchTerm) {
     selectedFormat.toLowerCase().includes('tahapan');
   const isLembar = selectedFormat.toLowerCase().includes('lembar');
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (fundSource === 'SEMUA') {
       setData([]);
       setLoading(false);
       return;
     }
-    fetchData();
-  }, [year, fundSource]);
-
-  const fetchData = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      if (window.arkas && window.arkas.getKertasKerja) {
-        const result = await window.arkas.getKertasKerja(year, fundSource);
-        if (result.success) {
-          setData(result.data);
+    let cancelled = false;
+    const load = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        if (window.arkas && window.arkas.getKertasKerja) {
+          const result = await window.arkas.getKertasKerja(year, fundSource);
+          if (cancelled) return;
+          if (result.success) {
+            setData(result.data);
+          } else {
+            setError(result.error || 'Gagal mengambil data Kertas Kerja');
+          }
         } else {
-          setError(result.error || 'Gagal mengambil data Kertas Kerja');
+          setError('API Kertas Kerja belum tersedia. Harap restart aplikasi.');
         }
-      } else {
-        setError('API Kertas Kerja belum tersedia. Harap restart aplikasi.');
+      } catch (err) {
+        if (!cancelled) {
+          console.error(err);
+          setError('Terjadi kesalahan sistem.');
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
       }
-    } catch (err) {
-      console.error(err);
-      setError('Terjadi kesalahan sistem.');
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+    load();
+    return () => { cancelled = true; };
+  }, [year, fundSource]);
 
   // --- Processing Logic ---
   const processedData = data

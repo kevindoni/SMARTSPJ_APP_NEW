@@ -86,14 +86,21 @@ export default function NotaGroupManager() {
   };
 
   useEffect(() => {
-    loadNotaGroups();
-    loadSavedGroups();
-    try {
-      const saved = localStorage.getItem('printed_groups');
-      if (saved) setPrintedGroups(new Set(JSON.parse(saved)));
-    } catch (e) {
-      console.error('Failed to load printed status:', e);
-    }
+    let cancelled = false;
+    const load = async () => {
+      await loadNotaGroups();
+      if (cancelled) return;
+      await loadSavedGroups();
+      if (cancelled) return;
+      try {
+        const saved = localStorage.getItem('printed_groups');
+        if (saved) setPrintedGroups(new Set(JSON.parse(saved)));
+      } catch (e) {
+        console.error('Failed to load printed status:', e);
+      }
+    };
+    load();
+    return () => { cancelled = true; };
   }, [year, month]);
 
   // Reload printed status when switching tabs (sync with Cetak Manual)
