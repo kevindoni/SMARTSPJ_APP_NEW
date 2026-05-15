@@ -1,5 +1,10 @@
 const { neon } = require('../license-service/node_modules/@neondatabase/serverless');
-const sql = neon('postgresql://neondb_owner:npg_S0BzYjieNpE2@ep-aged-rain-ao7wnfhj-pooler.c-2.ap-southeast-1.aws.neon.tech/neondb?sslmode=require');
+if (!process.env.DATABASE_URL) {
+  console.error('Error: DATABASE_URL environment variable is required.');
+  console.error('Usage: DATABASE_URL="postgresql://..." node scripts/reset-hw-null.js');
+  process.exit(1);
+}
+const sql = neon(process.env.DATABASE_URL);
 
 async function run() {
   await sql`UPDATE licenses SET hardware_id = NULL, activated_at = NULL WHERE npsn = '70007889'`;

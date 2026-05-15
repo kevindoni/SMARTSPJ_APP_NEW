@@ -26,30 +26,31 @@ export default function CetakSPTJM() {
   ];
 
   useEffect(() => {
-    fetchData();
-  }, [year, activeSemester, activeFund]);
+    let cancelled = false;
+    const load = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const schoolRes = await window.arkas.getSchoolInfo();
+        if (cancelled) return;
+        if (schoolRes.success) setSchool(schoolRes.data);
 
-  const fetchData = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      // Get school info
-      const schoolRes = await window.arkas.getSchoolInfo();
-      if (schoolRes.success) setSchool(schoolRes.data);
-
-      // Get SPTJM data
-      const sptjmRes = await window.arkas.getSPTJMData(year, parseInt(activeSemester), activeFund);
-      if (sptjmRes.success) {
-        setData(sptjmRes.data);
-      } else {
-        setError(sptjmRes.message || 'Gagal mengambil data SPTJM');
+        const sptjmRes = await window.arkas.getSPTJMData(year, parseInt(activeSemester), activeFund);
+        if (cancelled) return;
+        if (sptjmRes.success) {
+          setData(sptjmRes.data);
+        } else {
+          setError(sptjmRes.message || 'Gagal mengambil data SPTJM');
+        }
+      } catch (err) {
+        if (!cancelled) setError(err.message);
+      } finally {
+        if (!cancelled) setLoading(false);
       }
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+    load();
+    return () => { cancelled = true; };
+  }, [year, activeSemester, activeFund]);
 
   // Get semester months
   const getSemesterMonths = () => {

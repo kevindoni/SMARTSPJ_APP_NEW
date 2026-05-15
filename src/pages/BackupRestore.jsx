@@ -412,7 +412,7 @@ export default function BackupRestore() {
                 <div className="flex flex-wrap gap-2">
                   {backupInfo.files.map((f, i) => (
                     <span
-                      key={i}
+                      key={f.name || i}
                       className="inline-flex items-center gap-1 bg-slate-100 text-slate-700 text-xs font-medium px-2.5 py-1 rounded-lg"
                     >
                       <CheckCircle size={12} className="text-emerald-500" />
@@ -496,8 +496,8 @@ export default function BackupRestore() {
             Data diambil langsung dari database ARKAS.
           </p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-            {['BKU Umum', 'BKU Tunai', 'BKU Bank', 'Buku Pajak'].map((name, i) => (
-              <div key={i} className="bg-slate-50 rounded-lg p-2.5 text-center">
+            {['BKU Umum', 'BKU Tunai', 'BKU Bank', 'Buku Pajak'].map((name) => (
+              <div key={name} className="bg-slate-50 rounded-lg p-2.5 text-center">
                 <div className="text-xs font-bold text-slate-500">{name}</div>
                 <div className="text-[10px] text-slate-400">12 bulan</div>
               </div>
@@ -533,10 +533,10 @@ export default function BackupRestore() {
         </div>
         <div className="p-5">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {BACKUP_ITEMS.map((item, i) => {
+            {BACKUP_ITEMS.map((item) => {
               const Icon = item.icon;
               return (
-                <div key={i} className="flex items-center gap-3 bg-slate-50 rounded-lg px-4 py-3">
+                <div key={item.label} className="flex items-center gap-3 bg-slate-50 rounded-lg px-4 py-3">
                   <div className="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center flex-shrink-0">
                     <Icon size={16} className="text-emerald-600" />
                   </div>

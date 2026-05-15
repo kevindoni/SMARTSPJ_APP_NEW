@@ -118,6 +118,11 @@ export default function LicenseScreen() {
   const handleActivate = async (e) => {
     e.preventDefault();
     if (!licenseKey.trim()) { setError('Masukkan license key'); return; }
+    const keyPattern = /^SMARTSPJ-[A-Z0-9]{5}-[A-Z0-9]{5}-[A-Z0-9]{5}-[A-Z0-9]{5}$/;
+    if (!keyPattern.test(licenseKey.trim()) && licenseKey.trim().length < 10) {
+      setError('Format license key tidak valid');
+      return;
+    }
     setActivating(true); setError(null); setSuccess(null);
     try {
       const result = await activate(licenseKey.trim());

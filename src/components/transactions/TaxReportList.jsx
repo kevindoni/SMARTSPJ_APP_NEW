@@ -189,9 +189,8 @@ export default function TaxReportList({ stats }) {
   // Manual opening balance removed - not used
 
   // 2. Sort Data (saldo_awal entries first, then by date)
-  const sortedData = isMonthView
+  const sortedData = useMemo(() => isMonthView
     ? [...mergedData].sort((a, b) => {
-        // Saldo_awal entries should come first
         if ((a.manual_type === 'saldo_awal' || a.manual_type === 'saldo_awal_tahun') && b.manual_type !== 'saldo_awal' && b.manual_type !== 'saldo_awal_tahun') return -1;
         if ((b.manual_type === 'saldo_awal' || b.manual_type === 'saldo_awal_tahun') && a.manual_type !== 'saldo_awal' && a.manual_type !== 'saldo_awal_tahun') return 1;
 
@@ -199,7 +198,8 @@ export default function TaxReportList({ stats }) {
         const dateB = new Date(b.tanggal_transaksi);
         return dateA - dateB;
       })
-    : mergedData;
+    : mergedData
+  , [isMonthView, mergedData]);
 
   // 3. Running Balance
   const calculatedBalances = useMemo(() => {

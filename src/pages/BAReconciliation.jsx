@@ -105,51 +105,55 @@ export default function BAReconciliation() {
     }
   }, [year]);
 
-  // Fetch Data
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
-    fetchData();
-  }, [year, activeTab]);
-
-  const fetchData = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      if (!window.arkas?.getReconciliationData) {
-        throw new Error('API tidak tersedia');
-      }
-
-      // Fetch Main Data (always needed for BA Rekons & Doc)
-      if (activeTab === 'ba-rekons' || activeTab === 'lembar-ba') {
-        const result = await window.arkas.getReconciliationData(year);
-        if (result.success) setData(result.data);
-        else throw new Error(result.error || 'Gagal memuat data rekonsiliasi');
-
-        // Also fetch pajak data for Hutang Pajak display
-        if (window.arkas?.getPajakDetail) {
-          const pajakResult = await window.arkas.getPajakDetail(year);
-          if (pajakResult.success) setPajakData(pajakResult.data);
+    let cancelled = false;
+    const load = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        if (!window.arkas?.getReconciliationData) {
+          throw new Error('API tidak tersedia');
         }
-      } else if (activeTab === 'rekap-bunga') {
-        const result = await window.arkas.getBungaDetail(year);
-        if (result.success) setBungaData(result.data);
-        else throw new Error(result.error);
-      } else if (activeTab === 'rekap-pajak') {
-        const result = await window.arkas.getPajakDetail(year);
-        if (result.success) setPajakData(result.data);
-        else throw new Error(result.error);
-      } else if (reconSources.some((s) => s.id === activeTab)) {
-        const result = await window.arkas.getFundSourceDetail(year, activeTab);
-        if (result.success) setFundDetailData(result.data);
-        else throw new Error(result.error);
+
+        if (activeTab === 'ba-rekons' || activeTab === 'lembar-ba') {
+          const result = await window.arkas.getReconciliationData(year);
+          if (cancelled) return;
+          if (result.success) setData(result.data);
+          else throw new Error(result.error || 'Gagal memuat data rekonsiliasi');
+
+          if (window.arkas?.getPajakDetail) {
+            const pajakResult = await window.arkas.getPajakDetail(year);
+            if (cancelled) return;
+            if (pajakResult.success) setPajakData(pajakResult.data);
+          }
+        } else if (activeTab === 'rekap-bunga') {
+          const result = await window.arkas.getBungaDetail(year);
+          if (cancelled) return;
+          if (result.success) setBungaData(result.data);
+          else throw new Error(result.error);
+        } else if (activeTab === 'rekap-pajak') {
+          const result = await window.arkas.getPajakDetail(year);
+          if (cancelled) return;
+          if (result.success) setPajakData(result.data);
+          else throw new Error(result.error);
+        } else if (reconSources.some((s) => s.id === activeTab)) {
+          const result = await window.arkas.getFundSourceDetail(year, activeTab);
+          if (cancelled) return;
+          if (result.success) setFundDetailData(result.data);
+          else throw new Error(result.error);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          console.error('Reconciliation Error:', err);
+          setError(err.message);
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
       }
-    } catch (err) {
-      console.error('Reconciliation Error:', err);
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+    load();
+    return () => { cancelled = true; };
+  }, [year, activeTab, reconSources]);
 
   // Memoized Flattened Data for Smart Table
   const smartTableData = useMemo(() => {

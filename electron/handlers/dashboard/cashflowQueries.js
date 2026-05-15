@@ -68,6 +68,8 @@ function calculateCashFlows(db, yearStr, anggaranScope, fundSource) {
   let totalKeluar = 0;
 
   for (const tx of rawTransactions) {
+    if (!isBudgetMatch(tx)) continue;
+
     const uraian = (tx.uraian || '').toLowerCase();
     const val = Number(tx.saldo) || 0;
 

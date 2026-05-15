@@ -74,20 +74,46 @@ export default function LaporanK7() {
     { id: '12', label: 'Desember' },
   ];
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
-    fetchData();
+    let cancelled = false;
+    const load = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const schoolRes = await window.arkas.getSchoolInfo();
+        if (cancelled) return;
+        if (schoolRes.success) setSchool(schoolRes.data);
+
+        const k7Res = await window.arkas.getK7Data(
+          year,
+          periodType,
+          activeTahap,
+          activeMonth,
+          activeFund
+        );
+        if (cancelled) return;
+        if (k7Res.success) {
+          setData(k7Res.data);
+        } else {
+          setError(k7Res.message || 'Gagal mengambil data K7');
+        }
+      } catch (err) {
+        if (!cancelled) setError(err.message);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+    load();
+    return () => { cancelled = true; };
   }, [year, periodType, activeTahap, activeMonth, activeFund]);
 
   const fetchData = async () => {
     setLoading(true);
     setError(null);
     try {
-      // Get school info
       const schoolRes = await window.arkas.getSchoolInfo();
       if (schoolRes.success) setSchool(schoolRes.data);
 
-      // Get K7 data with period type
       const k7Res = await window.arkas.getK7Data(
         year,
         periodType,

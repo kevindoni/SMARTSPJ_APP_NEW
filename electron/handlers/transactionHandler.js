@@ -35,9 +35,9 @@ function getTransactions(db, params, overrides = {}) {
       budgetSourceFilter = `AND sd.nama_sumber_dana LIKE '%Lainnya%'`;
       transactionSourceFilter = `AND (sd.nama_sumber_dana LIKE '%Lainnya%' OR k.kode_rekening LIKE '03.05.%')`;
     } else {
-      const safeFund = String(params.fundSource).replace(/'/g, "''");
-      budgetSourceFilter = `AND sd.nama_sumber_dana LIKE '%${safeFund}%'`;
-      transactionSourceFilter = `AND sd.nama_sumber_dana LIKE '%${safeFund}%'`;
+      const safeFund = String(params.fundSource).replace(/'/g, "''").replace(/%/g, '\\%').replace(/_/g, '\\_');
+      budgetSourceFilter = `AND sd.nama_sumber_dana LIKE '%${safeFund}%' ESCAPE '\\'`;
+      transactionSourceFilter = `AND sd.nama_sumber_dana LIKE '%${safeFund}%' ESCAPE '\\'`;
     }
   }
 
@@ -70,12 +70,12 @@ function getTransactions(db, params, overrides = {}) {
   // Build Search Filter
   let searchFilter = '';
   if (params.search) {
-    const term = String(params.search).replace(/'/g, "''").replace(/\\/g, '\\\\');
+    const term = String(params.search).replace(/'/g, "''").replace(/\\/g, '\\\\').replace(/%/g, '\\%').replace(/_/g, '\\_');
     searchFilter = `AND (
-            k.uraian LIKE '%${term}%' OR 
-            k.no_bukti LIKE '%${term}%' OR
-            k.kode_rekening LIKE '%${term}%' OR
-            am.code LIKE '%${term}%'
+            k.uraian LIKE '%${term}%' ESCAPE '\\' OR 
+            k.no_bukti LIKE '%${term}%' ESCAPE '\\' OR
+            k.kode_rekening LIKE '%${term}%' ESCAPE '\\' OR
+            am.code LIKE '%${term}%' ESCAPE '\\'
         )`;
   }
 
@@ -179,7 +179,6 @@ function getTransactions(db, params, overrides = {}) {
                     
                     -- 4. Expenses (Negative): 1=Belanja, 3=Tarik Tunai (dari Bank), 5=Panjar (BPU), 11=Setor Pajak, 13=Pindahan-
                     WHEN k.id_ref_bku IN (1, 3, 5, 11, 13) THEN -k.saldo
-                    WHEN k.no_bukti LIKE 'BPU%' OR k.no_bukti LIKE 'BNU%' THEN -k.saldo  -- CRITICAL: Catch all BPU/BNU as Expenses
                     WHEN k.uraian LIKE '%Tarik Tunai%' OR k.uraian LIKE '%Setor Pajak%' OR k.uraian LIKE '%Setor%' OR k.uraian LIKE '%Biaya Admin%' THEN -k.saldo
                     
                     -- DEFAULT FAIL-SAFE: Anything not explicitly an Expense is INCOME
@@ -447,9 +446,7 @@ function getTransactionsByProof(db, no_bukti, year, overrides = {}) {
             k.id_kas_umum,
             k.no_bukti,
             k.uraian,
-            k.nilai_bersih as nominal, -- nilai_bersih or total_nilai? Usually 'nilai_bersih' is final. No, 'total_nilai' or 'nilai_bersih'? Let's check schema. Typically 'nominal' = nilai_bersih + pajak if separate? 
-            -- Actually, let's use the field 'k.nilai_bersih' as nominal for now, or match getTransactions logic.
-            -- getTransactions uses CTEs. Let's try a simpler approach for aggregation.
+            k.saldo as nominal,
             k.total_nilai,
             k.pajak_negara as ppn, -- Assuming column mapping
             k.id_ref_sumber_dana,

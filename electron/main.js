@@ -3,7 +3,7 @@ const path = require('path');
 const fs = require('fs');
 const { safeInList } = require('./config/constants');
 const { openDatabase } = require('./lib/db-helper');
-const { fr, calcPPN, calcPPN_DPP, calcPPh21, calcPPh23, calcSSPD, TAX } = require('./lib/financial-utils');
+const { fr, calcPPN, calcPPN_DPP, calcPPh21, calcPPh23, calcSSPD, TAX, isPenerimaan } = require('./lib/financial-utils');
 let autoUpdater;
 try {
   autoUpdater = require('electron-updater').autoUpdater;
@@ -592,15 +592,18 @@ ipcMain.handle('arkas:activate-license', async (event, key) => {
       );
       if (dbExists && ARKAS_PASSWORD) {
         const db = openDatabase(dbPath, true, ARKAS_PASSWORD);
-        const sekolah = getSchoolInfoWithOfficials(db);
-        debugInfo.push(`sekolah: ${sekolah ? 'found' : 'null'}`);
-        if (sekolah) {
-          debugInfo.push(
-            `npsn: ${JSON.stringify(sekolah.npsn)}, kode: ${JSON.stringify(sekolah.kode_instansi)}`
-          );
-          npsn = String(sekolah.npsn || sekolah.kode_instansi || '').trim();
+        try {
+          const sekolah = getSchoolInfoWithOfficials(db);
+          debugInfo.push(`sekolah: ${sekolah ? 'found' : 'null'}`);
+          if (sekolah) {
+            debugInfo.push(
+              `npsn: ${JSON.stringify(sekolah.npsn)}, kode: ${JSON.stringify(sekolah.kode_instansi)}`
+            );
+            npsn = String(sekolah.npsn || sekolah.kode_instansi || '').trim();
+          }
+        } finally {
+          db.close();
         }
-        db.close();
       }
     } catch (dbErr) {
       debugInfo.push(`error: ${dbErr.message}`);
@@ -704,73 +707,76 @@ ipcMain.handle('arkas:create-payment', async (event, tier) => {
       const dbPath = getDbPath();
       if (fs.existsSync(dbPath)) {
         const db = openDatabase(dbPath, true, ARKAS_PASSWORD);
-        const sekolah = getSchoolInfoWithOfficials(db);
-        if (sekolah) {
-          npsn = sekolah.npsn || sekolah.kode_instansi || '';
-          schoolName = sekolah.nama_sekolah || '';
-        }
         try {
-          const rows = db
-            .prepare("SELECT varname, varvalue FROM app_config WHERE varvalue LIKE '%@%'")
-            .all();
-          const priority = [
-            'email_arkas',
-            'email_bendahara',
-            'user_email',
-            'email_sekolah',
-            'email',
-          ];
-          for (const p of priority) {
-            const found = rows.find((r) => r.varname === p);
-            if (found && found.varvalue && found.varvalue.includes('@')) {
-              customerEmail = found.varvalue;
-              break;
-            }
+          const sekolah = getSchoolInfoWithOfficials(db);
+          if (sekolah) {
+            npsn = sekolah.npsn || sekolah.kode_instansi || '';
+            schoolName = sekolah.nama_sekolah || '';
           }
-        } catch {}
-        if (!customerEmail) {
           try {
-            const sekolahId = sekolah?.sekolah_id || sekolah?.instansi_id || sekolah?.npsn;
-            if (sekolahId) {
-              const ids = [sekolahId, sekolah?.instansi_id, sekolah?.npsn].filter(Boolean);
-              let penjab = null;
-              for (const id of ids) {
-                try {
-                  const row = db
-                    .prepare(
-                      'SELECT * FROM sekolah_penjab WHERE sekolah_id = ? ORDER BY tahun DESC LIMIT 1'
-                    )
-                    .get(id);
-                  if (row) {
-                    penjab = row;
-                    break;
-                  }
-                } catch {}
-              }
-              if (penjab) {
-                const emailPriority = [
-                  { key: 'email_bendahara', label: 'Email Bendahara' },
-                  { key: 'nip_komite', label: 'Email Sekolah (komite)' },
-                  { key: 'email_ks', label: 'Email Kepala Sekolah' },
-                ];
-                for (const ep of emailPriority) {
-                  const val = (penjab[ep.key] || '').trim();
-                  if (val && val.includes('@')) {
-                    customerEmail = val;
-                    break;
-                  }
-                }
+            const rows = db
+              .prepare("SELECT varname, varvalue FROM app_config WHERE varvalue LIKE '%@%'")
+              .all();
+            const priority = [
+              'email_arkas',
+              'email_bendahara',
+              'user_email',
+              'email_sekolah',
+              'email',
+            ];
+            for (const p of priority) {
+              const found = rows.find((r) => r.varname === p);
+              if (found && found.varvalue && found.varvalue.includes('@')) {
+                customerEmail = found.varvalue;
+                break;
               }
             }
           } catch {}
-        }
-        if (!customerEmail) {
-          const sekolahEmail = (sekolah?.email_kepsek || '').trim();
-          if (sekolahEmail && sekolahEmail.includes('@')) {
-            customerEmail = sekolahEmail;
+          if (!customerEmail) {
+            try {
+              const sekolahId = sekolah?.sekolah_id || sekolah?.instansi_id || sekolah?.npsn;
+              if (sekolahId) {
+                const ids = [sekolahId, sekolah?.instansi_id, sekolah?.npsn].filter(Boolean);
+                let penjab = null;
+                for (const id of ids) {
+                  try {
+                    const row = db
+                      .prepare(
+                        'SELECT * FROM sekolah_penjab WHERE sekolah_id = ? ORDER BY tahun DESC LIMIT 1'
+                      )
+                      .get(id);
+                    if (row) {
+                      penjab = row;
+                      break;
+                    }
+                  } catch {}
+                }
+                if (penjab) {
+                  const emailPriority = [
+                    { key: 'email_bendahara', label: 'Email Bendahara' },
+                    { key: 'nip_komite', label: 'Email Sekolah (komite)' },
+                    { key: 'email_ks', label: 'Email Kepala Sekolah' },
+                  ];
+                  for (const ep of emailPriority) {
+                    const val = (penjab[ep.key] || '').trim();
+                    if (val && val.includes('@')) {
+                      customerEmail = val;
+                      break;
+                    }
+                  }
+                }
+              }
+            } catch {}
           }
+          if (!customerEmail) {
+            const sekolahEmail = (sekolah?.email_kepsek || '').trim();
+            if (sekolahEmail && sekolahEmail.includes('@')) {
+              customerEmail = sekolahEmail;
+            }
+          }
+        } finally {
+          db.close();
         }
-        db.close();
       }
     } catch (dbErr) {
       console.error('[create-payment] DB error:', dbErr.message);
@@ -879,9 +885,12 @@ ipcMain.handle('arkas:get-license-debug', async () => {
     try {
       if (dbExists && ARKAS_PASSWORD) {
         const db = openDatabase(dbPath, true, ARKAS_PASSWORD);
-        const sekolah = getSchoolInfoWithOfficials(db);
-        if (sekolah) npsn = String(sekolah.npsn || sekolah.kode_instansi || '').trim();
-        db.close();
+        try {
+          const sekolah = getSchoolInfoWithOfficials(db);
+          if (sekolah) npsn = String(sekolah.npsn || sekolah.kode_instansi || '').trim();
+        } finally {
+          db.close();
+        }
       }
     } catch {}
     return {
@@ -911,13 +920,16 @@ ipcMain.handle('arkas:check-server-license', async () => {
       debugInfo.push(`pwd: ${ARKAS_PASSWORD ? 'loaded' : 'EMPTY'}`);
       if (dbExists && ARKAS_PASSWORD) {
         const db = openDatabase(dbPath, true, ARKAS_PASSWORD);
-        const sekolah = getSchoolInfoWithOfficials(db);
-        debugInfo.push(`sekolah: ${sekolah ? 'found' : 'null'}`);
-        if (sekolah) {
-          npsn = String(sekolah.npsn || sekolah.kode_instansi || '').trim();
-          debugInfo.push(`npsn: ${JSON.stringify(npsn)}`);
+        try {
+          const sekolah = getSchoolInfoWithOfficials(db);
+          debugInfo.push(`sekolah: ${sekolah ? 'found' : 'null'}`);
+          if (sekolah) {
+            npsn = String(sekolah.npsn || sekolah.kode_instansi || '').trim();
+            debugInfo.push(`npsn: ${JSON.stringify(npsn)}`);
+          }
+        } finally {
+          db.close();
         }
-        db.close();
       }
     } catch (dbErr) {
       debugInfo.push(`error: ${dbErr.message}`);
@@ -1165,13 +1177,15 @@ ipcMain.handle('arkas:get-app-version', async () => {
 });
 
 ipcMain.handle('arkas:get-school-info', async () => {
+  let db;
   try {
     const dbPath = getDbPath();
-    const db = openDatabase(dbPath, true, ARKAS_PASSWORD);
+    db = openDatabase(dbPath, true, ARKAS_PASSWORD);
     const sekolah = getSchoolInfoWithOfficials(db);
     db.close();
     return { success: true, data: sekolah };
   } catch (err) {
+    if (db && db.open) db.close();
     console.error('[getSchoolInfo] Error:', err.message, err.stack);
     return { success: false, error: err.message };
   }
@@ -1196,23 +1210,26 @@ ipcMain.handle('arkas:save-school-info', async (event, data) => {
 });
 
 ipcMain.handle('arkas:reload-school-data', async () => {
+  let db;
   try {
     const dbPath = getDbPath();
-    const db = openDatabase(dbPath, true, ARKAS_PASSWORD);
+    db = openDatabase(dbPath, true, ARKAS_PASSWORD);
 
     const sekolah = getSchoolInfoWithOfficials(db);
 
     db.close();
     return { success: true, data: sekolah };
   } catch (err) {
+    if (db && db.open) db.close();
     return { success: false, error: err.message };
   }
 });
 
 ipcMain.handle('arkas:get-fund-sources', async (event, year) => {
+  let db;
   try {
     const dbPath = getDbPath();
-    const db = openDatabase(dbPath, true, ARKAS_PASSWORD);
+    db = openDatabase(dbPath, true, ARKAS_PASSWORD);
     const sources = db
       .prepare(
         `SELECT DISTINCT sd.nama_sumber_dana FROM anggaran a JOIN ref_sumber_dana sd ON a.id_ref_sumber_dana = sd.id_ref_sumber_dana WHERE a.tahun_anggaran = ? AND a.soft_delete = 0 ORDER BY sd.nama_sumber_dana`
@@ -1221,17 +1238,19 @@ ipcMain.handle('arkas:get-fund-sources', async (event, year) => {
     db.close();
     return { success: true, data: sources.map((s) => s.nama_sumber_dana) };
   } catch (err) {
+    if (db && db.open) db.close();
     return { success: false, error: err.message };
   }
 });
 
 ipcMain.handle('arkas:get-available-years', async () => {
+  let db;
   try {
     const dbPath = getDbPath();
     if (!fs.existsSync(dbPath))
       return { success: true, data: [2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030, 2031] };
 
-    const db = openDatabase(dbPath, true, ARKAS_PASSWORD);
+    db = openDatabase(dbPath, true, ARKAS_PASSWORD);
 
     const years = db
       .prepare(
@@ -1251,6 +1270,7 @@ ipcMain.handle('arkas:get-available-years', async () => {
 
     return { success: true, data: result };
   } catch (err) {
+    if (db && db.open) db.close();
     console.error('Get Years Error:', err);
     return { success: false, error: err.message, data: [2024, 2025, 2026] };
   }
@@ -1282,9 +1302,10 @@ ipcMain.handle('arkas:get-budget-realization', async (event, year, fundSource, m
   );
 });
 ipcMain.handle('arkas:get-transactions', async (event, params) => {
+  let db;
   try {
     const dbPath = getDbPath();
-    const db = openDatabase(dbPath, true, ARKAS_PASSWORD);
+    db = openDatabase(dbPath, true, ARKAS_PASSWORD);
 
     // Load Virtual Overrides
     const localConfig = loadLocalConfig();
@@ -1295,14 +1316,16 @@ ipcMain.handle('arkas:get-transactions', async (event, params) => {
     db.close();
     return { success: true, data: result.rows, total: result.total };
   } catch (err) {
+    if (db && db.open) db.close();
     console.error('get-transactions Error:', err);
     return { success: false, error: err.message };
   }
 });
 
 ipcMain.handle('arkas:export-bku', async (event, frontendTransactions, params) => {
+  let db;
   try {
-    const db = openDatabase(getDbPath(), true, ARKAS_PASSWORD);
+    db = openDatabase(getDbPath(), true, ARKAS_PASSWORD);
 
     // 1. Get School Info (using shared function)
     const schoolInfo = getSchoolInfoWithOfficials(db);
@@ -1400,25 +1423,6 @@ ipcMain.handle('arkas:export-bku', async (event, frontendTransactions, params) =
             saldo_berjalan: openingBalance,
           });
         }
-
-        // Helper: Same logic as frontend isPenerimaan
-        const isPenerimaan = (tx) => {
-          const desc = (tx.uraian || '').toLowerCase();
-          if (desc.includes('saldo')) return true;
-          if (desc.includes('setor tunai')) return true;
-          if (desc.includes('pergeseran uang ke bank')) return false;
-          if (desc.includes('pergeseran uang di bank')) return true;
-          const noBukti = (tx.no_bukti || '').toUpperCase();
-          if (noBukti.startsWith('BPU') || noBukti.startsWith('BNU')) return false;
-          const expenseIds = [1, 3, 5, 11, 13];
-          if (expenseIds.some((id) => id == tx.id_ref_bku)) return false;
-          const receiptIds = [2, 4, 10, 12, 14, 26, 28];
-          if (receiptIds.some((id) => id == tx.id_ref_bku)) return true;
-          if (desc.includes('terima') || desc.includes('penerimaan')) return true;
-          if (desc.includes('giro') || desc.includes('bunga bank')) return true;
-          if (desc.includes('pengembalian') || desc.includes('pungut')) return true;
-          return false;
-        };
 
         // Calculate running balance for each row (starting from opening balance)
         let runningBal = fr(openingBalance);
@@ -1586,6 +1590,7 @@ ipcMain.handle('arkas:export-bku', async (event, frontendTransactions, params) =
     const result = await exportHandler.exportData(payload, actualParams);
     return result;
   } catch (err) {
+    if (db && db.open) db.close();
     console.error('Export BKU Error:', err);
     return { success: false, error: err.message };
   }
@@ -1999,10 +2004,10 @@ ipcMain.handle(
 
       // Calculate expected tax amounts with tolerance for rounding
       // PPN 11%: DPP = Nominal / 1.11, PPN = DPP * 0.11
-      const expectedPPN = calcPPN_DPP(nominal);
-      const expectedPPh21 = calcPPh21(nominal);
-      const expectedPPh23 = calcPPh23(nominal);
-      const expectedSSPD = calcSSPD(nominal);
+      const expectedPPN = calcPPN_DPP(transactionNominal);
+      const expectedPPh21 = calcPPh21(transactionNominal);
+      const expectedPPh23 = calcPPh23(transactionNominal);
+      const expectedSSPD = calcSSPD(transactionNominal);
 
       // Query all Terima entries on the same date
       const query = `
@@ -2287,8 +2292,9 @@ ipcMain.handle('arkas:get-reconciliation-data', async (event, year) => {
     if (manualTaxes.length > 0) {
       // Helper function to get month index (0-11) from date string
       const getMonthIndex = (dateStr) => {
-        if (!dateStr) return 0;
+        if (!dateStr) return -1;
         const month = parseInt(dateStr.substring(5, 7), 10);
+        if (isNaN(month) || month < 1 || month > 12) return -1;
         return month - 1;
       };
 
@@ -2303,6 +2309,7 @@ ipcMain.handle('arkas:get-reconciliation-data', async (event, year) => {
       manualTaxes.forEach((tax) => {
         const amount = tax.nominal || 0;
         const monthIndex = getMonthIndex(tax.tanggal);
+        if (monthIndex < 0 && tax.jenis_input !== 'saldo_awal_tahun' && tax.jenis_input !== 'saldo_awal') return;
 
         if (tax.jenis_input === 'saldo_awal_tahun' || tax.jenis_input === 'saldo_awal') {
           // Saldo awal adds to January pungut
@@ -2321,25 +2328,7 @@ ipcMain.handle('arkas:get-reconciliation-data', async (event, year) => {
       });
 
       // Apply manual tax to monthly rows (data.monthly is array of 12 months)
-      // Also calculate running pajak hutang balance
-      let pajakHutangBalance = 0; // Running balance starts at 0
-
-      // Add saldo awal tahun to initial balance
-      for (let m = 0; m < 12; m++) {
-        if (m === 0) {
-          // January gets the saldo_awal_tahun entries
-          manualTaxes.forEach((tax) => {
-            if (
-              (tax.jenis_input === 'saldo_awal_tahun' || tax.jenis_input === 'saldo_awal') &&
-              tax.position === 'pungutan'
-            ) {
-              pajakHutangBalance += tax.nominal || 0;
-            }
-          });
-        }
-      }
-
-      // Reset and recalculate with running balance
+      // Calculate running pajak hutang balance
       let runningPajakHutang = 0;
       // Add saldo awal tahun to initial balance
       manualTaxes.forEach((tax) => {
@@ -2543,9 +2532,10 @@ ipcMain.handle('arkas:get-pajak-detail', async (event, year) => {
     if (manualTaxes.length > 0) {
       // Helper function to get month index (0-11) from date string
       const getMonthIndex = (dateStr) => {
-        if (!dateStr) return 0;
+        if (!dateStr) return -1;
         const month = parseInt(dateStr.substring(5, 7), 10);
-        return month - 1; // Convert to 0-indexed
+        if (isNaN(month) || month < 1 || month > 12) return -1;
+        return month - 1;
       };
 
       // Helper function to map jenis_pajak to key
@@ -2573,6 +2563,7 @@ ipcMain.handle('arkas:get-pajak-detail', async (event, year) => {
         const amount = tax.nominal || 0;
         const key = getKey(tax.jenis_pajak);
         const monthIndex = getMonthIndex(tax.tanggal);
+        if (monthIndex < 0 && tax.jenis_input !== 'saldo_awal_tahun' && tax.jenis_input !== 'saldo_awal') return;
 
         // Handle different jenis_input types
         if (tax.jenis_input === 'saldo_awal_tahun' || tax.jenis_input === 'saldo_awal') {
@@ -2812,11 +2803,12 @@ ipcMain.handle('arkas:get-ba-audit-data', async (event, year) => {
 
 // SPTJM - Get SPTJM Data for a specific semester and fund type
 ipcMain.handle('arkas:get-sptjm-data', async (event, year, semester, fundType) => {
+  let db;
   try {
     if (!fs.existsSync(getDbPath())) {
       return { success: false, message: 'Database ARKAS tidak ditemukan.' };
     }
-    const db = openDatabase(getDbPath(), true, ARKAS_PASSWORD);
+    db = openDatabase(getDbPath(), true, ARKAS_PASSWORD);
 
     const yearStr = year.toString();
 
@@ -2943,6 +2935,7 @@ ipcMain.handle('arkas:get-sptjm-data', async (event, year, semester, fundType) =
       },
     };
   } catch (error) {
+    if (db && db.open) db.close();
     console.error('SPTJM Error:', error);
     return { success: false, message: error.message };
   }
@@ -2952,11 +2945,12 @@ ipcMain.handle('arkas:get-sptjm-data', async (event, year, semester, fundType) =
 ipcMain.handle(
   'arkas:get-k7-data',
   async (event, year, periodType, activeTahap, activeMonth, fundType) => {
+    let db;
     try {
       if (!fs.existsSync(getDbPath())) {
         return { success: false, message: 'Database ARKAS tidak ditemukan.' };
       }
-      const db = openDatabase(getDbPath(), true, ARKAS_PASSWORD);
+      db = openDatabase(getDbPath(), true, ARKAS_PASSWORD);
 
       const yearStr = year.toString();
       let startMonth, endMonth, openingMonth;
@@ -2972,7 +2966,7 @@ ipcMain.handle(
         openingMonth = '01';
       } else {
         // Default: tahap
-        const tahap = parseInt(activeTahap || '1');
+        const tahap = parseInt(activeTahap || '1') || 1;
         startMonth = tahap === 1 ? '01' : '07';
         endMonth = tahap === 1 ? '06' : '12';
         openingMonth = tahap === 1 ? '01' : '07';
@@ -3225,6 +3219,7 @@ ipcMain.handle(
         },
       };
     } catch (error) {
+      if (db && db.open) db.close();
       console.error('K7 Error:', error);
       return { success: false, message: error.message };
     }
@@ -3327,8 +3322,9 @@ ipcMain.handle('arkas:show-open-dialog', async (event, options) => {
 
 // IPC: EXPORT ALL BKU REPORTS (Batch Multi-Sheet Excel)
 ipcMain.handle('arkas:export-all-bku', async (event, params) => {
+  let db;
   try {
-    const db = openDatabase(getDbPath(), true, ARKAS_PASSWORD);
+    db = openDatabase(getDbPath(), true, ARKAS_PASSWORD);
 
     const schoolInfo = getSchoolInfoWithOfficials(db);
 
@@ -3350,24 +3346,6 @@ ipcMain.handle('arkas:export-all-bku', async (event, params) => {
 
     const allData = {};
     const months = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-
-    const isPenerimaan = (tx) => {
-      const desc = (tx.uraian || '').toLowerCase();
-      if (desc.includes('saldo')) return true;
-      if (desc.includes('setor tunai')) return true;
-      if (desc.includes('pergeseran uang ke bank')) return false;
-      if (desc.includes('pergeseran uang di bank')) return true;
-      const noBukti = (tx.no_bukti || '').toUpperCase();
-      if (noBukti.startsWith('BPU') || noBukti.startsWith('BNU')) return false;
-      const expenseIds = [1, 3, 5, 11, 13];
-      if (expenseIds.some((id) => id == tx.id_ref_bku)) return false;
-      const receiptIds = [2, 4, 10, 12, 14, 26, 28];
-      if (receiptIds.some((id) => id == tx.id_ref_bku)) return true;
-      if (desc.includes('terima') || desc.includes('penerimaan')) return true;
-      if (desc.includes('giro') || desc.includes('bunga bank')) return true;
-      if (desc.includes('pengembalian') || desc.includes('pungut')) return true;
-      return false;
-    };
 
     for (const report of reportTypes) {
       allData[report.type] = [];
@@ -3480,6 +3458,7 @@ ipcMain.handle('arkas:export-all-bku', async (event, params) => {
     });
     return result;
   } catch (err) {
+    if (db && db.open) db.close();
     console.error('Export All BKU Error:', err);
     return { success: false, error: err.message };
   }
