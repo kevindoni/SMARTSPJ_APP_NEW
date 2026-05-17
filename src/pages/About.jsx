@@ -3,6 +3,52 @@ import { Heart, Calendar, ChevronDown, Sparkles, CheckCircle, ArrowRight, Bug } 
 
 const CHANGELOG = [
   {
+    version: '1.8.0',
+    date: '17 Mei 2026',
+    title: 'Bug Hunting Round 1-4 — 20 Fixes',
+    changes: [
+      { type: 'sec', text: 'Hardcoded database credentials dihapus dari scripts → environment variable' },
+      { type: 'fix', text: 'Handler "pajak terkait" crash karena nominal undefined → variable name fix' },
+      { type: 'fix', text: '13 handler DB connection leak — db.close() sekarang selalu dipanggil di error path' },
+      { type: 'fix', text: 'Dashboard cash flow salah saat filter sumber dana — isBudgetMatch() sekarang dipanggil' },
+      { type: 'fix', text: 'SQL LIKE wildcard (% _) tidak di-escape — user bisa manipulasi hasil pencarian' },
+      { type: 'fix', text: 'Null date masuk Januari di tax report → skip entry tanpa tanggal valid' },
+      { type: 'fix', text: 'Nominal kwitansi tidak konsisten — kedua query sekarang pakai k.saldo' },
+      { type: 'fix', text: 'Race condition di 7 halaman — useEffect sekarang pakai cancellation flag' },
+      { type: 'imp', text: 'Dead code dihapus (pajakHutangBalance, duplicate SQL CASE)' },
+      { type: 'imp', text: 'parseInt NaN guard, NPSN URL encoding, setTimeout cleanup, React key fix' },
+      { type: 'imp', text: 'Input validation Pengaturan (NIP digit-only), license key format validation' },
+      { type: 'imp', text: 'ErrorBoundary logging, unhandled promise rejection handler, useMemo fix' },
+    ],
+  },
+  {
+    date: '13 Mei 2026',
+    title: 'License Persistence Fix',
+    changes: [
+      { type: 'fix', text: 'License hilang setelah update — hapus self-deletion bug di .arkas-key (safeStorage fallback)' },
+      { type: 'fix', text: 'Backup license (.sys_dat) sekarang dibaca otomatis jika file utama (.sys_cfg) gagal' },
+      { type: 'imp', text: 'NSIS installer eksplisit deleteAppDataOnUninstall: false — data license tidak terhapus saat update' },
+    ],
+  },
+  {
+    date: '13 Mei 2026',
+    title: 'Update Notification Fix',
+    changes: [
+      { type: 'fix', text: 'Notifikasi update otomatis muncul saat ada versi baru — tidak perlu klik tombol manual' },
+      { type: 'fix', text: 'Modal update notification sekarang menutupi sidebar (z-index fix)' },
+    ],
+  },
+  {
+    date: '13 Mei 2026',
+    title: 'Stability & Performance Improvements',
+    changes: [
+      { type: 'imp', text: 'Atomic JSON writes — atomicWriteJson() via tmp+rename, mencegah korupsi file saat crash' },
+      { type: 'imp', text: 'isPenerimaan() terpusat — hapus 2 duplikat di main.js, satu sumber di transaction-utils.js' },
+      { type: 'imp', text: 'SQLite WAL mode — journal_mode=WAL + synchronous=NORMAL untuk performa write lebih baik' },
+      { type: 'imp', text: 'webSecurity: true sudah aktif di semua BrowserWindow instance' },
+    ],
+  },
+  {
     version: '1.7.6',
     date: '12 Mei 2026',
     title: 'Security Audit & Financial Precision Fix',

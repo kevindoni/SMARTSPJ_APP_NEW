@@ -447,8 +447,7 @@ function getTransactionsByProof(db, no_bukti, year, overrides = {}) {
             k.no_bukti,
             k.uraian,
             k.saldo as nominal,
-            k.total_nilai,
-            k.pajak_negara as ppn, -- Assuming column mapping
+            k.saldo,
             k.id_ref_sumber_dana,
             k.kode_rekening,
             k.id_kas_nota
@@ -460,12 +459,7 @@ function getTransactionsByProof(db, no_bukti, year, overrides = {}) {
 
   const sumQuery = `
         SELECT 
-            SUM(kn.total) as total_nominal, -- Check if nilai_bersih includes tax?
-            -- Actually in ARKAS, often 'nilai_bersih' is what we paid? 
-            -- Let's stick to the 'nominal' logic from getTransactions:
-            -- It calculates nominal dynamically.
-            
-            -- Let's just fetch ALL columns for these rows and process in JS
+            SUM(kn.total) as total_nominal,
              k.*,
              kn.nama_toko, kn.alamat_toko, kn.no_telp, kn.is_badan_usaha
         FROM kas_umum k

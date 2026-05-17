@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { MONTHS } = require('../config/constants');
+const { atomicWriteJson } = require('../lib/transaction-utils');
 
 let DATA_DIR = path.join(__dirname, '../../data');
 
@@ -27,7 +28,7 @@ function saveLocalData(data) {
   if (!fs.existsSync(DATA_DIR)) {
     fs.mkdirSync(DATA_DIR, { recursive: true });
   }
-  fs.writeFileSync(getReconFilePath(), JSON.stringify(data, null, 2), 'utf-8');
+  atomicWriteJson(getReconFilePath(), data);
 }
 
 function getBankReconciliationData(db, year) {

@@ -1,7 +1,6 @@
 const { neon } = require('../license-service/node_modules/@neondatabase/serverless');
 if (!process.env.DATABASE_URL) {
   console.error('Error: DATABASE_URL environment variable is required.');
-  console.error('Usage: DATABASE_URL="postgresql://..." node scripts/reset-hw-null.js');
   process.exit(1);
 }
 const sql = neon(process.env.DATABASE_URL);

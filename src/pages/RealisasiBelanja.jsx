@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   List,
   AlertCircle,
@@ -35,36 +35,40 @@ export default function RealisasiBelanja() {
 
   // parsePlannedMonths and getShiftInfo are now imported from realisasiHelpers.js
 
+  const cancelledRef = useRef(false);
+
   useEffect(() => {
     if (fundSource !== 'SEMUA') {
-      let cancelled = false;
-      const load = async () => {
-        setLoading(true);
-        setError(null);
-        try {
-          if (window.arkas && window.arkas.getBudgetRealization) {
-            const res = await window.arkas.getBudgetRealization(year, fundSource, selectedMonth);
-            if (cancelled) return;
-            if (res.success) {
-              setItems(res.data);
-              setAnnualPagu(res.annualPagu || 0);
-              setCumulativeRealisasi(res.cumulativeRealisasi || 0);
-            } else {
-              setError(res.error || 'Gagal mengambil data realisasi');
-            }
-          } else {
-            setError('API getBudgetRealization tidak ditemukan');
-          }
-        } catch (err) {
-          if (!cancelled) setError(err.message);
-        } finally {
-          if (!cancelled) setLoading(false);
-        }
-      };
-      load();
-      return () => { cancelled = true; };
+      cancelledRef.current = false;
+      fetchData();
+      return () => { cancelledRef.current = true; };
     }
   }, [year, fundSource, selectedMonth]);
+
+  const fetchData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      if (window.arkas && window.arkas.getBudgetRealization) {
+        const res = await window.arkas.getBudgetRealization(year, fundSource, selectedMonth);
+        if (cancelledRef.current) return;
+        if (res.success) {
+          setItems(res.data);
+          setAnnualPagu(res.annualPagu || 0);
+          setCumulativeRealisasi(res.cumulativeRealisasi || 0);
+        } else {
+          setError(res.error || 'Gagal mengambil data realisasi');
+        }
+      } else {
+        setError('API getBudgetRealization tidak ditemukan');
+      }
+    } catch (err) {
+      if (cancelledRef.current) return;
+      setError(err.message);
+    } finally {
+      if (!cancelledRef.current) setLoading(false);
+    }
+  };
 
   const toggleRow = (id) => {
     const newExpanded = new Set(expandedRows);
@@ -352,7 +356,7 @@ export default function RealisasiBelanja() {
                         }
 
                         return (
-                          <tr key={item.kode_rekening || item.nama_barang || idx} className={theme.table.tr}>
+                          <tr key={`${item.kode_rekening}-${item.nama_barang}-${idx}`} className={theme.table.tr}>
                             <td
                               className={`${theme.table.tdCenter} font-mono font-bold text-slate-800`}
                             >
@@ -568,7 +572,7 @@ export default function RealisasiBelanja() {
                                       : 0;
                                   return (
                                     <tr
-                                      key={`sub-${sidx}`}
+                                      key={`sub-${sub.kode_rekening}-${sub.nama_barang}`}
                                       className={`${theme.table.tr} bg-slate-50/30 border-l-4 border-l-blue-400`}
                                     >
                                       <td
@@ -689,7 +693,7 @@ export default function RealisasiBelanja() {
 
                     return (
                       <div
-                        key={`pm-${pm.m}`}
+                        key={pm.m}
                         className={`bg-white rounded-xl border shadow-sm transition-all overflow-hidden ${isCurrent ? 'border-blue-500 ring-1 ring-blue-500' : 'border-slate-200'}`}
                       >
                         <div className="flex items-stretch">

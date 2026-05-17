@@ -118,11 +118,15 @@ export default function LicenseScreen() {
   const handleActivate = async (e) => {
     e.preventDefault();
     if (!licenseKey.trim()) { setError('Masukkan license key'); return; }
-    const keyPattern = /^SMARTSPJ-[A-Z0-9]{5}-[A-Z0-9]{5}-[A-Z0-9]{5}-[A-Z0-9]{5}$/;
-    if (!keyPattern.test(licenseKey.trim()) && licenseKey.trim().length < 10) {
-      setError('Format license key tidak valid');
+
+    const trimmedKey = licenseKey.trim();
+    const shortKeyPattern = /^SMARTSPJ-[A-Z0-9]{5}-[A-Z0-9]{5}-[A-Z0-9]{5}-[A-Z0-9]{4}$/;
+    const legacyKeyPattern = /^[A-Za-z0-9+/=]{30,}$/;
+    if (!shortKeyPattern.test(trimmedKey.toUpperCase()) && !legacyKeyPattern.test(trimmedKey.replace(/^SMARTSPJ-/i, '').replace(/[-\s]/g, ''))) {
+      setError('Format license key tidak valid. Gunakan format SMARTSPJ-XXXXX-XXXXX-XXXXX-XXXX');
       return;
     }
+
     setActivating(true); setError(null); setSuccess(null);
     try {
       const result = await activate(licenseKey.trim());

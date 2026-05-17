@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useFilter } from '../context/FilterContext';
 import { useArkasData } from '../hooks/useArkasData';
 import PrintReceiptContent from '../components/print/PrintReceiptContent';
@@ -61,15 +61,17 @@ export default function NotaGroupManager() {
     setError(null);
     try {
       const result = await window.arkas.notaGroups.getTransactionsByNota(year, month || null);
+      if (cancelledRef.current) return;
       if (result.success) {
         setNotaGroups(result.data || []);
       } else {
         setError(result.error);
       }
     } catch (err) {
+      if (cancelledRef.current) return;
       setError(err.message);
     } finally {
-      setLoading(false);
+      if (!cancelledRef.current) setLoading(false);
     }
   };
 
@@ -85,22 +87,19 @@ export default function NotaGroupManager() {
     }
   };
 
+  const cancelledRef = useRef(false);
+
   useEffect(() => {
-    let cancelled = false;
-    const load = async () => {
-      await loadNotaGroups();
-      if (cancelled) return;
-      await loadSavedGroups();
-      if (cancelled) return;
-      try {
-        const saved = localStorage.getItem('printed_groups');
-        if (saved) setPrintedGroups(new Set(JSON.parse(saved)));
-      } catch (e) {
-        console.error('Failed to load printed status:', e);
-      }
-    };
-    load();
-    return () => { cancelled = true; };
+    cancelledRef.current = false;
+    loadNotaGroups();
+    loadSavedGroups();
+    try {
+      const saved = localStorage.getItem('printed_groups');
+      if (saved) setPrintedGroups(new Set(JSON.parse(saved)));
+    } catch (e) {
+      console.error('Failed to load printed status:', e);
+    }
+    return () => { cancelledRef.current = true; };
   }, [year, month]);
 
   // Reload printed status when switching tabs (sync with Cetak Manual)

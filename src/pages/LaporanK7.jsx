@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Loader2, AlertCircle, ClipboardList, Download, Calendar } from 'lucide-react';
 import { useFilter } from '../context/FilterContext';
 import { formatRupiah } from '../utils/transactionHelpers';
@@ -74,37 +74,13 @@ export default function LaporanK7() {
     { id: '12', label: 'Desember' },
   ];
 
-  useEffect(() => {
-    let cancelled = false;
-    const load = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const schoolRes = await window.arkas.getSchoolInfo();
-        if (cancelled) return;
-        if (schoolRes.success) setSchool(schoolRes.data);
+  const cancelledRef = useRef(false);
 
-        const k7Res = await window.arkas.getK7Data(
-          year,
-          periodType,
-          activeTahap,
-          activeMonth,
-          activeFund
-        );
-        if (cancelled) return;
-        if (k7Res.success) {
-          setData(k7Res.data);
-        } else {
-          setError(k7Res.message || 'Gagal mengambil data K7');
-        }
-      } catch (err) {
-        if (!cancelled) setError(err.message);
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    };
-    load();
-    return () => { cancelled = true; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    cancelledRef.current = false;
+    fetchData();
+    return () => { cancelledRef.current = true; };
   }, [year, periodType, activeTahap, activeMonth, activeFund]);
 
   const fetchData = async () => {
@@ -112,6 +88,7 @@ export default function LaporanK7() {
     setError(null);
     try {
       const schoolRes = await window.arkas.getSchoolInfo();
+      if (cancelledRef.current) return;
       if (schoolRes.success) setSchool(schoolRes.data);
 
       const k7Res = await window.arkas.getK7Data(
@@ -121,15 +98,17 @@ export default function LaporanK7() {
         activeMonth,
         activeFund
       );
+      if (cancelledRef.current) return;
       if (k7Res.success) {
         setData(k7Res.data);
       } else {
         setError(k7Res.message || 'Gagal mengambil data K7');
       }
     } catch (err) {
+      if (cancelledRef.current) return;
       setError(err.message);
     } finally {
-      setLoading(false);
+      if (!cancelledRef.current) setLoading(false);
     }
   };
 

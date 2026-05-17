@@ -148,40 +148,16 @@ function validateLicense(licenseData) {
   return { valid: true };
 }
 
-function getStoredLicense() {
-  const fp = getLicenseFilePath();
-  if (!fs.existsSync(fp)) {
-    const oldFp = path.join(getDataDir(), 'license.json');
-    if (fs.existsSync(oldFp)) {
-      try {
-        const oldData = JSON.parse(fs.readFileSync(oldFp, 'utf-8'));
-        saveLicense(oldData);
-        fs.unlinkSync(oldFp);
-        return oldData;
-      } catch {}
-    }
-    return null;
-  }
-
+function readLicenseFile(fp, key) {
   try {
     const encoded = fs.readFileSync(fp, 'utf-8');
-    const decoded = xorDecode(encoded, OBFUSCATE_KEY);
+    const decoded = xorDecode(encoded, key);
     if (!decoded) return null;
     const parsed = JSON.parse(decoded);
-
-    if (!parsed.payload || !parsed.signature || !parsed.hash) {
-      return null;
-    }
-
+    if (!parsed.payload || !parsed.signature || !parsed.hash) return null;
     const expectedHash = computeLicenseHash(parsed.payload, parsed.signature);
-    if (parsed.hash !== expectedHash) {
-      return null;
-    }
-
-    if (!verifySignature(parsed.payload, parsed.signature).valid) {
-      return null;
-    }
-
+    if (parsed.hash !== expectedHash) return null;
+    if (!verifySignature(parsed.payload, parsed.signature).valid) return null;
     return {
       key: parsed.key,
       npsn: parsed.payload.npsn,
@@ -195,6 +171,35 @@ function getStoredLicense() {
   } catch {
     return null;
   }
+}
+
+function getStoredLicense() {
+  const fp = getLicenseFilePath();
+  if (!fs.existsSync(fp)) {
+    const oldFp = path.join(getDataDir(), 'license.json');
+    if (fs.existsSync(oldFp)) {
+      try {
+        const oldData = JSON.parse(fs.readFileSync(oldFp, 'utf-8'));
+        saveLicense(oldData);
+        fs.unlinkSync(oldFp);
+        return oldData;
+      } catch {}
+    }
+  } else {
+    const license = readLicenseFile(fp, OBFUSCATE_KEY);
+    if (license) return license;
+  }
+
+  const backupFp = getLicenseBackupPath();
+  if (fs.existsSync(backupFp)) {
+    const backup = readLicenseFile(backupFp, OBFUSCATE_KEY + '_bak');
+    if (backup) {
+      saveLicense(backup);
+      return backup;
+    }
+  }
+
+  return null;
 }
 
 function saveLicense(licenseData) {

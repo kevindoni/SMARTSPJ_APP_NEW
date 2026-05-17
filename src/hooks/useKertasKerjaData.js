@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useFilter } from '../context/FilterContext';
 
 export function useKertasKerjaData(selectedFormat, selectedMonth, searchTerm) {
@@ -13,40 +13,43 @@ export function useKertasKerjaData(selectedFormat, selectedMonth, searchTerm) {
     selectedFormat.toLowerCase().includes('tahapan');
   const isLembar = selectedFormat.toLowerCase().includes('lembar');
 
+  const cancelledRef = useRef(false);
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (fundSource === 'SEMUA') {
       setData([]);
       setLoading(false);
       return;
     }
-    let cancelled = false;
-    const load = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        if (window.arkas && window.arkas.getKertasKerja) {
-          const result = await window.arkas.getKertasKerja(year, fundSource);
-          if (cancelled) return;
-          if (result.success) {
-            setData(result.data);
-          } else {
-            setError(result.error || 'Gagal mengambil data Kertas Kerja');
-          }
-        } else {
-          setError('API Kertas Kerja belum tersedia. Harap restart aplikasi.');
-        }
-      } catch (err) {
-        if (!cancelled) {
-          console.error(err);
-          setError('Terjadi kesalahan sistem.');
-        }
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    };
-    load();
-    return () => { cancelled = true; };
+    cancelledRef.current = false;
+    fetchData();
+    return () => { cancelledRef.current = true; };
   }, [year, fundSource]);
+
+  const fetchData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      if (window.arkas && window.arkas.getKertasKerja) {
+        const result = await window.arkas.getKertasKerja(year, fundSource);
+        if (cancelledRef.current) return;
+        if (result.success) {
+          setData(result.data);
+        } else {
+          setError(result.error || 'Gagal mengambil data Kertas Kerja');
+        }
+      } else {
+        setError('API Kertas Kerja belum tersedia. Harap restart aplikasi.');
+      }
+    } catch (err) {
+      if (cancelledRef.current) return;
+      console.error(err);
+      setError('Terjadi kesalahan sistem.');
+    } finally {
+      if (!cancelledRef.current) setLoading(false);
+    }
+  };
 
   // --- Processing Logic ---
   const processedData = data

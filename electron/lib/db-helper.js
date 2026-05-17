@@ -9,6 +9,10 @@ function openDatabase(dbPath, readonly = true, password = '') {
     db.pragma('legacy=4');
     db.pragma(`key='${safeKey}'`);
     db.prepare('SELECT 1').get();
+    if (!readonly) {
+      db.pragma('journal_mode=WAL');
+      db.pragma('synchronous=NORMAL');
+    }
     return db;
   } catch (e) {
     console.error('[openDatabase] cipher sqlcipher/legacy4 failed:', e.message);

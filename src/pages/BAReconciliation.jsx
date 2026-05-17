@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import {
   Loader2,
   AlertCircle,
@@ -105,55 +105,59 @@ export default function BAReconciliation() {
     }
   }, [year]);
 
+  const cancelledRef = useRef(false);
+
+  // Fetch Data
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
-    let cancelled = false;
-    const load = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        if (!window.arkas?.getReconciliationData) {
-          throw new Error('API tidak tersedia');
-        }
+    cancelledRef.current = false;
+    fetchData();
+    return () => { cancelledRef.current = true; };
+  }, [year, activeTab]);
 
-        if (activeTab === 'ba-rekons' || activeTab === 'lembar-ba') {
-          const result = await window.arkas.getReconciliationData(year);
-          if (cancelled) return;
-          if (result.success) setData(result.data);
-          else throw new Error(result.error || 'Gagal memuat data rekonsiliasi');
-
-          if (window.arkas?.getPajakDetail) {
-            const pajakResult = await window.arkas.getPajakDetail(year);
-            if (cancelled) return;
-            if (pajakResult.success) setPajakData(pajakResult.data);
-          }
-        } else if (activeTab === 'rekap-bunga') {
-          const result = await window.arkas.getBungaDetail(year);
-          if (cancelled) return;
-          if (result.success) setBungaData(result.data);
-          else throw new Error(result.error);
-        } else if (activeTab === 'rekap-pajak') {
-          const result = await window.arkas.getPajakDetail(year);
-          if (cancelled) return;
-          if (result.success) setPajakData(result.data);
-          else throw new Error(result.error);
-        } else if (reconSources.some((s) => s.id === activeTab)) {
-          const result = await window.arkas.getFundSourceDetail(year, activeTab);
-          if (cancelled) return;
-          if (result.success) setFundDetailData(result.data);
-          else throw new Error(result.error);
-        }
-      } catch (err) {
-        if (!cancelled) {
-          console.error('Reconciliation Error:', err);
-          setError(err.message);
-        }
-      } finally {
-        if (!cancelled) setLoading(false);
+  const fetchData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      if (!window.arkas?.getReconciliationData) {
+        throw new Error('API tidak tersedia');
       }
-    };
-    load();
-    return () => { cancelled = true; };
-  }, [year, activeTab, reconSources]);
+
+      if (activeTab === 'ba-rekons' || activeTab === 'lembar-ba') {
+        const result = await window.arkas.getReconciliationData(year);
+        if (cancelledRef.current) return;
+        if (result.success) setData(result.data);
+        else throw new Error(result.error || 'Gagal memuat data rekonsiliasi');
+
+        if (window.arkas?.getPajakDetail) {
+          const pajakResult = await window.arkas.getPajakDetail(year);
+          if (cancelledRef.current) return;
+          if (pajakResult.success) setPajakData(pajakResult.data);
+        }
+      } else if (activeTab === 'rekap-bunga') {
+        const result = await window.arkas.getBungaDetail(year);
+        if (cancelledRef.current) return;
+        if (result.success) setBungaData(result.data);
+        else throw new Error(result.error);
+      } else if (activeTab === 'rekap-pajak') {
+        const result = await window.arkas.getPajakDetail(year);
+        if (cancelledRef.current) return;
+        if (result.success) setPajakData(result.data);
+        else throw new Error(result.error);
+      } else if (reconSources.some((s) => s.id === activeTab)) {
+        const result = await window.arkas.getFundSourceDetail(year, activeTab);
+        if (cancelledRef.current) return;
+        if (result.success) setFundDetailData(result.data);
+        else throw new Error(result.error);
+      }
+    } catch (err) {
+      if (cancelledRef.current) return;
+      console.error('Reconciliation Error:', err);
+      setError(err.message);
+    } finally {
+      if (!cancelledRef.current) setLoading(false);
+    }
+  };
 
   // Memoized Flattened Data for Smart Table
   const smartTableData = useMemo(() => {

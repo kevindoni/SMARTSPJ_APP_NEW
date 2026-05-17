@@ -7,6 +7,7 @@
 const fs = require('fs');
 const path = require('path');
 const { app } = require('electron');
+const { atomicWriteJson } = require('../lib/transaction-utils');
 
 // Data file path (stored in the project's data folder)
 let dataFilePath = null;
@@ -21,7 +22,7 @@ function initManualTaxStorage(projectDataDir) {
 
     // Ensure the file exists with empty array if not present
     if (!fs.existsSync(dataFilePath)) {
-        fs.writeFileSync(dataFilePath, JSON.stringify([], null, 2), 'utf8');
+        atomicWriteJson(dataFilePath, []);
     }
 }
 
@@ -80,7 +81,7 @@ function saveManualTax(entry) {
     taxes.push(newEntry);
 
     try {
-        fs.writeFileSync(dataFilePath, JSON.stringify(taxes, null, 2), 'utf8');
+        atomicWriteJson(dataFilePath, taxes);
         return newEntry;
     } catch (err) {
         console.error('Error saving manual tax:', err);
@@ -113,7 +114,7 @@ function updateManualTax(id, updates) {
     };
 
     try {
-        fs.writeFileSync(dataFilePath, JSON.stringify(taxes, null, 2), 'utf8');
+        atomicWriteJson(dataFilePath, taxes);
         return taxes[index];
     } catch (err) {
         console.error('Error updating manual tax:', err);
@@ -141,7 +142,7 @@ function deleteManualTax(id) {
     taxes.splice(index, 1);
 
     try {
-        fs.writeFileSync(dataFilePath, JSON.stringify(taxes, null, 2), 'utf8');
+        atomicWriteJson(dataFilePath, taxes);
         return true;
     } catch (err) {
         console.error('Error deleting manual tax:', err);

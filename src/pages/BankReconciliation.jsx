@@ -20,37 +20,39 @@ export default function BankReconciliation() {
   const [bankValues, setBankValues] = useState({});
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
-  const savedTimeoutRef = useRef(null);
+
+  const cancelledRef = useRef(false);
+  const saveTimeoutRef = useRef(null);
 
   useEffect(() => {
-    return () => {
-      if (savedTimeoutRef.current) clearTimeout(savedTimeoutRef.current);
-    };
+    return () => { if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current); };
   }, []);
 
   useEffect(() => {
-    let cancelled = false;
-    const load = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const res = await window.arkas.getBankReconciliation(year);
-        if (cancelled) return;
-        if (res.success) {
-          setData(res.data);
-          setBankValues(res.data.savedValues || {});
-        } else {
-          setError(res.error || 'Gagal mengambil data');
-        }
-      } catch (err) {
-        if (!cancelled) setError(err.message);
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    };
-    load();
-    return () => { cancelled = true; };
+    cancelledRef.current = false;
+    fetchData();
+    return () => { cancelledRef.current = true; };
   }, [year]);
+
+  const fetchData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await window.arkas.getBankReconciliation(year);
+      if (cancelledRef.current) return;
+      if (res.success) {
+        setData(res.data);
+        setBankValues(res.data.savedValues || {});
+      } else {
+        setError(res.error || 'Gagal mengambil data');
+      }
+    } catch (err) {
+      if (cancelledRef.current) return;
+      setError(err.message);
+    } finally {
+      if (!cancelledRef.current) setLoading(false);
+    }
+  };
 
   const handleSave = async () => {
     if (Object.values(bankValues).some(v => v)) {
@@ -62,8 +64,7 @@ export default function BankReconciliation() {
       const res = await window.arkas.saveBankReconciliation(year, bankValues);
       if (res.success) {
         setSaved(true);
-        if (savedTimeoutRef.current) clearTimeout(savedTimeoutRef.current);
-        savedTimeoutRef.current = setTimeout(() => setSaved(false), 3000);
+        saveTimeoutRef.current = setTimeout(() => setSaved(false), 3000);
       }
     } catch (err) {
       console.error('Save error:', err);

@@ -2,6 +2,8 @@ const https = require('https');
 
 async function scrapeSchoolData(npsn) {
     if (!npsn) return { success: false, message: 'NPSN is required' };
+
+    // FALLBACK TO EXTERNAL SCRAPER (Backup)
     const safeNpsn = encodeURIComponent(String(npsn));
     const url = `https://referensi.data.kemendikdasmen.go.id/tabs.php?npsn=${safeNpsn}`;
 

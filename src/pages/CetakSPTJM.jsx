@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Loader2, AlertCircle, FileSignature, Download, Printer, Calendar } from 'lucide-react';
 import { useFilter } from '../context/FilterContext';
 import { formatDateIndonesian } from '../utils/dateHelpers';
@@ -25,32 +25,36 @@ export default function CetakSPTJM() {
     { id: 'kinerja', label: 'BOS Kinerja', sourceIds: [12, 35] },
   ];
 
-  useEffect(() => {
-    let cancelled = false;
-    const load = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const schoolRes = await window.arkas.getSchoolInfo();
-        if (cancelled) return;
-        if (schoolRes.success) setSchool(schoolRes.data);
+  const cancelledRef = useRef(false);
 
-        const sptjmRes = await window.arkas.getSPTJMData(year, parseInt(activeSemester), activeFund);
-        if (cancelled) return;
-        if (sptjmRes.success) {
-          setData(sptjmRes.data);
-        } else {
-          setError(sptjmRes.message || 'Gagal mengambil data SPTJM');
-        }
-      } catch (err) {
-        if (!cancelled) setError(err.message);
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    };
-    load();
-    return () => { cancelled = true; };
+  useEffect(() => {
+    cancelledRef.current = false;
+    fetchData();
+    return () => { cancelledRef.current = true; };
   }, [year, activeSemester, activeFund]);
+
+  const fetchData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const schoolRes = await window.arkas.getSchoolInfo();
+      if (cancelledRef.current) return;
+      if (schoolRes.success) setSchool(schoolRes.data);
+
+      const sptjmRes = await window.arkas.getSPTJMData(year, parseInt(activeSemester), activeFund);
+      if (cancelledRef.current) return;
+      if (sptjmRes.success) {
+        setData(sptjmRes.data);
+      } else {
+        setError(sptjmRes.message || 'Gagal mengambil data SPTJM');
+      }
+    } catch (err) {
+      if (cancelledRef.current) return;
+      setError(err.message);
+    } finally {
+      if (!cancelledRef.current) setLoading(false);
+    }
+  };
 
   // Get semester months
   const getSemesterMonths = () => {

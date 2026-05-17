@@ -15,6 +15,7 @@
  */
 
 const { MONTHS, safeInList } = require('../config/constants');
+const { atomicWriteJson } = require('../lib/transaction-utils');
 
 // Signatory storage directory (initialized by main.js)
 let signatoryStorageDir = null;
@@ -1622,7 +1623,7 @@ function saveSignatoryData(dbPath, data) {
       fs.mkdirSync(dataDir, { recursive: true });
     }
 
-    fs.writeFileSync(jsonPath, JSON.stringify(data, null, 2), 'utf8');
+    atomicWriteJson(jsonPath, data);
     return { success: true };
   } catch (error) {
     console.error('[Signatory] Save error:', error);

@@ -15,7 +15,7 @@ import {
   Rocket,
 } from 'lucide-react';
 import { useFilter } from '../../context/FilterContext';
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 const isElectron = typeof window !== 'undefined' && window.arkas;
 
@@ -42,7 +42,7 @@ function UpdateNotificationModal({ version, releaseNotes, onDownload, onDismiss,
   const changes = parseReleaseNotes(releaseNotes);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onClick={onDismiss} />
       <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         <div className="relative bg-gradient-to-br from-indigo-600 via-violet-600 to-purple-700 px-6 py-5">
@@ -118,7 +118,6 @@ export default function Header({ dbStatus, availableSources, availableYears }) {
   const [updateError, setUpdateError] = useState(null);
   const [downloadSpeed, setDownloadSpeed] = useState(0);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
-  const autoCheckRef = useRef(false);
 
   // Fetch app version
   useEffect(() => {
@@ -129,12 +128,6 @@ export default function Header({ dbStatus, availableSources, availableYears }) {
       .catch(() => {});
   }, []);
 
-  useEffect(() => {
-    const t = setTimeout(() => { autoCheckRef.current = true; }, 3000);
-    return () => clearTimeout(t);
-  }, []);
-
-  // Listen for auto-update events from main process (cleanup on unmount)
   useEffect(() => {
     if (!isElectron) return;
 
@@ -147,9 +140,7 @@ export default function Header({ dbStatus, availableSources, availableYears }) {
           setUpdateInfo(info);
           setUpdateStatus('available');
           setUpdateError(null);
-          if (autoCheckRef.current) {
-            setShowUpdateModal(true);
-          }
+          setShowUpdateModal(true);
         })
       );
     }
