@@ -106,24 +106,6 @@ export default function Pengaturan() {
     setSaving(true);
     setMessage(null);
 
-    if (!formData.kepala_sekolah.trim() && !formData.bendahara.trim()) {
-      setMessage({ type: 'error', text: 'Minimal nama Kepala Sekolah atau Bendahara harus diisi.' });
-      setSaving(false);
-      return;
-    }
-
-    const nipPattern = /^[0-9]{0,25}$/;
-    if (formData.nip_kepala.trim() && !nipPattern.test(formData.nip_kepala.trim())) {
-      setMessage({ type: 'error', text: 'NIP Kepala Sekolah hanya boleh berisi angka (maks 25 karakter).' });
-      setSaving(false);
-      return;
-    }
-    if (formData.nip_bendahara.trim() && !nipPattern.test(formData.nip_bendahara.trim())) {
-      setMessage({ type: 'error', text: 'NIP Bendahara hanya boleh berisi angka (maks 25 karakter).' });
-      setSaving(false);
-      return;
-    }
-
     try {
       const res = await window.arkas.saveSchoolInfo(formData);
       if (res.success) {
