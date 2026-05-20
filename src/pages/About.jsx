@@ -3,6 +3,16 @@ import { Heart, Calendar, ChevronDown, Sparkles, CheckCircle, ArrowRight, Bug } 
 
 const CHANGELOG = [
   {
+    version: '1.8.1',
+    date: '20 Mei 2026',
+    title: 'Cross-Drive Save Fix & Print Blank Fix',
+    changes: [
+      { type: 'fix', text: 'Rekonsiliasi Bank tidak tersimpan — atomicWriteJson gagal rename cross-drive (C:→D:) di Windows' },
+      { type: 'fix', text: 'Cetak/Export PDF muncul popup Electron blank — setWindowOpenHandler sekarang allow window.open untuk print' },
+      { type: 'imp', text: 'File temporary sekarang ditulis di direktori yang sama dengan file tujuan (portable lintas drive)' },
+    ],
+  },
+  {
     version: '1.8.0',
     date: '17 Mei 2026',
     title: 'Bug Hunting Round 1-4 — 20 Fixes',
