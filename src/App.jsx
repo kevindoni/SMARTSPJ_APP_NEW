@@ -1,6 +1,7 @@
 ﻿import React, { useState } from 'react';
 import { LicenseProvider, useLicense } from './context/LicenseContext';
 import { useArkasData } from './hooks/useArkasData';
+import ErrorBoundary from './components/ErrorBoundary';
 import MainLayout from './components/layout/MainLayout';
 import DashboardRedesigned from './components/dashboard/DashboardRedesigned';
 import TransactionList from './components/transactions/TransactionList';
@@ -38,23 +39,23 @@ function AppContent() {
       availableSources={availableSources}
       availableYears={availableYears}
     >
-      {activeTab === 'dashboard' && <DashboardRedesigned />}
-      {activeTab === 'kertas-kerja' && <KertasKerja />}
-      {activeTab === 'realisasi-belanja' && <RealisasiBelanja />}
-      {activeTab === 'transactions' && <TransactionList stats={stats} />}
-      {activeTab === 'tax-report' && <TaxReportList stats={stats} />}
-      {activeTab === 'cash-report' && <CashReportList stats={stats} />}
-      {activeTab === 'bank-report' && <BankReportList stats={stats} />}
-      {activeTab === 'reconciliation' && <BAReconciliation />}
-      {activeTab === 'bank-reconciliation' && <BankReconciliation />}
-      {activeTab === 'sptjm' && <CetakSPTJM />}
-      {activeTab === 'k7-report' && <LaporanK7 />}
-      {activeTab === 'register-kas' && <RegisterKas />}
-      {activeTab === 'nota-groups' && <NotaGroupManager />}
-      {activeTab === 'settings' && <Pengaturan />}
-      {activeTab === 'backup-restore' && <BackupRestore />}
-      {activeTab === 'about' && <About />}
-      {activeTab === 'license' && <LicenseScreen />}
+      {activeTab === 'dashboard' && <ErrorBoundary><DashboardRedesigned /></ErrorBoundary>}
+      {activeTab === 'kertas-kerja' && <ErrorBoundary><KertasKerja /></ErrorBoundary>}
+      {activeTab === 'realisasi-belanja' && <ErrorBoundary><RealisasiBelanja /></ErrorBoundary>}
+      {activeTab === 'transactions' && <ErrorBoundary><TransactionList stats={stats} /></ErrorBoundary>}
+      {activeTab === 'tax-report' && <ErrorBoundary><TaxReportList stats={stats} /></ErrorBoundary>}
+      {activeTab === 'cash-report' && <ErrorBoundary><CashReportList stats={stats} /></ErrorBoundary>}
+      {activeTab === 'bank-report' && <ErrorBoundary><BankReportList stats={stats} /></ErrorBoundary>}
+      {activeTab === 'reconciliation' && <ErrorBoundary><BAReconciliation /></ErrorBoundary>}
+      {activeTab === 'bank-reconciliation' && <ErrorBoundary><BankReconciliation /></ErrorBoundary>}
+      {activeTab === 'sptjm' && <ErrorBoundary><CetakSPTJM /></ErrorBoundary>}
+      {activeTab === 'k7-report' && <ErrorBoundary><LaporanK7 /></ErrorBoundary>}
+      {activeTab === 'register-kas' && <ErrorBoundary><RegisterKas /></ErrorBoundary>}
+      {activeTab === 'nota-groups' && <ErrorBoundary><NotaGroupManager /></ErrorBoundary>}
+      {activeTab === 'settings' && <ErrorBoundary><Pengaturan /></ErrorBoundary>}
+      {activeTab === 'backup-restore' && <ErrorBoundary><BackupRestore /></ErrorBoundary>}
+      {activeTab === 'about' && <ErrorBoundary><About /></ErrorBoundary>}
+      {activeTab === 'license' && <ErrorBoundary><LicenseScreen /></ErrorBoundary>}
     </MainLayout>
   );
 }

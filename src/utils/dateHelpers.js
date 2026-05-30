@@ -8,6 +8,7 @@ const MONTH_NAMES_ID = [
  * Uses manual parsing to avoid timezone issues with new Date('YYYY-MM-DD').
  */
 export function formatDateIndonesian(dateStr) {
+  if (!dateStr) return '-';
   const [y, m, d] = dateStr.split('-').map(Number);
   return `${d} ${MONTH_NAMES_ID[m - 1]} ${y}`;
 }

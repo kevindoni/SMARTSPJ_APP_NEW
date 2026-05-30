@@ -32,6 +32,15 @@ const EmptyState = ({ message }) => (
   </div>
 );
 
+const formatShortDate = (dateStr) => {
+  if (!dateStr) return '-';
+  const clean = dateStr.split(' ')[0];
+  const parts = clean.split('-');
+  if (parts.length < 3) return '-';
+  return `${parseInt(parts[2])} ${MONTH_NAMES_SHORT[parseInt(parts[1]) - 1]}`;
+};
+const MONTH_NAMES_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+
 /* ─── Welcome / No-Data State ─── */
 const WelcomeState = ({ isElectron }) => (
   <div className="flex flex-col items-center justify-center py-16 px-6 animate-fade-in">
@@ -296,7 +305,7 @@ export default function DashboardRedesigned() {
                     <tr key={idx} className="hover:bg-emerald-50/30">
                       <td className="py-2 px-3 text-xs text-slate-400">{idx + 1}</td>
                       <td className="py-2 px-3 text-xs text-slate-700 font-medium max-w-[200px] truncate">{item.uraian}</td>
-                      <td className="py-2 px-3 text-[10px] text-slate-400 text-right font-mono">{item.tanggal_transaksi ? new Date(item.tanggal_transaksi).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' }) : '-'}</td>
+                      <td className="py-2 px-3 text-[10px] text-slate-400 text-right font-mono">{item.tanggal_transaksi ? formatShortDate(item.tanggal_transaksi) : '-'}</td>
                       <td className="py-2 px-3 text-xs font-bold text-emerald-600 text-right whitespace-nowrap">{formatRupiah(item.nominal)}</td>
                     </tr>
                   ))}
@@ -320,7 +329,7 @@ export default function DashboardRedesigned() {
                     <tr key={idx} className="hover:bg-rose-50/30">
                       <td className="py-2 px-3 text-xs text-slate-400">{idx + 1}</td>
                       <td className="py-2 px-3 text-xs text-slate-700 font-medium max-w-[200px] truncate" title={item.uraian}>{item.uraian}</td>
-                      <td className="py-2 px-3 text-[10px] text-slate-400 text-right font-mono">{item.tanggal_transaksi ? new Date(item.tanggal_transaksi).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' }) : '-'}</td>
+                      <td className="py-2 px-3 text-[10px] text-slate-400 text-right font-mono">{item.tanggal_transaksi ? formatShortDate(item.tanggal_transaksi) : '-'}</td>
                       <td className="py-2 px-3 text-xs font-bold text-rose-600 text-right whitespace-nowrap">{formatRupiah(item.nominal)}</td>
                     </tr>
                   ))}

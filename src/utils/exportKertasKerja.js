@@ -47,26 +47,28 @@ const groupData = (data) => {
   let totalAll = 0;
 
   data.forEach((item) => {
-    const parts = (item.kode_kegiatan || '').split('.');
+    const clonedItem = { ...item };
+
+    const parts = (clonedItem.kode_kegiatan || '').split('.');
     const codeL1 = parts[0] || 'XX';
     const codeL2 = parts[1] ? `${parts[0]}.${parts[1]}` : `${codeL1}.XX`;
-    const codeL3 = item.kode_kegiatan;
+    const codeL3 = clonedItem.kode_kegiatan;
 
     if (!grouped[codeL1])
       grouped[codeL1] = { name: STANDARDS_MAP[codeL1] || `Standar ${codeL1}`, l2: {} };
     if (!grouped[codeL1].l2[codeL2]) grouped[codeL1].l2[codeL2] = { name: '', l3: {} };
     if (!grouped[codeL1].l2[codeL2].l3[codeL3])
-      grouped[codeL1].l2[codeL2].l3[codeL3] = { name: item.nama_kegiatan, items: [] };
+      grouped[codeL1].l2[codeL2].l3[codeL3] = { name: clonedItem.nama_kegiatan, items: [] };
 
-    const price = item.harga_satuan || 0;
-    item.q1 = ((item.v1 || 0) + (item.v2 || 0) + (item.v3 || 0)) * price;
-    item.q2 = ((item.v4 || 0) + (item.v5 || 0) + (item.v6 || 0)) * price;
-    item.q3 = ((item.v7 || 0) + (item.v8 || 0) + (item.v9 || 0)) * price;
-    item.q4 = ((item.v10 || 0) + (item.v11 || 0) + (item.v12 || 0)) * price;
-    item.totalYear = item.q1 + item.q2 + item.q3 + item.q4;
+    const price = clonedItem.harga_satuan || 0;
+    clonedItem.q1 = ((clonedItem.v1 || 0) + (clonedItem.v2 || 0) + (clonedItem.v3 || 0)) * price;
+    clonedItem.q2 = ((clonedItem.v4 || 0) + (clonedItem.v5 || 0) + (clonedItem.v6 || 0)) * price;
+    clonedItem.q3 = ((clonedItem.v7 || 0) + (clonedItem.v8 || 0) + (clonedItem.v9 || 0)) * price;
+    clonedItem.q4 = ((clonedItem.v10 || 0) + (clonedItem.v11 || 0) + (clonedItem.v12 || 0)) * price;
+    clonedItem.totalYear = clonedItem.q1 + clonedItem.q2 + clonedItem.q3 + clonedItem.q4;
 
-    grouped[codeL1].l2[codeL2].l3[codeL3].items.push(item);
-    totalAll += item.total || item.totalYear || 0;
+    grouped[codeL1].l2[codeL2].l3[codeL3].items.push(clonedItem);
+    totalAll += clonedItem.total || clonedItem.totalYear || 0;
   });
 
   return { grouped, totalAll };
@@ -778,7 +780,7 @@ export function exportToPDF(data, metadata) {
     : `RKAS - ${isQuarterly ? 'TRIWULAN' : isAnnual ? 'TAHUNAN' : 'BULANAN'}`;
 
   // Find the table container in the DOM
-  const tableContainer = document.querySelector('.bg-white.p-6');
+  const tableContainer = document.getElementById('rkas-print-area') || document.querySelector('.bg-white.p-6');
   const tableContent = tableContainer ? tableContainer.innerHTML : '';
 
   // Handle Lembar format separately
@@ -853,6 +855,10 @@ export function exportToPDF(data, metadata) {
         `;
 
     const printWindow = window.open('', '_blank', 'width=1000,height=800');
+    if (!printWindow) {
+      alert('Pop-up diblokir oleh browser. Harap izinkan pop-up untuk mencetak dokumen.');
+      return false;
+    }
     printWindow.document.write(printContent);
     printWindow.document.close();
     printWindow.focus();
@@ -939,6 +945,10 @@ export function exportToPDF(data, metadata) {
     `;
 
   const printWindow = window.open('', '_blank', 'width=1400,height=900');
+  if (!printWindow) {
+    alert('Pop-up diblokir oleh browser. Harap izinkan pop-up untuk mencetak dokumen.');
+    return false;
+  }
   printWindow.document.write(printContent);
   printWindow.document.close();
   printWindow.focus();

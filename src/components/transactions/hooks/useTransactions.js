@@ -1,8 +1,4 @@
-/**
- * useTransactions.js
- * Custom hook for fetching and managing transaction data
- */
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 export default function useTransactions({
   year,
@@ -17,22 +13,14 @@ export default function useTransactions({
   const [hasMore, setHasMore] = useState(true);
   const [offset, setOffset] = useState(0);
   const isMonthView = selectedMonth !== 'SEMUA';
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => {
-    setData([]);
-    setOffset(0);
-    setHasMore(true);
-    fetchTransactions(0, true);
-  }, [year, fundSource, search, selectedMonth, selectedFilters, paymentType]);
+  const cancelledRef = useRef(false);
 
   const fetchTransactions = useCallback(
     async (currentOffset, isReset = false) => {
       if (loading && !isReset) return;
       setLoading(true);
 
-      // Always fetch large batch for comprehensive totals (Tax Reports, etc.)
-      const limit = 100000;
+      const limit = isMonthView ? 10000 : 5000;
 
       try {
         const res = await window.arkas.getTransactions({
@@ -41,10 +29,12 @@ export default function useTransactions({
           search,
           month: selectedMonth,
           filterType: selectedFilters,
-          paymentType: paymentType || undefined, // Add payment type filter
+          paymentType: paymentType || undefined,
           limit: limit,
           offset: currentOffset,
         });
+
+        if (cancelledRef.current) return;
 
         if (res.success) {
           if (isReset) {
@@ -55,14 +45,23 @@ export default function useTransactions({
           setHasMore(res.data.length === limit && !isMonthView);
         }
       } catch (error) {
+        if (cancelledRef.current) return;
         console.error('[useTransactions] Error:', error);
       } finally {
-        setLoading(false);
+        if (!cancelledRef.current) setLoading(false);
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [year, fundSource, search, selectedMonth, selectedFilters, paymentType]
+    [year, fundSource, search, selectedMonth, selectedFilters, paymentType, loading, isMonthView]
   );
+
+  useEffect(() => {
+    cancelledRef.current = false;
+    setData([]);
+    setOffset(0);
+    setHasMore(true);
+    fetchTransactions(0, true);
+    return () => { cancelledRef.current = true; };
+  }, [year, fundSource, search, selectedMonth, selectedFilters, paymentType]);
 
   const handleLoadMore = useCallback(() => {
     const newOffset = offset + 20;

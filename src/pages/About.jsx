@@ -3,6 +3,27 @@ import { Heart, Calendar, ChevronDown, Sparkles, CheckCircle, ArrowRight, Bug } 
 
 const CHANGELOG = [
   {
+    version: '1.8.2',
+    date: '30 Mei 2026',
+    title: 'Stability & Precision Fix — 14 Improvements',
+    changes: [
+      { type: 'fix', text: 'Export RKAS tidak lagi mengubah data di layar — item di-clone sebelum mutasi (q1-q4 triwulan)' },
+      { type: 'fix', text: '4 halaman (Rekonsiliasi Bank, Register Kas, SPTJM, K7) crash di browser dev mode — tambah window.arkas guard' },
+      { type: 'fix', text: 'BKU fetch 100.000 baris tanpa race condition guard — limit diturunkan + cancellation flag ditambahkan' },
+      { type: 'fix', text: 'Volume desimal dibulatkan di realisasi — Math.round diganti parseFloat agar presisi terjaga' },
+      { type: 'fix', text: 'Harga satuan summary menampilkan total anggaran saat volume = 0 — sekarang tampilkan Rp 0' },
+      { type: 'fix', text: 'Tanggal di Dashboard mundur 1 hari karena timezone UTC — parsing manual tanpa new Date()' },
+      { type: 'fix', text: 'formatDateIndonesian crash saat input null — tambah null guard' },
+      { type: 'fix', text: 'Export PDF crash saat popup diblokir browser — tambah null check + pesan alert' },
+      { type: 'fix', text: 'Satu halaman error matikan seluruh app — tambah per-page ErrorBoundary' },
+      { type: 'imp', text: 'Duplikat ToastContainer di 3 halaman dihapus — cukup 1 di MainLayout' },
+      { type: 'imp', text: 'groupByActivity di RealisasiBelanja menggunakan helper terpusat — hapus duplikasi kode 25 baris' },
+      { type: 'imp', text: 'Variabel saldoAwalKinerja2025 di-rename ke saldoAwalBOSKinerja — tidak lagi terikat tahun' },
+      { type: 'imp', text: 'Export PDF RKAS menggunakan id selector — tidak lagi bergantung pada Tailwind class' },
+      { type: 'imp', text: 'localStorage try-catch di FilterContext — kompatibel dengan Safari Private Browsing' },
+    ],
+  },
+  {
     version: '1.8.1',
     date: '20 Mei 2026',
     title: 'Cross-Drive Save Fix & Print Blank Fix',

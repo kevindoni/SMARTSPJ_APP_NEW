@@ -37,6 +37,10 @@ export default function CetakSPTJM() {
     setLoading(true);
     setError(null);
     try {
+      if (!window.arkas?.getSchoolInfo) {
+        setError('Jalankan melalui aplikasi Electron untuk mengakses data.');
+        return;
+      }
       const schoolRes = await window.arkas.getSchoolInfo();
       if (cancelledRef.current) return;
       if (schoolRes.success) setSchool(schoolRes.data);

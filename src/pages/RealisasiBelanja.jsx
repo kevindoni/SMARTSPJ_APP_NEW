@@ -14,7 +14,7 @@ import {
 import { useFilter } from '../context/FilterContext';
 import { useArkasData } from '../hooks/useArkasData';
 import { formatRupiah } from '../utils/transactionHelpers';
-import { REALISASI_MONTHS, parsePlannedMonths } from '../utils/realisasiHelpers';
+import { REALISASI_MONTHS, parsePlannedMonths, groupByActivity } from '../utils/realisasiHelpers';
 import { theme } from '../theme';
 
 export default function RealisasiBelanja() {
@@ -98,33 +98,7 @@ export default function RealisasiBelanja() {
     );
   }
 
-  // Helper to group by activity for summary view
-  const activities = items.reduce((acc, current) => {
-    const key = current.kode_kegiatan;
-    if (!acc[key]) {
-      acc[key] = {
-        kode: current.kode_kegiatan,
-        nama: current.nama_kegiatan,
-        anggaran: 0,
-        realisasi: 0,
-        vol_pagu: 0,
-        vol_realisasi: 0,
-        vol_realisasi_kumulatif: 0,
-        units: new Set(),
-        rekenings: [],
-      };
-    }
-    acc[key].anggaran += current.total_anggaran || 0;
-    acc[key].realisasi += current.total_realisasi || 0;
-    acc[key].vol_pagu += current.total_volume_pagu || 0;
-    acc[key].vol_realisasi += current.total_volume_realisasi || 0;
-    acc[key].vol_realisasi_kumulatif += current.cumulative_volume_realisasi || 0;
-    if (current.satuan) acc[key].units.add(current.satuan);
-    acc[key].rekenings.push(current);
-    return acc;
-  }, {});
-
-  const sortedActivities = Object.values(activities).sort((a, b) => a.kode.localeCompare(b.kode));
+  const sortedActivities = groupByActivity(items);
 
   // Calculate internal totals to ensure consistency between cards and table
   const totalPaguInternal = items.reduce((sum, item) => sum + (item.total_anggaran || 0), 0);
@@ -501,7 +475,7 @@ export default function RealisasiBelanja() {
                               <td className={theme.table.tdNumber}>
                                 {formatRupiah(
                                   isSummary
-                                    ? item.anggaran / (item.vol_pagu || 1)
+                                    ? (item.vol_pagu > 0 ? item.anggaran / item.vol_pagu : 0)
                                     : item.harga_satuan || 0
                                 )}
                               </td>

@@ -2,6 +2,11 @@ import React from 'react';
 import { formatRupiah } from '../../utils/transactionHelpers';
 import { STANDARDS_MAP } from '../../utils/kertasKerjaHelpers';
 
+const safeAmount = (value) => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : 0;
+};
+
 export default function KertasKerjaFormalTableQuarterly({
   processedData,
   fundSource,
@@ -28,11 +33,11 @@ export default function KertasKerjaFormalTableQuarterly({
       grouped[codeL1].l2[codeL2].l3[codeL3] = { name: item.nama_kegiatan, items: [] };
 
     // Calculate Quarterly Totals (Rupiah)
-    const price = item.harga_satuan || 0;
-    const q1 = ((item.v1 || 0) + (item.v2 || 0) + (item.v3 || 0)) * price;
-    const q2 = ((item.v4 || 0) + (item.v5 || 0) + (item.v6 || 0)) * price;
-    const q3 = ((item.v7 || 0) + (item.v8 || 0) + (item.v9 || 0)) * price;
-    const q4 = ((item.v10 || 0) + (item.v11 || 0) + (item.v12 || 0)) * price;
+    const price = safeAmount(item.harga_satuan);
+    const q1 = (safeAmount(item.v1) + safeAmount(item.v2) + safeAmount(item.v3)) * price;
+    const q2 = (safeAmount(item.v4) + safeAmount(item.v5) + safeAmount(item.v6)) * price;
+    const q3 = (safeAmount(item.v7) + safeAmount(item.v8) + safeAmount(item.v9)) * price;
+    const q4 = (safeAmount(item.v10) + safeAmount(item.v11) + safeAmount(item.v12)) * price;
 
     const enrichedItem = { ...item, q1, q2, q3, q4, totalYear: q1 + q2 + q3 + q4 };
 
@@ -57,10 +62,10 @@ export default function KertasKerjaFormalTableQuarterly({
     return {
       total: items.reduce((s, i) => s + (Number(i.totalYear) || 0), 0),
       q: [
-        items.reduce((s, i) => s + i.q1, 0),
-        items.reduce((s, i) => s + i.q2, 0),
-        items.reduce((s, i) => s + i.q3, 0),
-        items.reduce((s, i) => s + i.q4, 0),
+        items.reduce((s, i) => s + safeAmount(i.q1), 0),
+        items.reduce((s, i) => s + safeAmount(i.q2), 0),
+        items.reduce((s, i) => s + safeAmount(i.q3), 0),
+        items.reduce((s, i) => s + safeAmount(i.q4), 0),
       ],
     };
   };
@@ -70,7 +75,7 @@ export default function KertasKerjaFormalTableQuarterly({
   const sekolah = schoolInfo?.nama || '-';
 
   return (
-    <div className="bg-white p-6 rounded-none shadow-none text-black text-xs overflow-x-auto">
+    <div id="rkas-print-area" className="bg-white p-6 rounded-none shadow-none text-black text-xs overflow-x-auto">
       {/* HEADERS */}
       <div className="mb-4">
         <h3 className="font-bold text-sm uppercase mb-2">A. PENERIMAAN</h3>
@@ -276,7 +281,7 @@ export default function KertasKerjaFormalTableQuarterly({
                                             item.v10,
                                             item.v11,
                                             item.v12,
-                                          ].reduce((a, b) => a + b, 0)}
+                                          ].reduce((a, b) => a + safeAmount(b), 0)}
                                         </td>
                                         <td className="border border-black px-1 py-1 text-center">
                                           {item.satuan}

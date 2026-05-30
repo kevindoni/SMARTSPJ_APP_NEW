@@ -6,6 +6,7 @@ import {
   Download,
   Save,
   AlertTriangle,
+  AlertCircle,
   CheckCircle,
   Calculator,
   Banknote,
@@ -18,7 +19,6 @@ import autoTable from 'jspdf-autotable';
 import ExcelJS from 'exceljs';
 import { formatRupiah } from '../utils/transactionHelpers';
 import { toast } from 'react-toastify';
-import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const NOTES = [100000, 50000, 20000, 10000, 5000, 2000, 1000];
@@ -44,6 +44,7 @@ export default function RegisterKas() {
   const [activeMonth, setActiveMonth] = useState(new Date().getMonth() + 1); // 1-indexed to match MONTHS array (id: 1 = Jan)
 
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [balances, setBalances] = useState({
     saldo_buku: 0,
     saldo_bank: 0,
@@ -67,6 +68,11 @@ export default function RegisterKas() {
       setCoinCounts(Object.fromEntries(COINS.map((c) => [c, 0])));
 
       try {
+        if (!window.arkas?.getClosingBalances) {
+          setError('Jalankan melalui aplikasi Electron untuk mengakses data.');
+          setLoading(false);
+          return;
+        }
         const res = await window.arkas.getClosingBalances(year, activeMonth, fundSource);
         if (res.success) {
           setBalances((prev) => ({ ...prev, ...res.data }));
@@ -129,7 +135,12 @@ export default function RegisterKas() {
     [coinCounts]
   );
   const totalFisik = totalNotes + totalCoins;
-  const difference = balances.saldo_buku - totalFisik;
+  const saldoTunaiBuku = balances.saldo_buku || 0;
+  const saldoBank = balances.saldo_bank || 0;
+  const saldoPajak = balances.saldo_pajak || 0;
+  const totalKasTercatat = totalFisik + saldoBank + saldoPajak;
+  const totalSaldoSistem = saldoTunaiBuku + saldoBank + saldoPajak;
+  const difference = saldoTunaiBuku - totalFisik;
 
   // Generate PDF Logic
   const handlePrintRegister = () => {
@@ -164,7 +175,7 @@ export default function RegisterKas() {
       ['Tanggal Penutupan Kas Yang Lalu', ':', prevDateStr],
       ['Jumlah Penerimaan (D)', ':', formatRupiah(balances.total_penerimaan)],
       ['Jumlah Total Pengeluaran (K)', ':', formatRupiah(balances.total_pengeluaran)],
-      ['Saldo Buku (A = D - K)', ':', formatRupiah(balances.saldo_buku)],
+      ['Saldo Tunai Buku', ':', formatRupiah(saldoTunaiBuku)],
       ['Saldo Kas (B)', ':', formatRupiah(totalFisik)], // Physical cash count
     ];
 
@@ -217,23 +228,21 @@ export default function RegisterKas() {
       '3. Saldo Bank, Surat Berharga dll',
       '',
       'Sub Jumlah (3)',
-      `Rp. ${(balances.saldo_bank || 0).toLocaleString('id-ID')}`,
+      `Rp. ${saldoBank.toLocaleString('id-ID')}`,
     ]);
     body.push([
       '4. Saldo Kas Pajak',
       '',
       'Sub Jumlah (4)',
-      `Rp. ${(balances.saldo_pajak || 0).toLocaleString('id-ID')}`,
+      `Rp. ${saldoPajak.toLocaleString('id-ID')}`,
     ]);
 
-    const totalSemua = subTotal1 + subTotal2 + balances.saldo_bank; // + Pajak? Usually Pajak is part of Bank/Tunai mix, but here treated separate line? No, layout imply addition.
-
-    body.push(['', '', 'Jumlah (1+2)', `Rp. ${(subTotal1 + subTotal2).toLocaleString('id-ID')}`]);
+    body.push(['', '', 'Jumlah (1+2+3+4)', `Rp. ${totalKasTercatat.toLocaleString('id-ID')}`]);
     body.push([
       '',
       '',
       'Perbedaan',
-      `Rp. ${(balances.saldo_buku - (subTotal1 + subTotal2)).toLocaleString('id-ID')}`,
+      `Rp. ${(totalSaldoSistem - totalKasTercatat).toLocaleString('id-ID')}`,
     ]);
 
     autoTable(doc, {
@@ -323,9 +332,9 @@ export default function RegisterKas() {
 
     const tableBody = [
       ['a', 'Saldo KAS (Uang kertas dan logam)', ':', formatRupiah(totalFisik)],
-      ['b', 'Saldo Bank', ':', formatRupiah(balances.saldo_bank)],
-      ['c', 'Saldo Pajak', ':', formatRupiah(balances.saldo_pajak)],
-      ['', 'Jumlah', ':', formatRupiah(totalFisik + balances.saldo_bank)],
+      ['b', 'Saldo Bank', ':', formatRupiah(saldoBank)],
+      ['c', 'Saldo Pajak', ':', formatRupiah(saldoPajak)],
+      ['', 'Jumlah', ':', formatRupiah(totalKasTercatat)],
     ];
 
     autoTable(doc, {
@@ -343,7 +352,7 @@ export default function RegisterKas() {
 
     y = doc.lastAutoTable.finalY + 10;
     doc.text(
-      `Perbedaan Antara Saldo KAS dan Kas Umum : ${formatRupiah(balances.saldo_buku - totalFisik)}`,
+      `Perbedaan Antara Saldo Tunai Buku dan Kas Fisik : ${formatRupiah(difference)}`,
       14,
       y
     );
@@ -401,7 +410,7 @@ export default function RegisterKas() {
       const headerData = [
         ['Tanggal Penutupan Kas', ':', dateStr],
         ['Penutup Kas', ':', school?.bendahara || '-'],
-        ['Saldo Buku (Sistem)', ':', balances.saldo_buku],
+        ['Saldo Tunai Buku (Sistem)', ':', saldoTunaiBuku],
         ['Total Penerimaan', ':', balances.total_penerimaan],
         ['Total Pengeluaran', ':', balances.total_pengeluaran],
       ];
@@ -463,10 +472,10 @@ export default function RegisterKas() {
         ]);
       });
       addRow(['', '', 'Sub Jumlah (2)', subTotal2], { bold: true });
-      addRow(['', '', 'Jumlah (1+2)', subTotal1 + subTotal2], { bold: true });
-      addRow(['3. Saldo Bank', '', '', balances.saldo_bank]);
-      addRow(['4. Saldo Pajak', '', '', balances.saldo_pajak]);
-      addRow(['', '', 'Perbedaan', balances.saldo_buku - (subTotal1 + subTotal2)], { bold: true });
+      addRow(['3. Saldo Bank', '', '', saldoBank]);
+      addRow(['4. Saldo Pajak', '', '', saldoPajak]);
+      addRow(['', '', 'Jumlah (1+2+3+4)', totalKasTercatat], { bold: true });
+      addRow(['', '', 'Perbedaan', totalSaldoSistem - totalKasTercatat], { bold: true });
 
       const buf = await wb.xlsx.writeBuffer();
       const blob = new Blob([buf], {
@@ -521,10 +530,10 @@ export default function RegisterKas() {
       };
       [
         ['a', 'Saldo KAS (Uang kertas dan logam)', ':', totalFisik],
-        ['b', 'Saldo Bank', ':', balances.saldo_bank],
-        ['c', 'Saldo Pajak', ':', balances.saldo_pajak],
-        ['', 'Jumlah', ':', totalFisik + balances.saldo_bank],
-        ['', 'Perbedaan', ':', balances.saldo_buku - totalFisik],
+        ['b', 'Saldo Bank', ':', saldoBank],
+        ['c', 'Saldo Pajak', ':', saldoPajak],
+        ['', 'Jumlah', ':', totalKasTercatat],
+        ['', 'Perbedaan Tunai', ':', difference],
       ].forEach(([a, b, c, d]) => {
         const row = ws.getRow(r);
         [
@@ -557,9 +566,20 @@ export default function RegisterKas() {
     setExportMenu(null);
   };
 
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[60vh] gap-4">
+        <AlertCircle className="w-12 h-12 text-red-500" />
+        <p className="text-red-600">{error}</p>
+        <button onClick={() => window.location.reload()} className="px-4 py-2 bg-indigo-600 text-white rounded-lg">
+          Coba Lagi
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6 animate-in fade-in zoom-in-95 duration-300">
-      <ToastContainer />
       {/* Page Header */}
       <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-center gap-4">
         <div className="flex items-center gap-3">
@@ -742,10 +762,10 @@ export default function RegisterKas() {
             {/* Saldo Buku */}
             <div>
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
-                Saldo Buku (Sistem)
+                Saldo Tunai Buku (Sistem)
               </p>
               <p className="text-xl font-extrabold text-slate-800 tabular-nums">
-                {loading ? '...' : formatRupiah(balances.saldo_buku)}
+                {loading ? '...' : formatRupiah(saldoTunaiBuku)}
               </p>
             </div>
 
@@ -808,13 +828,13 @@ export default function RegisterKas() {
               <div className="flex justify-between items-center">
                 <span className="text-xs text-slate-500">Saldo Bank</span>
                 <span className="text-xs font-bold text-slate-700 tabular-nums">
-                  {formatRupiah(balances.saldo_bank)}
+                  {formatRupiah(saldoBank)}
                 </span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-xs text-slate-500">Saldo Pajak</span>
                 <span className="text-xs font-bold text-slate-700 tabular-nums">
-                  {formatRupiah(balances.saldo_pajak)}
+                  {formatRupiah(saldoPajak)}
                 </span>
               </div>
             </div>

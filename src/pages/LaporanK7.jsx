@@ -6,7 +6,6 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { formatDateIndonesian } from '../utils/dateHelpers';
 import { toast } from 'react-toastify';
-import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 // Standar Nasional Pendidikan categories
@@ -87,6 +86,10 @@ export default function LaporanK7() {
     setLoading(true);
     setError(null);
     try {
+      if (!window.arkas?.getSchoolInfo) {
+        setError('Jalankan melalui aplikasi Electron untuk mengakses data.');
+        return;
+      }
       const schoolRes = await window.arkas.getSchoolInfo();
       if (cancelledRef.current) return;
       if (schoolRes.success) setSchool(schoolRes.data);
@@ -412,7 +415,6 @@ export default function LaporanK7() {
 
   return (
     <div className="space-y-6 animate-in fade-in zoom-in-95 duration-300">
-      <ToastContainer />
       {/* Header */}
       <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between">
         <div className="flex items-center gap-3">

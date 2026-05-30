@@ -75,7 +75,7 @@ export const exportBaRekonsToPdf = (
   const saldoAwalKinerja =
     (openingDetails.silpaKinerja?.bank || 0) + (openingDetails.silpaKinerja?.tunai || 0);
 
-  const saldoAwalKinerja2025 =
+  const saldoAwalBOSKinerja =
     (openingDetails.kinerja?.bank || 0) + (openingDetails.kinerja?.tunai || 0);
 
   const terimaReguler1 = income.regulerT1 || 0;
@@ -86,7 +86,7 @@ export const exportBaRekonsToPdf = (
     saldoAwalLainnya +
     saldoAwalReguler +
     saldoAwalKinerja +
-    saldoAwalKinerja2025 +
+    saldoAwalBOSKinerja +
     terimaReguler1 +
     terimaReguler2 +
     terimaKinerja;
@@ -311,7 +311,7 @@ export const exportBaRekonsToPdf = (
     [
       `BOSP Kinerja ${year}`,
       { content: 'Rp', styles: yellowStyle },
-      { content: formatRupiahLocal(saldoAwalKinerja2025), styles: yellowStyle },
+      { content: formatRupiahLocal(saldoAwalBOSKinerja), styles: yellowStyle },
       '',
       '',
     ],

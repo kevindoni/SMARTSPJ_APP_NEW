@@ -3,21 +3,29 @@ import React, { createContext, useContext, useState } from 'react';
 const FilterContext = createContext();
 
 export function FilterProvider({ children }) {
-  // Initial state from localStorage to prevent reset on refresh
   const [year, setYear] = useState(() => {
-    const saved = localStorage.getItem('selected_year');
-    return saved ? Number(saved) : new Date().getFullYear();
+    try {
+      const saved = localStorage.getItem('selected_year');
+      return saved ? Number(saved) : new Date().getFullYear();
+    } catch {
+      return new Date().getFullYear();
+    }
   });
 
   const [fundSource, setFundSource] = useState(() => {
-    const saved = localStorage.getItem('selected_fund_source');
-    return saved || 'SEMUA';
+    try {
+      const saved = localStorage.getItem('selected_fund_source');
+      return saved || 'SEMUA';
+    } catch {
+      return 'SEMUA';
+    }
   });
 
-  // Save to localStorage whenever filters change
   React.useEffect(() => {
-    localStorage.setItem('selected_year', year);
-    localStorage.setItem('selected_fund_source', fundSource);
+    try {
+      localStorage.setItem('selected_year', year);
+      localStorage.setItem('selected_fund_source', fundSource);
+    } catch { /* localStorage unavailable in private browsing */ }
   }, [year, fundSource]);
 
   return (

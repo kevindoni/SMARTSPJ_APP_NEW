@@ -2,6 +2,11 @@ import React from 'react';
 import { formatRupiah } from '../../utils/transactionHelpers';
 import { STANDARDS_MAP, SOURCE_COLUMNS } from '../../utils/kertasKerjaHelpers';
 
+const safeAmount = (value) => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : 0;
+};
+
 export default function KertasKerjaFormalTableAnnual({
   processedData,
   year: _year,
@@ -45,8 +50,9 @@ export default function KertasKerjaFormalTableAnnual({
 
     // Add to Grand Totals
     const grandKey = `${sourceKey}-${typeKey}`;
-    grandTotals[grandKey] = (grandTotals[grandKey] || 0) + item.total;
-    totalAll += (item.total || 0);
+    const itemTotal = safeAmount(item.total);
+    grandTotals[grandKey] = (grandTotals[grandKey] || 0) + itemTotal;
+    totalAll += itemTotal;
   });
 
   // Helper to calculate row columns
@@ -54,7 +60,7 @@ export default function KertasKerjaFormalTableAnnual({
     const cols = {}; // { 'BOSP REGULER-OPS': 1000, ... }
     items.forEach((item) => {
       const k = `${item.annualSource}-${item.annualType}`;
-      cols[k] = (cols[k] || 0) + item.total;
+      cols[k] = (cols[k] || 0) + safeAmount(item.total);
     });
     return cols;
   };
@@ -89,7 +95,7 @@ export default function KertasKerjaFormalTableAnnual({
         Object.values(l2.l3).flatMap((l3) => l3.items)
       );
       return {
-        total: allItems.reduce((s, i) => s + i.total, 0),
+        total: allItems.reduce((s, i) => s + safeAmount(i.total), 0),
         cols: calculateRowColumns(allItems),
       };
     }
@@ -97,14 +103,14 @@ export default function KertasKerjaFormalTableAnnual({
       // L2
       const allItems = Object.values(groupLevel.l3).flatMap((l3) => l3.items);
       return {
-        total: allItems.reduce((s, i) => s + i.total, 0),
+        total: allItems.reduce((s, i) => s + safeAmount(i.total), 0),
         cols: calculateRowColumns(allItems),
       };
     }
     if (level === 3) {
       // L3
       return {
-        total: groupLevel.items.reduce((s, i) => s + i.total, 0),
+        total: groupLevel.items.reduce((s, i) => s + safeAmount(i.total), 0),
         cols: calculateRowColumns(groupLevel.items),
       };
     }
@@ -115,7 +121,7 @@ export default function KertasKerjaFormalTableAnnual({
   const sekolah = schoolInfo?.nama || '-';
 
   return (
-    <div className="bg-white p-6 rounded-none shadow-none text-black text-xs overflow-x-auto">
+    <div id="rkas-print-area" className="bg-white p-6 rounded-none shadow-none text-black text-xs overflow-x-auto">
       {/* HEADERS */}
       <div className="mb-4">
         <h3 className="font-bold text-sm uppercase mb-2">A. PENERIMAAN</h3>
@@ -266,7 +272,7 @@ export default function KertasKerjaFormalTableAnnual({
                                     {l3.items.map((item, idx) => {
                                       const colData = {};
                                       colData[`${item.annualSource}-${item.annualType}`] =
-                                        item.total;
+                                        safeAmount(item.total);
 
                                       return (
                                         <tr key={`${l3Code}-${idx}`}>

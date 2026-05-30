@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import { useFilter } from '../context/FilterContext';
 import { formatRupiah } from '../utils/transactionHelpers';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 
 export default function BankReconciliation() {
   const { year } = useFilter();
@@ -38,6 +38,10 @@ export default function BankReconciliation() {
     setLoading(true);
     setError(null);
     try {
+      if (!window.arkas?.getBankReconciliation) {
+        setError('Jalankan melalui aplikasi Electron untuk mengakses data.');
+        return;
+      }
       const res = await window.arkas.getBankReconciliation(year);
       if (cancelledRef.current) return;
       if (res.success) {
@@ -425,7 +429,6 @@ export default function BankReconciliation() {
           </div>
         </div>
       )}
-          <ToastContainer position="top-right" autoClose={3000} />
     </div>
   );
 }

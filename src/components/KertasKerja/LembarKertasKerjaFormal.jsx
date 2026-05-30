@@ -119,7 +119,7 @@ export default function LembarKertasKerjaFormal({
   const regionCode = `${pad(prov)}.${pad(kab)}.${pad(kec)}`;
 
   return (
-    <div className="bg-white p-6 rounded-none shadow-none text-black box-border overflow-x-auto">
+    <div id="rkas-print-area" className="bg-white p-6 rounded-none shadow-none text-black box-border overflow-x-auto">
       {/* CONTAINER TABLE FOR LAYOUT CONSISTENCY */}
       <div className="min-w-[800px]">
         {/* MAIN TABLE 1 STRUCTURING HEADER + CONTENT */}

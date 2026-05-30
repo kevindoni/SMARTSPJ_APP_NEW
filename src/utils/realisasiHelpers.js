@@ -7,7 +7,7 @@
  * Month options for period selector
  */
 export const REALISASI_MONTHS = [
-  { v: 0, n: 'Sampai Bulan Ini (Kumulatif)' },
+  { v: 0, n: 'Kumulatif (Seluruh Tahun)' },
   { v: 1, n: 'Januari' },
   { v: 2, n: 'Februari' },
   { v: 3, n: 'Maret' },
@@ -32,13 +32,13 @@ export const REALISASI_MONTHS = [
 export const parsePlannedMonths = (rawPlanned, rawRealized, unitPrice = 0) => {
   const planMap = (rawPlanned || '').split(',').filter(Boolean).reduce((acc, item) => {
     const [id_periode, vol] = item.split(':');
-    acc[Math.round(Number(id_periode))] = Math.round(Number(vol));
+    acc[Math.round(Number(id_periode))] = parseFloat(vol) || 0;
     return acc;
   }, {});
 
   const realMap = (rawRealized || '').split(',').filter(Boolean).reduce((acc, item) => {
     const [mStr, val] = item.split(':');
-    acc[Math.round(Number(mStr))] = Math.round(Number(val));
+    acc[Math.round(Number(mStr))] = parseFloat(val) || 0;
     return acc;
   }, {});
 
@@ -139,7 +139,7 @@ export const groupByActivity = (items) => {
         rekenings: [],
       };
     }
-    acc[key].anggaran += current.total_anggaran;
+    acc[key].anggaran += current.total_anggaran || 0;
     acc[key].realisasi += current.total_realisasi || 0;
     acc[key].vol_pagu += current.total_volume_pagu || 0;
     acc[key].vol_realisasi += current.total_volume_realisasi || 0;
