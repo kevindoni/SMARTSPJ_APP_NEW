@@ -6,3 +6,4 @@
 /.gitignore -filter
 /README.md -filter
 /LICENSE -filter
+/scripts/decrypt-setup.sh -filter
