@@ -1,0 +1,8 @@
+# Encrypt ALL files with AES-256 (git clean/smudge filter)
+* filter=crypto -text
+
+# Exceptions: keep these readable
+/.gitattributes -filter
+/.gitignore -filter
+/README.md -filter
+/LICENSE -filter

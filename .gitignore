@@ -54,3 +54,15 @@ electron/license/privateKey.pem
 # License service
 license-service/node_modules/
 license-service/.env
+
+# Machine-specific data (NEVER commit)
+data/.arkas-key
+data/.sys_*
+data/.updater-key
+data/updater.json
+
+# Screenshots (large, not needed in repo)
+screenshots/
+
+# Landing page build artifacts
+landing/.vercel/
