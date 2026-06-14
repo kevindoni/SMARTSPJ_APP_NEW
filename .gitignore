@@ -66,3 +66,6 @@ screenshots/
 
 # Landing page build artifacts
 landing/.vercel/
+
+#criptography keys
+smartspj-crypto-key.txt
