@@ -55,6 +55,9 @@ electron/license/privateKey.pem
 license-service/node_modules/
 license-service/.env
 
+# License tool (internal admin GUI — JANGAN upload ke GitHub)
+license-tool/
+
 # Machine-specific data (NEVER commit)
 data/.arkas-key
 data/.sys_*
@@ -68,4 +71,4 @@ screenshots/
 landing/.vercel/
 
 #criptography keys
-smartspj-crypto-key.txt
+smartspj-crypto-key.txtSmartSPJ.zip
