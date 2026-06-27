@@ -79,3 +79,6 @@ SmartSPJ.zip
 
 # Temp release notes
 release-notes-*.md
+
+# Internal docs (not for public repo)
+/docs/

@@ -6,8 +6,8 @@
 <h1 align="center">🎯 SmartSPJ</h1>
 
 <p align="center">
-  <strong>Aplikasi Desktop Pendamping ARKAS untuk Pengelolaan SPJ BOS</strong><br/>
-  <em>Buat laporan, bukti transaksi, dan dokumen pertanggungjawaban BOS &mdash; lebih cepat, rapi, dan akurat.</em>
+  <strong>Pendamping ARKAS untuk SPJ BOS yang Cepat, Rapi, dan Akurat</strong><br/>
+  <em>Semua dokumen pertanggungjawaban sekolah — satu aplikasi, siap cetak.</em>
 </p>
 
 <p align="center">
@@ -18,50 +18,83 @@
 
 <p align="center">
   <a href="#kenapa-smartspj">Kenapa</a> &bull;
-  <a href="#fitur">Fitur</a> &bull;
+  <a href="#fitur-unggulan">Fitur Unggulan</a> &bull;
+  <a href="#semua-fitur">Semua Fitur</a> &bull;
   <a href="#yang-baru">Yang Baru</a> &bull;
-  <a href="#download">Download</a> &bull;
-  <a href="#dokumentasi">Dokumentasi</a>
+  <a href="#download">Download</a>
 </p>
 
 ---
 
 ## Kenapa SmartSPJ?
 
-> **Satu aplikasi, semua dokumen SPJ BOS siap cetak.**
+Menyusun SPJ BOS sering kali menyita waktu — menginput ulang data, mengecek transaksi satu per satu, hingga merekap dokumen untuk laporan. **SmartSPJ hadir untuk mengakhiri pekerjaan repetitif itu.**
 
-Bekerja menguras waktu saat menyusun kwitansi, bukti pengeluaran, BA Rekonsiliasi, hingga SPTJM? SmartSPJ menyatukan semuanya dalam satu tempat. Aplikasi membaca data ARKAS Anda secara **read-only** &mdash; menampilkan, menganalisis, mencetak, dan mengekspor &mdash; **tanpa pernah mengubah data asli**.
+Aplikasi membaca langsung **database ARKAS** Anda dan mengubahnya menjadi dokumen siap cetak dalam hitungan detik.
 
-| 💡 | Tanpa input manual berulang | Data ARKAS langsung dipakai, cukup pilih & cetak |
-|:---:|---|---|
-| 🛡️ | Aman untuk ARKAS | Akses read-only, data asli tetap utuh |
-| ⚡ | Hemat waktu | Satu klik untuk batch cetak & export 12 bulan |
-| 📊 | Transparan | Monitoring realisasi vs anggaran per item |
+| 💡 | **Tanpa input manual** | Data ARKAS langsung dipakai — pilih dan cetak |
+|:---:|:---|:---|
+| 🛡️ | **Aman untuk ARKAS** | Akses **read-only** &mdash; data asli Anda tidak pernah berubah |
+| ⚡ | **Hemat waktu** | Batch cetak & export 12 bulan dalam satu klik |
+| 📊 | **Transparan** | Pantau realisasi vs anggaran per item secara real-time |
+| 🖨️ | **Lengkap** | Kwitansi, bukti, rekonsiliasi, SPTJM, RKAS &mdash; semua di satu tempat |
+
+> _"Dulu sehari penuh menyusun SPJ, sekarang cukup hitungan menit."_
 
 ---
 
-## Fitur
+## Fitur Unggulan
 
-### 📈 Dashboard & Analitik Keuangan
-Statistik real-time, grafik pendapatan & belanja, pergerakan kas per sumber dana (BOS Reguler, BOS Kinerja, SiLPA), breakdown belanja per kategori, dan Top 5 pengeluaran.
+### 🚀 Cetak & Export Sekali Klik
+Kwitansi A2, Bukti Pengeluaran, dan seluruh buku kas bisa dicetak atau diekspor **satuan maupun batch** — termasuk 12 bulan sekaligus dalam satu file Excel multi-sheet.
 
-### 🧮 RKAS Creator & Proporsi
-Susun RKAS langsung dengan visualisasi proporsi anggaran (donut chart). Empat mode tampilan: **Standar, Kegiatan, Bulanan, dan Proporsi**. Plus monitoring **Realisasi & Selisih** per item dan deteksi sinkronisasi otomatis dengan ARKAS.
+### 📊 Monitoring Realisasi vs Anggaran
+Pantau setiap item belanja: mana yang sudah terealisasi, mana yang **sisa/hemat**, **kurang/over**, atau **belum jatuh tempo**. Tidak ada lagi anggaran yang "hilang" tanpa keterangan jelas.
 
-### 📒 Buku Kas & Buku Pembantu
-**BKU** dengan filter & pencarian, **Buku Pembantu Tunai / Bank / Pajak** (termasuk input pajak manual). Export Excel & PDF per bulan maupun 12 bulan sekaligus (All-in-One multi-sheet).
+### 🔄 Sinkron Otomatis dengan ARKAS
+Sistem mendeteksi sendiri bila data RKAS lokal tertinggal dari ARKAS — cukup satu klik **Sync** untuk memperbarui. Tidak ada lagi total anggaran yang meleset dari pagu.
 
-### 🖨️ Cetak Bukti Transaksi
-Kwitansi A2 & Bukti Pengeluaran (satuan/batch), Nota Group Manager, Merge Transaksi, dan pratinjau dokumen sebelum dicetak.
+### 🔁 Rekonsiliasi Otomatis
+**BA Rekonsiliasi** dan **Rekonsiliasi Bank** disusun otomatis dari data ARKAS — tinggal periksa dan cetak.
 
-### 🔁 Rekonsiliasi & Kertas Kerja
-**BA Rekonsiliasi** otomatis, **Rekonsiliasi Bank**, **Kertas Kerja** (bulanan/triwulan/tahunan), dan Smart Reconciliation Table. Export PDF, Excel, HTML.
+### 🧮 RKAS Proporsi Visual
+Susun RKAS dengan visualisasi proporsi anggaran yang interaktif, lengkap dengan empat mode tampilan: Standar, Kegiatan, Bulanan, dan Proporsi.
 
-### 📑 Laporan & Dokumen Pertanggungjawaban
-**SPTJM**, **K7/K7a**, **Register Kas**, **Realisasi Belanja**, **Rekap Saldo Bulanan** &mdash; semua siap cetak & export.
+### 💾 Backup & Restore Andal
+Cadangkan konfigurasi maupun seluruh data (ZIP), dengan pratinjau isi sebelum dipulihkan &mdash; data aman, pulih kapan saja.
 
-### 💾 Backup & Restore
-Backup konfigurasi (JSON) maupun lengkap (ZIP), dengan pratinjau isi sebelum restore.
+---
+
+## Semua Fitur
+
+<details>
+<summary><strong>📌 Klik untuk melihat daftar lengkap</strong></summary>
+
+**Dashboard & Analitik**
+- Statistik keuangan real-time & perbandingan transaksi bulanan
+- Grafik pendapatan, belanja, dan saldo akhir
+- Pergerakan kas per sumber dana (BOS Reguler, BOS Kinerja, SiLPA)
+- Breakdown belanja per kategori/kegiatan & Top 5 pengeluaran
+
+**Buku Kas & Pembantu**
+- Buku Kas Umum (BKU) &mdash; filter, pencarian, paginasi
+- Buku Pembantu Tunai, Bank, dan Pajak (input pajak manual)
+- Export Excel & PDF per bulan / 12 bulan (All-in-One)
+
+**Cetak Bukti Transaksi**
+- Kwitansi A2 & Bukti Pengeluaran (satuan & batch)
+- Nota Group Manager & Merge Transaksi
+- Pratinjau dokumen sebelum cetak
+
+**Rekonsiliasi & Kertas Kerja**
+- BA Rekonsiliasi & Rekonsiliasi Bank
+- Kertas Kerja (bulanan/triwulan/tahunan) + Smart Reconciliation Table
+- Export PDF, Excel, HTML
+
+**Laporan Pertanggungjawaban**
+- SPTJM, K7/K7a, Register Kas, Realisasi Belanja, Rekap Saldo Bulanan
+
+</details>
 
 ---
 
@@ -71,7 +104,7 @@ Backup konfigurasi (JSON) maupun lengkap (ZIP), dengan pratinjau isi sebelum res
 
 - **Kolom Realisasi & Selisih** di Buat RKAS, Kertas Kerja, dan Realisasi Belanja.
 - Selisih otomatis dikategorikan: **Sisa** (hemat), **Kurang** (over), **Belum Dipakai** (jatuh tempo belum dibayar).
-- Anggaran bulan depan ditandai **"Belum Jatuh Tempo"** — tidak keliru jadi efisiensi.
+- Anggaran bulan depan ditandai **"Belum Jatuh Tempo"** — tidak keliru dihitung sebagai efisiensi.
 - **Deteksi sinkronisasi ARKAS** — peringatan + tombol Sync saat data lokal usang.
 - Detail Aliran Dana per item: Target, Realisasi BKU, Selisih per bulan.
 
@@ -87,15 +120,7 @@ Backup konfigurasi (JSON) maupun lengkap (ZIP), dengan pratinjau isi sebelum res
   </a>
 </p>
 
-> **Catatan Windows SmartScreen** — aplikasi belum pakai code signing publik, jadi SmartScreen mungkin memperingatkan. Pilih **More info** → **Run anyway** untuk lanjut.
-
----
-
-## Dokumentasi
-
-| 📄 | Dokumen |
-|:---:|---|
-| 📘 | [Panduan Lengkap](docs/PANDUAN_LENGKAP.md) — dokumentasi teknis & operasional |
+> **Catatan Windows SmartScreen** — aplikasi belum menggunakan code signing publik, sehingga SmartScreen mungkin memperingatkan. Pilih **More info → Run anyway** untuk melanjutkan instalasi.
 
 ---
 
@@ -103,7 +128,7 @@ Backup konfigurasi (JSON) maupun lengkap (ZIP), dengan pratinjau isi sebelum res
 
 Hak cipta &copy; 2024&ndash;2026 **KevinDoni**. Seluruh hak dilindungi.
 
-SmartSPJ dilisensikan di bawah **SmartSPJ Proprietary License** — penggunaan, reproduksi, modifikasi, distribusi, atau publikasi ulang tanpa izin tertulis tidak diperbolehkan. Lihat [LICENSE](LICENSE) untuk detail.
+SmartSPJ dilisensikan di bawah **SmartSPJ Proprietary License** &mdash; penggunaan, reproduksi, modifikasi, distribusi, atau publikasi ulang tanpa izin tertulis tidak diperbolehkan. Lihat [LICENSE](LICENSE) untuk detail.
 
 ---
 
