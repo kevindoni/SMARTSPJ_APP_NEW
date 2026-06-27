@@ -73,3 +73,9 @@ landing/.vercel/
 #criptography keys
 smartspj-crypto-key.txt
 SmartSPJ.zip
+
+# Kilo workspace data (local only)
+.kilo/
+
+# Temp release notes
+release-notes-*.md
