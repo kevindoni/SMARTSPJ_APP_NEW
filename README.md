@@ -1,9 +1,5 @@
 # SmartSPJ
 
-<p align="center">
-  <img src="docs/logo.png" width="128" alt="SmartSPJ Logo">
-</p>
-
 <h1 align="center">SmartSPJ</h1>
 
 <p align="center">
