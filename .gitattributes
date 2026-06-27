@@ -7,3 +7,13 @@
 /README.md -filter
 /LICENSE -filter
 /scripts/decrypt-setup.sh -filter
+
+# Binary assets (images, docs) — never encrypt
+*.png -filter
+*.jpg -filter
+*.jpeg -filter
+*.gif -filter
+*.ico -filter
+*.svg -filter
+*.pdf -filter
+/docs/** -filter
