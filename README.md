@@ -11,6 +11,9 @@
 </p>
 
 <p align="center">
+  <a href="https://smartspj.vercel.app/">
+    <img src="https://img.shields.io/badge/🌐_Website-smartspj.vercel.app-3B82F6?style=for-the-badge&logo=vercel&logoColor=white" alt="Website"/>
+  </a>
   <a href="https://github.com/kevindoni/SMARTSPJ_APP_NEW/releases">
     <img src="https://img.shields.io/badge/⬇️_Download-Installer%20Terbaru-22C55E?style=for-the-badge&logo=github&logoColor=white" alt="Download"/>
   </a>
@@ -131,6 +134,11 @@ Hak cipta &copy; 2024&ndash;2026 **KevinDoni**. Seluruh hak dilindungi.
 SmartSPJ dilisensikan di bawah **SmartSPJ Proprietary License** &mdash; penggunaan, reproduksi, modifikasi, distribusi, atau publikasi ulang tanpa izin tertulis tidak diperbolehkan. Lihat [LICENSE](LICENSE) untuk detail.
 
 ---
+
+<p align="center">
+  <a href="https://smartspj.vercel.app/">🌐 Website</a> &bull;
+  <a href="https://github.com/kevindoni/SMARTSPJ_APP_NEW/releases">⬇️ Download</a>
+</p>
 
 <p align="center">
   <em>🎯 SmartSPJ — Dibuat untuk membantu bendahara sekolah Indonesia.</em>
