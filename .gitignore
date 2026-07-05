@@ -82,3 +82,10 @@ release-notes-*.md
 
 # Internal docs (not for public repo)
 /docs/
+.codegraph/
+.kilo/
+.kilocode/
+.playwright-mcp/
+HERMES_INSTRUCTIONS.md
+bug_report_verified.md
+SESSION_LOG_v1.11.8.md
