@@ -1,0 +1,19 @@
+# Encrypt ALL files with AES-256 (git clean/smudge filter)
+* filter=crypto -text
+
+# Exceptions: keep these readable
+/.gitattributes -filter
+/.gitignore -filter
+/README.md -filter
+/LICENSE -filter
+/scripts/decrypt-setup.sh -filter
+
+# Binary assets (images, docs) — never encrypt
+*.png -filter
+*.jpg -filter
+*.jpeg -filter
+*.gif -filter
+*.ico -filter
+*.svg -filter
+*.pdf -filter
+/docs/** -filter
