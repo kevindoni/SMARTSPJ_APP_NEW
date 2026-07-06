@@ -67,6 +67,9 @@ data/updater.json
 # Screenshots (large, not needed in repo)
 screenshots/
 
+# databasesimulasi
+databasesimulasi
+
 # Landing page build artifacts
 landing/.vercel/
 
