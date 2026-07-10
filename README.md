@@ -11,8 +11,8 @@
 </p>
 
 <p align="center">
-  <a href="https://smartspj.vercel.app/">
-    <img src="https://img.shields.io/badge/🌐_Website-smartspj.vercel.app-3B82F6?style=for-the-badge&logo=vercel&logoColor=white" alt="Website"/>
+<a href="https://smartspj.my.id/">
+<img src="https://img.shields.io/badge/🌐_Website-smartspj.my.id-3B82F6?style=for-the-badge&logoColor=white" alt="Website"/>
   </a>
   <a href="https://github.com/kevindoni/SMARTSPJ_APP_NEW/releases">
     <img src="https://img.shields.io/badge/⬇️_Download-Installer%20Terbaru-22C55E?style=for-the-badge&logo=github&logoColor=white" alt="Download"/>
@@ -136,8 +136,8 @@ SmartSPJ dilisensikan di bawah **SmartSPJ Proprietary License** &mdash; pengguna
 ---
 
 <p align="center">
-  <a href="https://smartspj.vercel.app/">🌐 Website</a> &bull;
-  <a href="https://github.com/kevindoni/SMARTSPJ_APP_NEW/releases">⬇️ Download</a>
+  <a href="https://smartspj.my.id/">🌐 Website</a> &bull;
+  <a href="https://smartspj.my.id/download">⬇️ Download</a>
 </p>
 
 <p align="center">
