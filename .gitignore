@@ -76,6 +76,8 @@ landing/.vercel/
 #criptography keys
 smartspj-crypto-key.txt
 SmartSPJ.zip
+smartspj-hosting.zip
+migrate-licenses.sql
 
 # Kilo workspace data (local only)
 .kilo/
