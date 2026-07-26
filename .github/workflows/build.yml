@@ -24,10 +24,10 @@ jobs:
           git config --local filter.crypto.clean "openssl aes-256-cbc -pbkdf2 -salt -pass env:CRYPTO_KEY_VAL"
           git config --local filter.crypto.smudge "openssl aes-256-cbc -pbkdf2 -d -pass env:CRYPTO_KEY_VAL"
           git config --local filter.crypto.required true
-          # Remove -filter exceptions so ALL files (incl PNG) get smudged/decrypted.
+          # Remove -filter exceptions from .gitattributes so ALL files get smudged.
           sed -i 's/ -filter//g' .gitattributes
-          # Force re-extract ALL files from object store (apply smudge).
-          find . -path ./.git -prune -o -type f -exec rm {} +
+          # Force git to re-smudge ALL files (PNGs stored encrypted need decrypt).
+          git rm --cached -r -q .
           git checkout -- .
           echo "=== Decrypt check ==="
           node -p "require('./package.json').version"
