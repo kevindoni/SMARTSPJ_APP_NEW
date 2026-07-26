@@ -4,6 +4,16 @@ Semua perubahan penting pada proyek ini akan didokumentasikan dalam file ini.
 
 ---
 
+## [2.1.3] — 26 Juli 2026
+
+### Perbaikan
+
+- **CI/CD auto-publish** — Release otomatis publish (un-draft + set latest) setelah build.
+- **check-changelog strict** — Build gagal jika CHANGELOG.md ATAU About.jsx belum di-update ke versi package.json.
+- **About.jsx v2.1.2 changelog** — Entry v2.1.2 yang hilang di build sebelumnya sekarang benar.
+
+---
+
 ## [2.1.2] — 26 Juli 2026
 
 ### Fitur Baru
