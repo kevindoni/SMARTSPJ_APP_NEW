@@ -18,17 +18,25 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup crypto filter + decrypt source
+      - name: Decrypt source (crypto filter + manual fallback for binary)
         shell: bash
         run: |
+          # Setup crypto filter for JS/text files
           git config --local filter.crypto.clean "openssl aes-256-cbc -pbkdf2 -salt -pass env:CRYPTO_KEY_VAL"
           git config --local filter.crypto.smudge "openssl aes-256-cbc -pbkdf2 -d -pass env:CRYPTO_KEY_VAL"
           git config --local filter.crypto.required true
-          # Remove -filter exceptions from .gitattributes so ALL files get smudged.
-          sed -i 's/ -filter//g' .gitattributes
-          # Force git to re-smudge ALL files (PNGs stored encrypted need decrypt).
-          git rm --cached -r -q .
-          git checkout -- .
+
+          # Force re-checkout with filter applied (decrypts text/JS files)
+          git checkout --force HEAD
+
+          # Manually decrypt any remaining encrypted binary files (PNG, etc)
+          # Some binary files were committed encrypted despite -filter exception.
+          find . -not -path './.git/*' -type f | while read -r f; do
+            if head -c 8 "$f" 2>/dev/null | grep -q 'Salted__'; then
+              openssl aes-256-cbc -pbkdf2 -d -pass env:CRYPTO_KEY_VAL -in "$f" -out "$f.tmp" 2>/dev/null && mv "$f.tmp" "$f" || rm -f "$f.tmp"
+            fi
+          done
+
           echo "=== Decrypt check ==="
           node -p "require('./package.json').version"
           echo "=== PNG header ==="
