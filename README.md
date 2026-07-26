@@ -141,9 +141,9 @@ Export ke **PDF** dan **Excel** dengan format yang rapi dan siap cetak.
 
 | Paket | Harga | Fitur |
 |-------|-------|-------|
-| **Free** | Gratis (30 hari) | Semua fitur, view BKU (50 baris), backup 1x |
-| **Pro** | Rp 250.000 / tahun | Semua fitur, export & cetak unlimited, gabung transaksi |
-| **Lifetime** | Rp 1.000.000 sekali bayar | Semua fitur Pro, berlaku selamanya, update gratis |
+| **Free** | Gratis | Semua fitur, view BKU (50 baris), backup 1x |
+| **Pro** | Tahunan | Semua fitur, export & cetak unlimited, gabung transaksi |
+| **Lifetime** | Sekali bayar | Semua fitur Pro, berlaku selamanya, update gratis |
 
 Pembayaran via **QRIS, Transfer Bank, E-Wallet** (Midtrans). Lisensi otomatis dikirim setelah pembayaran.
 
