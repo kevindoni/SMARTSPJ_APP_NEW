@@ -6,24 +6,26 @@ on:
       - 'v*'
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: windows-latest
-
     steps:
-      - name: Checkout (encrypted)
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup crypto filter + decrypt
+      - name: Setup crypto filter + decrypt source
         shell: bash
         run: |
-          git config --global filter.crypto.clean "openssl aes-256-cbc -pbkdf2 -salt -pass file:$PWD/.git/crypto-key"
-          git config --global filter.crypto.smudge "openssl aes-256-cbc -pbkdf2 -d -pass file:$PWD/.git/crypto-key"
-          git config --global filter.crypto.required true
           printf '%s' "${{ secrets.CRYPTO_KEY }}" > .git/crypto-key
+          git config --local filter.crypto.clean "openssl aes-256-cbc -pbkdf2 -salt -pass file:$PWD/.git/crypto-key"
+          git config --local filter.crypto.smudge "openssl aes-256-cbc -pbkdf2 -d -pass file:$PWD/.git/crypto-key"
+          git config --local filter.crypto.required true
           git checkout --force HEAD
-          echo "Decryption done. Checking first file..."
-          head -1 package.json
+          echo "=== Decrypt check: package.json version ==="
+          node -p "require('./package.json').version"
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -31,20 +33,20 @@ jobs:
           node-version: 20
 
       - name: Install dependencies
-        run: npm ci || npm install
+        run: npm install
 
-      - name: Build (vite + jsc)
+      - name: Build (vite + jsc compile)
         run: npm run build
         env:
           NODE_OPTIONS: --max-old-space-size=4096
 
-      - name: Build installer (electron-builder)
+      - name: Build installer (electron-builder + publish)
         run: npm run build:electron
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_OPTIONS: --max-old-space-size=4096
 
-      - name: Upload artifacts
+      - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: SmartSPJ-installer
@@ -53,16 +55,3 @@ jobs:
             release/*.blockmap
             release/latest.yml
           retention-days: 30
-
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: |
-            release/*.exe
-            release/*.blockmap
-            release/latest.yml
-          generate_release_notes: true
-          draft: false
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
