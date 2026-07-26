@@ -24,9 +24,13 @@ jobs:
           git config --local filter.crypto.clean "openssl aes-256-cbc -pbkdf2 -salt -pass env:CRYPTO_KEY_VAL"
           git config --local filter.crypto.smudge "openssl aes-256-cbc -pbkdf2 -d -pass env:CRYPTO_KEY_VAL"
           git config --local filter.crypto.required true
+          # Force ALL files (including PNG/binary) through crypto filter — some are stored encrypted.
+          echo "* filter=crypto" >> .gitattributes
           git checkout --force HEAD
           echo "=== Decrypt check: package.json version ==="
           node -p "require('./package.json').version"
+          echo "=== PNG check: logo.png header ==="
+          head -c 8 electron/logo.png | xxd | head -1
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
