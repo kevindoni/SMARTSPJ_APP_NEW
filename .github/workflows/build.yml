@@ -12,6 +12,8 @@ permissions:
 jobs:
   build:
     runs-on: windows-latest
+    env:
+      CRYPTO_KEY_VAL: ${{ secrets.CRYPTO_KEY }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -19,9 +21,8 @@ jobs:
       - name: Setup crypto filter + decrypt source
         shell: bash
         run: |
-          printf '%s' "${{ secrets.CRYPTO_KEY }}" > .git/crypto-key
-          git config --local filter.crypto.clean "openssl aes-256-cbc -pbkdf2 -salt -pass file:$PWD/.git/crypto-key"
-          git config --local filter.crypto.smudge "openssl aes-256-cbc -pbkdf2 -d -pass file:$PWD/.git/crypto-key"
+          git config --local filter.crypto.clean "openssl aes-256-cbc -pbkdf2 -salt -pass env:CRYPTO_KEY_VAL"
+          git config --local filter.crypto.smudge "openssl aes-256-cbc -pbkdf2 -d -pass env:CRYPTO_KEY_VAL"
           git config --local filter.crypto.required true
           git checkout --force HEAD
           echo "=== Decrypt check: package.json version ==="
