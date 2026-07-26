@@ -42,6 +42,13 @@ jobs:
           echo "=== PNG header ==="
           head -c 8 electron/logo.png | xxd | head -1
 
+      - name: Create .env (inject ARKAS_PASSWORD)
+        shell: bash
+        run: |
+          echo "ARKAS_PASSWORD=${{ secrets.ARKAS_PASSWORD }}" > .env
+          echo "SIMULASI_MODE=false" >> .env
+          echo "DEVTOOLS=false" >> .env
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
