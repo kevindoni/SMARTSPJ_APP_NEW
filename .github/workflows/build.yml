@@ -1,0 +1,68 @@
+name: Build & Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout (encrypted)
+        uses: actions/checkout@v4
+
+      - name: Setup crypto filter + decrypt
+        shell: bash
+        run: |
+          git config --global filter.crypto.clean "openssl aes-256-cbc -pbkdf2 -salt -pass file:$PWD/.git/crypto-key"
+          git config --global filter.crypto.smudge "openssl aes-256-cbc -pbkdf2 -d -pass file:$PWD/.git/crypto-key"
+          git config --global filter.crypto.required true
+          printf '%s' "${{ secrets.CRYPTO_KEY }}" > .git/crypto-key
+          git checkout --force HEAD
+          echo "Decryption done. Checking first file..."
+          head -1 package.json
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci || npm install
+
+      - name: Build (vite + jsc)
+        run: npm run build
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
+
+      - name: Build installer (electron-builder)
+        run: npm run build:electron
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_OPTIONS: --max-old-space-size=4096
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: SmartSPJ-installer
+          path: |
+            release/*.exe
+            release/*.blockmap
+            release/latest.yml
+          retention-days: 30
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            release/*.exe
+            release/*.blockmap
+            release/latest.yml
+          generate_release_notes: true
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

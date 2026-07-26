@@ -7,6 +7,8 @@
 /README.md -filter
 /LICENSE -filter
 /scripts/decrypt-setup.sh -filter
+/.github/** -filter
+/CHANGELOG.md -filter
 
 # Binary assets (images, docs) — never encrypt
 *.png -filter
