@@ -80,3 +80,14 @@ jobs:
             release/*.blockmap
             release/latest.yml
           retention-days: 30
+
+      - name: Publish release (un-draft + set latest)
+        shell: bash
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          gh release edit "v${VERSION}" --draft=false --latest \
+            --title "v${VERSION}" \
+            --notes "Lihat CHANGELOG.md" \
+            --repo ${{ github.repository }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
