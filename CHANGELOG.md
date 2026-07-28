@@ -4,6 +4,21 @@ Semua perubahan penting pada proyek ini akan didokumentasikan dalam file ini.
 
 ---
 
+## [2.1.4] — 28 Juli 2026
+
+### Perbaikan
+
+- **Hutang Pajak BA Rekonsiliasi** — Nilai UTANG PJK di tabel REKAP SALDO BULANAN kini akurat (pakai saldo dari Tab Pajak, bukan perhitungan terpisah). Sebelumnya terhitung double (198.200 → 99.100).
+- **Info Card Hutang Pajak** — Pakai saldo akhir dari Tab Pajak (getPajakDetail) bukan pajakPungut - pajakSetor.
+- **BPU di Gabung Transaksi** — BPU (id_ref_bku=4) tidak lagi di-exclude dari modal Gabung Transaksi BKU. Sebelumnya tertimpa filter penerimaan.
+- **Limit transaksi modal Gabung** — `limit: 0` sekarang benar-benar "tanpa batas" (sebelumnya `0 || 50` = 50, BPU terpotong).
+- **A2/Kwitansi: nama penerima kosong** — Kolom "Yang menerima uang" tidak lagi mencetak nama otomatis. Hanya "Nama:" + "Alamat:" di atas, garis kosong di bawah untuk ditulis manual dengan pulpen.
+- **Sisa Anggaran RKAS bisa minus** — Card "Sisa Anggaran" menampilkan nilai negatif (merah) jika realisasi melebihi anggaran, bukan di-clamp ke 0.
+- **Harga satuan RKAS bisa minus** — Input harga satuan di Tambah Item menerima nilai negatif (untuk adjustment/koreksi).
+- **PajakHutang di reconciliation handler** — Tambah properti pajakHutang (opening/closing) ke monthly/quarterly/semester/annual data.
+
+---
+
 ## [2.1.3] — 26 Juli 2026
 
 ### Perbaikan
