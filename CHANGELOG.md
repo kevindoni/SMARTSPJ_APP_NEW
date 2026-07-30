@@ -4,6 +4,27 @@ Semua perubahan penting pada proyek ini akan didokumentasikan dalam file ini.
 
 ---
 
+## [2.1.5] — 30 Juli 2026
+
+### Perbaikan
+
+- **Hutang Pajak BA Rekonsiliasi tidak double** — Info Card & Summary Banner kini ambil saldo akhir dari Tab Pajak (getPajakDetail), bukan perhitungan `pajakPungut - pajakSetor`. Sebelumnya 198.200 → sekarang 99.100.
+- **Saldo Pajak terbawa ke bulan berikutnya** — BKU Pajak: saldo akhir bulan lalu muncul sebagai baris "Saldo Bulan [nama bulan]" di awal bulan berikutnya. Sebelumnya selalu mulai dari 0.
+- **"Saldo Bulan Lalu" → "Saldo Bulan Januari"** — Label saldo awal di TaxTransactionTable kini tampilkan nama bulan spesifik.
+- **A2/Kwitansi: nama penerima dikosongkan** — Kolom "Yang menerima uang" tidak cetak nama otomatis di bawah garis. Hanya "Nama:" + "Alamat:" di atas. Ditulis manual dengan pulpen.
+- **Bukti Pengeluaran: Penerima dikosongkan** — Signature block "Penerima" tidak cetak nama otomatis.
+- **BPU muncul di Gabung Transaksi BKU** — BPU (id_ref_bku=4) tidak lagi di-exclude sebagai penerimaan. Sebelumnya tidak muncul di modal.
+- **Limit transaksi modal Gabung** — `limit:0` sekarang benar = tanpa batas (sebelumnya `0||50`=50, transaksi terpotong).
+- **Dropdown bulan terfilter** — Semua dropdown bulan (6 tempat: BKU, Cetak Manual, Nota Gabungan, Realisasi Belanja, Kertas Kerja, Register Kas) hanya tampil sampai bulan terakhir yang punya data di ARKAS.
+
+### Peningkatan
+
+- **Sisa Anggaran RKAS bisa minus** — Card "Sisa Anggaran" tampil merah jika realisasi melebihi anggaran (bukan di-clamp ke 0).
+- **Harga satuan RKAS bisa minus** — Input harga satuan menerima nilai negatif untuk adjustment/koreksi.
+- **Uraian override terpusat + sync lintas komponen** — Edit uraian di mana pun (BKU/Nota Gabungan/Cetak Manual) → sync ke semua via backend `uraian-overrides.json` + cross-component event.
+
+---
+
 ## [2.1.4] — 28 Juli 2026
 
 ### Perbaikan
