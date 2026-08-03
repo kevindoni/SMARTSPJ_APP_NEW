@@ -4,6 +4,32 @@ Semua perubahan penting pada proyek ini akan didokumentasikan dalam file ini.
 
 ---
 
+## [2.1.6] — 3 Agustus 2026
+
+### Perbaikan
+
+- **KODE KEGIATAN BKU per transaksi** — Sebelumnya semua transaksi menampilkan kode kegiatan yang sama (`03.01.01.`). Sekarang tiap transaksi mendapatkan kode kegiatan yang benar sesuai kode rekening-nya. Berdampak juga ke export PDF & Excel.
+- **Filter bulan RKAS & Realisasi Belanja** — Dropdown bulan tidak lagi terbatas sampai bulan terakhir dengan data ARKAS. RKAS & Realisasi Belanja sekarang menampilkan semua 12 bulan (Januari–Desember) karena merupakan dokumen perencanaan.
+- **maxMonth type coercion** — Filter bulan di 6 halaman (BKU, Cetak Manual, Nota Gabungan, Register Kas, dll) sekarang menggunakan `parseInt` yang benar agar tidak ada bug string vs integer comparison.
+
+### Fitur Baru
+
+- **SSH Suplemen dari Perbup 3/2026** — Halaman Cari Barang & Kode Rekening sekarang menampilkan 859 barang tambahan dari PDF Peraturan Bupati Temanggung No 3 Tahun 2026 yang tidak ada di database ARKAS. Termasuk:
+  - Material bangunan (aspal hot mixed, keramik, granit, dll)
+  - SBU/honorarium (PPK, tim teknis, lisensi software, dll)
+  - Data ter-bundle dalam installer (`data/ssh-supplement-2026.json`, 65KB)
+  - Anti-double: barang yang sudah ada di ARKAS otomatis di-skip
+  - Badge warna: SSH 2026 (biru), SSH 2025 (amber), Suplemen (hijau)
+  - Harga satuan tampil untuk semua barang
+  - Layout grid tabel dengan header
+
+### Perubahan UI
+
+- **Sidebar** — Menu "Bukti Transaksi" diganti menjadi "Cetak Kwitansi A2"
+- **Cari Barang** — Layout baru grid tabel (Nama | Satuan | Harga | Sumber)
+
+---
+
 ## [2.1.5] — 30 Juli 2026
 
 ### Perbaikan
