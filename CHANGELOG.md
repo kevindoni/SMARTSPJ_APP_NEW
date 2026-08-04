@@ -4,6 +4,15 @@ Semua perubahan penting pada proyek ini akan didokumentasikan dalam file ini.
 
 ---
 
+## [2.1.9] — 4 Agustus 2026
+
+### Perbaikan
+
+- **Rekonsiliasi Bank: Saldo Tunai Bulan Terakhir** — Saldo tunai untuk bulan terakhir yang punya transaksi (misal Juli) sekarang dihitung dari checkpoint terakhir + perubahan bulan tersebut, sehingga selisih bank = Rp 0.
+- **Urutan BKU: BNU dulu, Pajak kemudian** — Transaksi dengan No. Bukti (BNU/BPU) muncul lebih dulu pada tanggal yang sama.
+
+---
+
 ## [2.1.8] — 4 Agustus 2026
 
 ### Fitur Baru
