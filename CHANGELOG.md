@@ -4,44 +4,29 @@ Semua perubahan penting pada proyek ini akan didokumentasikan dalam file ini.
 
 ---
 
-## [2.1.9] — 4 Agustus 2026
+## [2.2.0] — 4 Agustus 2026
 
 ### Perbaikan
 
-- **Rekonsiliasi Bank: Saldo Tunai Bulan Terakhir** — Saldo tunai untuk bulan terakhir yang punya transaksi (misal Juli) sekarang dihitung dari checkpoint terakhir + perubahan bulan tersebut, sehingga selisih bank = Rp 0.
+- **Rekonsiliasi Bank: Saldo Tunai Tidak Double-Count** — Pembayaran BNU/BPU yang menggunakan uang tunai (`id_ref_bku=4`) sebelumnya dihitung 2x. Sekarang hanya dihitung 1x, sehingga saldo bank untuk bulan terakhir akurat (selisih = 0).
 - **Urutan BKU: BNU dulu, Pajak kemudian** — Transaksi dengan No. Bukti (BNU/BPU) muncul lebih dulu pada tanggal yang sama.
-
----
-
-## [2.1.8] — 4 Agustus 2026
+- **Export Excel: Closing Text** — Semua laporan Excel (BKU Umum, Tunai, Bank, Pajak) sekarang memiliki teks penutup (Saldo Bank, Saldo Tunai, Jumlah).
+- **Kode Kegiatan BKU per Transaksi** — Tiap transaksi mendapatkan kode kegiatan yang benar sesuai kode rekening-nya.
+- **Kertas Kerja Triwulan Q4 bisa Minus** — Q4 tidak lagi dipaksa 0.
+- **NIP Kepala Sekolah di Export** — NIP kepala sekolah sekarang muncul di tanda tangan BKU.
 
 ### Fitur Baru
 
-- **RKAS Auto-Split Revisi ARKAS** — Saat import, SmartSPJ otomatis memisahkan revisi ARKAS menjadi versi Awal + Pergeseran + Perubahan. Revisi pertama = Awal, revisi tengah = Pergeseran, revisi terbaru = Perubahan.
-- **RKAS Diff Antar Versi** — Tab Perubahan menampilkan diff antara versi terhadap versi sebelumnya (Perubahan vs Pergeseran terakhir, bukan vs Awal).
-- **RKAS Tombol Sync Re-split** — Reset & re-import semua revisi ARKAS dengan satu klik.
-- **Gabung Transaksi: Pajak Nested** — Pajak Terima/Setor otomatis tampil di bawah BNU terkait, bukan terpisah di bawah. Memudahkan pencarian saat akan digabung.
-- **Gabung Transaksi: Total dengan Tanda +/-** — Setor pajak dihitung negatif, sehingga pasangan Terima + Setor = Rp 0.
-- **Export Excel: Closing Text** — Semua laporan Excel (BKU Umum, Tunai, Bank, Pajak) sekarang memiliki teks penutup (Saldo Bank, Saldo Tunai, Jumlah) di bagian bawah, sama seperti PDF.
-- **Rekonsiliasi Bank: Detail Saldo Tunai** — Card bulanan sekarang menampilkan Saldo Tunai + Saldo Total (Bank + Tunai) + Saldo Akhir Bank secara terpisah.
+- **RKAS Auto-Split Revisi ARKAS** — Saat import, SmartSPJ otomatis memisahkan revisi ARKAS menjadi versi Awal + Pergeseran + Perubahan.
+- **RKAS Diff Antar Versi + Tombol Sync Re-split** — Tab Perubahan menampilkan diff antar versi. Tombol Sync Re-split untuk reset & re-import.
+- **Gabung Transaksi: Pajak Nested** — Pajak Terima/Setor otomatis tampil di bawah BNU terkait + total dengan tanda +/-.
+- **Rekonsiliasi Bank: Detail Saldo Tunai** — Card bulanan dan tabel utama menampilkan Saldo Tunai + Saldo Total.
 
-### Perbaikan
+### Peningkatan
 
-- **Kode Kegiatan BKU per Transaksi** — Sebelumnya semua transaksi menampilkan kode kegiatan yang sama (`03.01.01.`). Sekarang tiap transaksi mendapatkan kode kegiatan yang benar sesuai kode rekening-nya.
-- **RKAS Filter Bulan Dihapus** — RKAS & Realisasi Belanja sekarang menampilkan Januari–Desember (12 bulan) karena merupakan dokumen perencanaan.
-- **Urutan BKU: BNU dulu, Pajak kemudian** — Transaksi dengan No. Bukti (BNU/BPU) muncul lebih dulu, lalu diikuti pajak Terima/Setor pada tanggal yang sama.
-- **Kertas Kerja Triwulan Q4 bisa Minus** — Q4 tidak lagi dipaksa 0 (sebelumnya `Math.max(0, ...)`). Q4 bisa minus agar total triwulan = total anggaran ARKAS.
-- **Kertas Kerja Realisasi** — JOIN fallback via `kode_rekening + uraian` agar realisasi tetap terbaca saat ARKAS membuat `id_rapbs` baru saat revisi.
-- **NIP Kepala Sekolah di Export** — NIP kepala sekolah sekarang muncul di tanda tangan BKU. Sebelumnya field name tidak match (`nip_kepala` vs `nip_kepsek`).
-- **Rekonsiliasi Bank: Saldo Tunai Bulan Terakhir** — Saldo tunai untuk bulan terakhir yang ada transaksi sekarang dihitung dari checkpoint "Saldo Tunai Bulan X" yang dibuat di bulan yang sama.
-- **maxMonth Type Coercion** — Filter bulan di 6 halaman (BKU, Cetak Manual, Nota Gabungan, Register Kas, dll) sekarang menggunakan `parseInt` yang benar.
+- **RKAS & Realisasi: Dropdown 12 Bulan** — Dokumen perencanaan menampilkan Januari–Desember.
+- **Cari Barang: SSH Suplemen Perbup 3/2026** — 859 barang tambahan + layout grid tabel dengan harga satuan.
 - **Sidebar** — Menu "Bukti Transaksi" diganti menjadi "Cetak Kwitansi A2".
-
-### Peningkatan Internal
-
-- **Beta Channel** — Auto-updater sekarang mendukung pre-release (`allowPrerelease=true`), sehingga user bisa update ke versi beta.
-- **SSH Suplemen Perbup 3/2026** — 859 barang tambahan dari PDF Peraturan Bupati Temanggung No 3 Tahun 2026 yang tidak ada di database ARKAS, ter-bundle dalam installer (`data/ssh-supplement-2026.json`).
-- **Landing Page Redesign** — Landing page `smartspj.my.id` didesain ulang dengan SEO lengkap (structured data, sitemap, robots.txt, GZIP compression, security headers).
 
 ---
 
