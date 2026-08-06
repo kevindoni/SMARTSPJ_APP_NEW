@@ -4,6 +4,27 @@ Semua perubahan penting pada proyek ini akan didokumentasikan dalam file ini.
 
 ---
 
+## [2.2.1] — 6 Agustus 2026
+
+### Perbaikan
+
+- **Cetak BKU Merge** — Semua item tercetak penuh dengan benar saat cetak A2 & Bukti dari gabungan transaksi.
+- **Sinkron Print Status** — Status cetak tersinkron antara Nota Gabungan dan CETAK MANUAL (mencegah double cetak).
+- **Toko/Vendor untuk Gabungan** — Field penerima uang otomatis disesuaikan untuk gabungan transaksi.
+- **Rekonsiliasi Bank** — Bulan tanpa transaksi tidak lagi ditampilkan.
+- **Laporan K7** — Tab BOS Kinerja hanya muncul jika ada data tersedia.
+
+### Fitur Baru
+
+- **Gabung Transaksi BKU** — Menampilkan kode rekening per item.
+
+### Peningkatan
+
+- **Manajemen License** — Tampilan paket lebih simpel dan rapi.
+- **Sidebar** — Menu "Cari Barang & Kode Rekening" disingkat menjadi "Cari Barang & Rekening".
+
+---
+
 ## [2.2.0] — 4 Agustus 2026
 
 ### Perbaikan
