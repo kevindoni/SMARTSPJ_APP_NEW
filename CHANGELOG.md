@@ -4,6 +4,22 @@ Semua perubahan penting pada proyek ini akan didokumentasikan dalam file ini.
 
 ---
 
+## [2.2.2] — 20 Agustus 2026
+
+### Fitur Baru
+
+- **Export Excel Realisasi Belanja** — 1 file berisi 4 sheet: Ringkasan (indeks kinerja + status per kegiatan), Rincian Per Bulan (matrix 12 bulan target vs realisasi dengan warna status), Ringkasan Per Bulan (total semua item per bulan), dan Status Per Item (daftar BELUM DIBELANJAKAN/PARSIAL + SUDAH TEREALISASI).
+- **Deteksi Rapel/Lintas Bulan di Excel** — Item yang target bulannya dibayar di bulan lain (rapel/gseer) ditandai warna teal + keterangan `RAP: dibayar di <bulan>`, konsisten dengan modal Aliran Dana di aplikasi.
+
+### Perbaikan
+
+- **Klasifikasi Lunas vs Parsial** — Bulan dengan transaksi melebihi target bulan itu (menutup bulan lain) tidak lagi muncul sebagai "PARSIAL sisa negatif".
+- **Total Pagu Konsisten** — Sheet Rincian Per Bulan memakai pagu resmi RKAS (`total_anggaran`), bukan penjumlahan target bulanan.
+- **Status Bulan Akurat** — Bulan tanpa target tapi ada belanja diberi status "GESER", bukan "TEREALISASI PENUH".
+- **Free Tier Gating** — Tombol Export Excel hanya aktif untuk pengguna LANGGANAN.
+
+---
+
 ## [2.2.1] — 6 Agustus 2026
 
 ### Perbaikan
