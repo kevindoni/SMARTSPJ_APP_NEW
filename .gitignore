@@ -92,6 +92,8 @@ release-notes-*.md
 .kilo/
 .kilocode/
 .playwright-mcp/
+.mimosa
+docs
 HERMES_INSTRUCTIONS.md
 bug_report_verified.md
 SESSION_LOG_v1.11.8.md
