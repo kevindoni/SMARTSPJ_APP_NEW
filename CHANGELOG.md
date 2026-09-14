@@ -4,6 +4,41 @@ Semua perubahan penting pada proyek ini akan didokumentasikan dalam file ini.
 
 ---
 
+## [2.2.4] — 14 September 2026
+
+### Fitur Baru
+
+- **RKAS Tahun Berikutnya** — RKAS tahun anggaran depan kini bisa disusun manual di SmartSPJ
+  (Buat Perubahan dari versi kosong → Tambah Item) sebelum data ada di ARKAS. Begitu ARKAS
+  resmi (disahkan dinas), muncul banner "Data RKAS Resmi ARKAS Sudah Tersedia" dan satu klik
+  menggantikan draft dengan data resmi ARKAS.
+- **Tab Status SPJ** — halaman Bukti Transaksi kini punya ringkasan kelengkapan per bulan:
+  cetak A2, pajak belum setor, dan lampiran nota (opsional), plus navigasi cepat per bulan.
+- **Cetak Langsung dari Preview** — tombol Cetak di preview A2/Bukti Pengeluaran (selain
+  Simpan PDF); cetak langsung juga menandai status "sudah dicetak".
+
+### Perbaikan
+
+- **Saldo Buku Tidak Minus** — urutan baris pada filter "Semua Bulan" kini konsisten dengan
+  filter bulanan (Tarik Tunai/saldo awal didahulukan pada tanggal sama) di BKU Umum, Buku
+  Bank, dan Buku Tunai; saldo berjalan tidak lagi minus sesaat.
+- **Buku Pajak Rapi** — pasangan pajak diurutkan per item: Terima (X) langsung diikuti
+  Setor (X) pada tanggal yang sama.
+- **Anti Merge Lintas Bulan** — tombol Gabung Transaksi disembunyikan saat filter
+  "Semua Bulan" (BKU, Bank, Tunai, Pajak).
+- **RKAS Stabil** — diperbaiki duplikasi versi saat pindah tahun anggaran, spinner Sync
+  Re-split yang bisa menggantung, dan crash tombol import revisi yang belum terdefinisi.
+
+### Peningkatan
+
+- Tab Bukti Transaksi ditata ulang: **Nota Otomatis** (bukti terbentuk per nota ARKAS) dan
+  **Gabung Manual** (pilih sendiri transaksi yang mau digabung); pilihan bulan tersinkron
+  antar tab.
+- Penghitungan "Total Item" konsisten antar tab (transaksi asli, bukan baris tampilan).
+- Merge bulan lain tidak lagi muncul sebagai kartu kosong di daftar nota.
+
+---
+
 ## [2.2.3] — 8 September 2026
 
 ### Perbaikan
