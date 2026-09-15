@@ -4,6 +4,32 @@ Semua perubahan penting pada proyek ini akan didokumentasikan dalam file ini.
 
 ---
 
+## [2.2.5] — 15 September 2026
+
+### Fitur Baru
+
+- **Tombol Pergeseran Baru** — popup geser anggaran (sumber/tujuan) dihapus; tombol Pergeseran
+  kini langsung membuat versi Pergeseran baru (salinan versi aktif, editable). Pergeseran
+  yang sebenarnya tetap mengikuti revisi ARKAS saat import/sync.
+- **Deteksi Pergeseran Antar Bulan** — tab Pergeseran kini menampilkan item yang distribusi
+  bulan-nya digeser (mis. "Pergeseran bulan (Okt → Sep)") walau jumlahnya tidak berubah.
+
+### Perbaikan
+
+- **Urutan Versi Kronologis** — versi yang dibuat belakangan selalu tampil paling kanan;
+  Pergeseran yang dibuat setelah Perubahan kini muncul di belakang Perubahan tsb.
+- **Diff RKAS-P Akurat** — pembanding versi kini versi tepat sebelumnya (bukan lagi
+  "pergeseran terakhir"), dan dihitung ulang otomatis saat daftar versi termuat.
+- **Banner Penggantian Tepat Sasaran** — banner "Ganti dengan Data ARKAS" hanya muncul
+  untuk tahun yang benar-benar draft manual (belum pernah import ARKAS).
+
+### Peningkatan
+
+- **Pencarian RKAS Responsif** — input "Cari item..." memakai debounce sehingga tetap mulus
+  saat mengetik pada tabel ratusan baris.
+
+---
+
 ## [2.2.4] — 14 September 2026
 
 ### Fitur Baru
