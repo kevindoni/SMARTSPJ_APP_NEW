@@ -4,17 +4,6 @@ Semua perubahan penting pada proyek ini akan didokumentasikan dalam file ini.
 
 ---
 
-## [2.2.7] — 16 September 2026
-
-### Peningkatan
-
-- **Pembelian Lisensi Langsung dari Aplikasi kini via Tripay** — tombol Beli di halaman
-  lisensi membuka pembayaran QRIS / Virtual Account / e-wallet (Tripay), yang bisa dipakai
-  segera tanpa menunggu. Setelah membayar, cukup klik Cek Status Pembayaran dan license key
-  muncul otomatis.
-
----
-
 ## [2.2.6] — 16 September 2026
 
 ### Perbaikan
