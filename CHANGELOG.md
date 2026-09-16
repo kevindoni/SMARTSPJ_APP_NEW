@@ -4,6 +4,30 @@ Semua perubahan penting pada proyek ini akan didokumentasikan dalam file ini.
 
 ---
 
+## [2.2.6] — 16 September 2026
+
+### Perbaikan
+
+- **Import RKAS 100% Sesuai ARKAS** — logika import disederhanakan menjadi murni: harga &
+  volume diambil apa adanya dari ARKAS. Untuk item yang `jumlah` ≠ `volume × harga` di ARKAS
+  (akibat pergeseran langsung), volume disesuaikan agar nominal tetap identik dengan ARKAS.
+  Akibatnya **Total Anggaran selalu persis = Pagu** — selisih pembulatan tidak akan terjadi lagi.
+- **Ringkasan Realisasi** — kolom Uraian kini menampilkan nama barang asli per kegiatan
+  (mis. "Banner (+1 lainnya)"), bukan lagi label generik "Total Akumulasi Kegiatan".
+
+### Peningkatan
+
+- **Tambah/Edit Item Lebih Responsif di PC Lama** — daftar pencarian di form (standar harga,
+  kode rekening, kegiatan) kini dibatasi hasil tampilannya dan dioptimalkan, sehingga mengetik
+  tidak lagi tersendat.
+
+### Lainnya
+
+- Verifikasi menyeluruh terhadap data ARKAS: BKU Umum, Buku Kas Tunai/Bank/Pajak, Realisasi
+  Belanja, dan RKAS kini selaras penuh (total, saldo berjalan, dan per item).
+
+---
+
 ## [2.2.5] — 15 September 2026
 
 ### Fitur Baru
