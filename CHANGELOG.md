@@ -4,6 +4,42 @@ Semua perubahan penting pada proyek ini akan didokumentasikan dalam file ini.
 
 ---
 
+## [2.2.8] — 17 September 2026
+
+### Fitur Baru
+
+- **Card "Sisa Belanja"** — hemat dari selisih harga satuan tetap tercatat sebagai dana
+  yang bisa dianggarkan ulang, bahkan setelah harga item disesuaikan ke harga real.
+- **RKAS T-1 (Tahun Depan)** — susun RKAS tahun anggaran berikutnya langsung di SmartSPJ
+  meski ARKAS-nya belum terbit; saat data resmi tersedia, draft digantikan satu klik.
+- **Changelog di Modal Update** — menampilkan semua versi yang belum dimiliki user,
+  dikelompokkan per versi (bisa dibuka-tutup).
+
+### Perbaikan
+
+- **Anggaran Item Persis ARKAS** — Total per item diambil dari `jumlah` resmi ARKAS,
+  tanpa selisih pembulatan sekecil apa pun; Σ anggaran selalu = Pagu.
+- **Nota A2: 1 Kode Rekening** — gabungan nota lintas kode rekening kini ditolak;
+  yang boleh digabung hanya transaksi dengan kode rekening yang sama (beda nomor bukti).
+
+### Peningkatan
+
+- **Kunci Bulan Akurat** — mengikuti periode ARKAS & volume tercatat di BKU; pembayaran
+  24 April untuk alokasi Januari kini mengunci Januari.
+- **Keamanan Trial Diperkuat** — mundurkan jam sistem atau manipulasi file trial tidak
+  lagi bisa memperpanjang masa uji coba.
+- **Performa Kertas Kerja** — 428+ item terasa instan; klik & form tidak me-render ulang
+  seluruh tabel. Toast dinormalisasi di seluruh aplikasi.
+- **Cetak RKAS-P** — kolom Jumlah memakai rencana (vol × harga) sehingga pergeseran
+  terlihat jelas (Berkurang/Bertambah), jumlah resmi tetap dicatat di keterangan.
+
+## [2.2.7] — 16 September 2026
+
+### Peningkatan
+
+- **Peningkatan Sistem** — pembaruan keamanan, keandalan sinkronisasi data, dan
+  perapian tampilan pada beberapa halaman.
+
 ## [2.2.6] — 16 September 2026
 
 ### Perbaikan
