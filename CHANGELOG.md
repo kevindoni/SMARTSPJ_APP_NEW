@@ -4,41 +4,37 @@ Semua perubahan penting pada proyek ini akan didokumentasikan dalam file ini.
 
 ---
 
-## [2.2.8] — 17 September 2026
-
-### Fitur Baru
-
-- **Card "Sisa Belanja"** — hemat dari selisih harga satuan tetap tercatat sebagai dana
-  yang bisa dianggarkan ulang, bahkan setelah harga item disesuaikan ke harga real.
-- **RKAS T-1 (Tahun Depan)** — susun RKAS tahun anggaran berikutnya langsung di SmartSPJ
-  meski ARKAS-nya belum terbit; saat data resmi tersedia, draft digantikan satu klik.
-- **Changelog di Modal Update** — menampilkan semua versi yang belum dimiliki user,
-  dikelompokkan per versi (bisa dibuka-tutup).
+## [2.2.9] — 27 September 2026
 
 ### Perbaikan
 
-- **Anggaran Item Persis ARKAS** — Total per item diambil dari `jumlah` resmi ARKAS,
-  tanpa selisih pembulatan sekecil apa pun; Σ anggaran selalu = Pagu.
-- **Nota A2: 1 Kode Rekening** — gabungan nota lintas kode rekening kini ditolak;
-  yang boleh digabung hanya transaksi dengan kode rekening yang sama (beda nomor bukti).
+- **Gabung Transaksi BKU kini akurat** — total uang masuk & keluar sama persis dengan ARKAS.
+- **Bukti PPN tampil berdampingan dengan belanjanya** — tidak lagi terpisah-pisah di atas tabel.
+- **Angka penutupan Buku Pembantu Bank kini sama dengan tabelnya.**
+- **RKAS yang sudah disahkan dinas kini terkunci otomatis** — tidak bisa diubah tanpa membuat
+  versi perubahan.
+- **Register Penutupan Kas: keterangan selisih kini benar arah** (kelebihan/kekurangan) dan
+  tanpa tanda minus.
+- **Jendela aplikasi tidak menumpuk lagi** saat dibuka ulang.
 
-### Peningkatan
+### Fitur Baru
 
-- **Kunci Bulan Akurat** — mengikuti periode ARKAS & volume tercatat di BKU; pembayaran
-  24 April untuk alokasi Januari kini mengunci Januari.
-- **Keamanan Trial Diperkuat** — mundurkan jam sistem atau manipulasi file trial tidak
-  lagi bisa memperpanjang masa uji coba.
-- **Performa Kertas Kerja** — 428+ item terasa instan; klik & form tidak me-render ulang
-  seluruh tabel. Toast dinormalisasi di seluruh aplikasi.
-- **Cetak RKAS-P** — kolom Jumlah memakai rencana (vol × harga) sehingga pergeseran
-  terlihat jelas (Berkurang/Bertambah), jumlah resmi tetap dicatat di keterangan.
+- **Hapus banyak item RKAS sekaligus** — centang beberapa item, hapus sekali jalan.
+- **Pagu sementara** — susun RKAS tahun depan walau pagu resmi belum keluar; otomatis
+  terganti begitu pagu resmi terbit.
+
+---
 
 ## [2.2.7] — 16 September 2026
 
 ### Peningkatan
 
-- **Peningkatan Sistem** — pembaruan keamanan, keandalan sinkronisasi data, dan
-  perapian tampilan pada beberapa halaman.
+- **Pembelian Lisensi Langsung dari Aplikasi kini via Tripay** — tombol Beli di halaman
+  lisensi membuka pembayaran QRIS / Virtual Account / e-wallet (Tripay), yang bisa dipakai
+  segera tanpa menunggu. Setelah membayar, cukup klik Cek Status Pembayaran dan license key
+  muncul otomatis.
+
+---
 
 ## [2.2.6] — 16 September 2026
 
