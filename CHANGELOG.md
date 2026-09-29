@@ -4,6 +4,28 @@ Semua perubahan penting pada proyek ini akan didokumentasikan dalam file ini.
 
 ---
 
+## [3.0.0] — 29 September 2026
+
+### Perbaikan
+
+- **Export PDF & Excel Buku Pembantu Pajak: kolom SALDO selalu terisi angka berjalan** — tidak lagi NaN.
+- **Kolom PPh 22 pada Buku Pembantu Pajak kini berfungsi penuh** (pungutan, setor, dan total).
+- **Pindah-pindah tahun di RKAS tidak lagi menciptakan versi duplikat** (Pergeseran/Perubahan kembar).
+- **Modal revisi RKAS (Awal/Pergeseran/Perubahan) tidak lagi kosong saat dibuka** — tombolnya kini berfungsi.
+- **Sinkronisasi ulang RKAS (Sync Re-split) selalu selesai** — indikator memproses tidak lagi nyangkut.
+
+### Fitur Baru
+
+- **RKAS tahun depan bisa disusun bertahap sebagai draft** — begitu ARKAS disahkan dinas, satu klik
+  menggantikan draft dengan data resmi ARKAS.
+
+### Peningkatan
+
+- **Admin web: Key Sementara kini bisa dibuat untuk sekolah yang sudah terdaftar** — lisensi
+  lamanya langsung diperpanjang.
+
+---
+
 ## [2.2.9] — 27 September 2026
 
 ### Perbaikan
