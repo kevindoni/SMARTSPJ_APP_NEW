@@ -4,6 +4,26 @@ Semua perubahan penting pada proyek ini akan didokumentasikan dalam file ini.
 
 ---
 
+## [3.0.2] — 29 September 2026
+
+### Perbaikan
+
+- **Urutan Buku Pembantu Pajak: pasangan Terima→Setor selalu berdampingan** di layar maupun
+  PDF — tidak pernah terpisah lagi.
+- **Saldo pajak tidak pernah tampil minus** — mengikuti cara ARKAS.
+
+### Fitur Baru
+
+- **Buku Pembantu Pajak kini memakai Nama Kegiatan & Kode Kegiatan dari data ARKAS** (plus
+  tanda Transaksi SIPLah) — persis format ARKAS.
+- **Splash screen baru** — animasi logo SmartSPJ asli yang ringan dan tajam.
+
+### Peningkatan
+
+- **PDF pajak lebih padat dan rapi** — kolom uraian lebih lega, jumlah halaman berkurang.
+
+---
+
 ## [3.0.1] — 29 September 2026
 
 ### Fitur Baru
