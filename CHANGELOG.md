@@ -4,6 +4,20 @@ Semua perubahan penting pada proyek ini akan didokumentasikan dalam file ini.
 
 ---
 
+## [3.0.1] — 29 September 2026
+
+### Fitur Baru
+
+- **Update otomatis sepenuhnya** — begitu tersambung internet, versi baru diunduh di latar
+  belakang dan terpasang otomatis saat aplikasi ditutup.
+
+### Peningkatan
+
+- Tidak perlu lagi klik download/install — cukup tutup aplikasi seperti biasa, versi baru
+  menyala saat dibuka lagi.
+
+---
+
 ## [3.0.0] — 29 September 2026
 
 ### Perbaikan
