@@ -12,6 +12,7 @@ Semua perubahan penting pada proyek ini akan didokumentasikan dalam file ini.
 
 ### Peningkatan
 
+- **Splash screen baru** — logo SmartSPJ asli dengan animasi ringan dan tajam saat aplikasi dibuka.
 - **Pembaruan aplikasi kini jauh lebih praktis** — setelah versi ini, pembaruan berikutnya terpasang otomatis saat aplikasi ditutup.
 
 ---
