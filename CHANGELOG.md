@@ -10,11 +10,6 @@ Semua perubahan penting pada proyek ini akan didokumentasikan dalam file ini.
 
 - **Export BKU Pajak untuk semua bulan sekaligus kini berjalan mulus** — saldo tampil akurat di setiap baris dan setiap bulan.
 - **Tanggal "Aktif Sejak" pada informasi lisensi kini tampil benar**.
-- **Pembelian ulang setelah menonaktifkan lisensi kini lancar tanpa hambatan**.
-
-### Fitur Baru
-
-- **Metode pembelian lisensi kini lebih lengkap dan fleksibel** — pilih cara bayar yang paling mudah untuk sekolah Anda.
 
 ### Peningkatan
 
