@@ -9,18 +9,10 @@ Semua perubahan penting pada proyek ini akan didokumentasikan dalam file ini.
 ### Perbaikan
 
 - **Export BKU Pajak "semua bulan": saldo per baris & per bulan kini benar** (sebelumnya salah kaprah).
-- **Harga Pro Plus Komite di jendela pembayaran** (Rp 500.000).
-
-### Fitur Baru
-
-- **3 kanal pembayaran online: iPaymu (QRIS/VA/retail/kartu), DANA, dan Midtrans** — semua
-  terhubung aktivasi lisensi otomatis.
-- **Kanal pembayaran diatur dari dashboard admin** — aplikasi sekolah mengikuti otomatis.
+- **Harga paket di jendela pembelian kini tampil benar**.
 
 ### Peningkatan
 
-- **Order belum dibayar tidak menumpuk di daftar lisensi** (hangus otomatis 48 jam).
-- **Panel Key Sementara kini memiliki daftar key yang pernah dibuat**.
 - **Persiapan update otomatis penuh** — setelah versi ini, semua update berikutnya terpasang sendiri.
 
 ---
