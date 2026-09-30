@@ -9,7 +9,6 @@ Semua perubahan penting pada proyek ini akan didokumentasikan dalam file ini.
 ### Perbaikan
 
 - **Export BKU Pajak untuk semua bulan sekaligus kini berjalan mulus** — saldo tampil akurat di setiap baris dan setiap bulan.
-- **Tanggal "Aktif Sejak" pada informasi lisensi kini tampil benar**.
 
 ### Peningkatan
 
