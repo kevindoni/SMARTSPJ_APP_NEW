@@ -8,12 +8,12 @@ Semua perubahan penting pada proyek ini akan didokumentasikan dalam file ini.
 
 ### Perbaikan
 
-- **Export BKU Pajak "semua bulan": saldo per baris & per bulan kini benar** (sebelumnya salah kaprah).
-- **Harga paket di jendela pembelian kini tampil benar**.
+- **Export BKU Pajak untuk semua bulan sekaligus kini berjalan mulus** — saldo tampil akurat di setiap baris dan setiap bulan.
+- **Harga paket di halaman pembelian kini tampil sesuai seharusnya**.
 
 ### Peningkatan
 
-- **Persiapan update otomatis penuh** — setelah versi ini, semua update berikutnya terpasang sendiri.
+- **Pembaruan aplikasi kini jauh lebih praktis** — setelah versi ini, pembaruan berikutnya terpasang otomatis saat aplikasi ditutup.
 
 ---
 
