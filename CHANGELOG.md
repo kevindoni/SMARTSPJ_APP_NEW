@@ -4,6 +4,18 @@ Semua perubahan penting pada proyek ini akan didokumentasikan dalam file ini.
 
 ---
 
+## [3.0.5] — 4 Oktober 2026
+
+### Perbaikan
+
+- **Saldo BKU rekap semua bulan tidak dobel hitung lagi** — baris "Saldo Bank/Tunai Bulan…" pada bulan-bulan berikutnya kini dikenali sebagai saldo berjalan, sehingga saldo akhir di BKU Umum, Laporan Kas, dan Laporan Bank akurat.
+- **Setor pajak "belum disetor" konsisten di semua tampilan** — saldo berjalan dan saldo akhir dihitung dari data yang sama dengan tabel, identifikasi baris pajak juga lebih akurat.
+- **Grafik arus kas akurat saat filter sumber dana aktif** — tarik tunai, setor tunai, dan pergeseran tidak lagi hilang dari perhitungan; pergantian saldo Desember–Januari mengikuti ARKAS.
+- **Peringatan "No. Bukti duplikat" kini lebih tepat sasaran** — honor bulan lalu yang dibayar bulan ini, nota gabungan multi-item, dan data yang sudah dihapus tidak lagi dianggap duplikat.
+- **Daftar BUKTI TRANSAKSI kini mengikuti filter sumber dana** — memilih BOS Reguler / Lainnya langsung menyaring daftarnya, sama seperti halaman BKU.
+
+---
+
 ## [3.0.4] — 2 Oktober 2026
 
 ### Perbaikan
