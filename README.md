@@ -130,6 +130,9 @@ Export ke **PDF** dan **Excel** dengan format yang rapi dan siap cetak.
 3. Ikuti petunjuk instalasi
 4. Buka SmartSPJ — auto-connect ke ARKAS
 
+### Pembaruan Otomatis
+Setelah versi 3.0.3, pembaruan berjalan sendiri: begitu tersambung internet, versi baru diunduh di latar belakang dan **terpasang otomatis saat aplikasi ditutup**. Cek manual tersedia di menu **Tentang → Cek Update**.
+
 ### Persyaratan
 - Windows 10/11 (64-bit)
 - ARKAS sudah terinstall di komputer yang sama
@@ -196,6 +199,17 @@ Pembayaran via **QRIS, Transfer Bank, E-Wallet** (Midtrans). Lisensi otomatis di
 ---
 
 ## 📝 Changelog
+
+### v3.0.5 (4 Oktober 2026)
+- 🐛 Saldo BKU rekap semua bulan tidak dobel hitung lagi — BKU Umum, Laporan Kas & Laporan Bank akurat
+- 🐛 Setor pajak "belum disetor" konsisten di semua tampilan
+- 🐛 Grafik arus kas akurat saat filter sumber dana aktif
+- 🐛 Peringatan "No. Bukti duplikat" lebih tepat sasaran — honor dibayar di bulan berikutnya & nota gabungan tidak lagi dianggap duplikat
+- ✨ Daftar Bukti Transaksi kini mengikuti filter sumber dana
+
+### v3.0.4 (2 Oktober 2026)
+- 🐛 Perbaikan cetak A2 per kode rekening
+- 🐛 Perbaikan export BKU Pajak semua bulan
 
 ### v2.0.4 (10 Juli 2026)
 - ✨ Gabung Transaksi BKU
