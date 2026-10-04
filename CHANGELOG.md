@@ -4,6 +4,15 @@ Semua perubahan penting pada proyek ini akan didokumentasikan dalam file ini.
 
 ---
 
+## [3.0.4] — 2 Oktober 2026
+
+### Perbaikan
+
+- **Cetak A2 per kode rekening sempat gagal diproses** — sudah diperbaiki dan kini berjalan normal.
+- **Export BKU Pajak semua bulan sempat gagal dimulai** — sudah diperbaiki dan kini berjalan normal.
+
+---
+
 ## [3.0.3] — 30 September 2026
 
 ### Perbaikan
