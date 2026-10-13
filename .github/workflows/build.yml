@@ -85,9 +85,11 @@ jobs:
         shell: bash
         run: |
           VERSION=$(node -p "require('./package.json').version")
+          NOTES=$(awk -v ver="$VERSION" '$0 ~ "^## \\["ver"\\]" {f=1; next} f && /^---/ {exit} f' CHANGELOG.md)
+          [ -z "$NOTES" ] && NOTES="Lihat CHANGELOG.md"
           gh release edit "v${VERSION}" --draft=false --latest \
             --title "v${VERSION}" \
-            --notes "Lihat CHANGELOG.md" \
+            --notes "$NOTES" \
             --repo ${{ github.repository }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
