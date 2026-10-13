@@ -4,6 +4,14 @@ Semua perubahan penting pada proyek ini akan didokumentasikan dalam file ini.
 
 ---
 
+## [3.0.6] — 13 Oktober 2026
+
+### Optimasi
+
+- **Optimasi sistem** — performa dan kestabilan aplikasi lebih baik.
+
+---
+
 ## [3.0.5] — 4 Oktober 2026
 
 ### Perbaikan
