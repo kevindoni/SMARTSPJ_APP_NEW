@@ -4,6 +4,31 @@ Semua perubahan penting pada proyek ini akan didokumentasikan dalam file ini.
 
 ---
 
+## [3.0.7] — 21 Oktober 2026
+
+### Fitur Baru
+
+- **Checklist kelengkapan SPJ otomatis mengikuti Lampiran SPJ BOS 2026** — Panitia, Honorarium PTT/GTT (guru, tenaga administrasi, keamanan, kebersihan, operator dapodik, perpustakaan), Narasumber/Pengawas/Tenaga Ahli, dan jenis baru Uang Saku/Transport; honor guru kini menyertakan Surat Pernyataan Tidak Menerima Tunjangan Profesi/Sertifikasi dan Profil PTK dapodik.
+- **Belanja via SIPLAH otomatis memakai Susunan SPJ SIPLAH lengkap** — BA Negosiasi, Surat Pemesanan, BAST, s.d. Kwitansi (dengan syarat ada No. Nota).
+- **Satu dokumen A2 = satu halaman checklist** — bukti campuran (mis. honor panitia + tenaga administrasi) tidak lagi mencetak dua checklist sekaligus.
+
+### Perbaikan
+
+- **Kode Program/Kegiatan di A2 kini sesuai jenjang sekolah** — nama kegiatan tidak lagi tertukar varian jenjang lain (mis. "…pembelajaran dan bermain" versi TK muncul di sekolah SMP).
+- **Untuk Kepentingan belanja honor kini tertulis jenisnya** (mis. "Honorarium Guru \<nama\>"), bukan "Belanja \<nama\>".
+- **Kolom Pemegang Barang hanya terisi untuk belanja barang** (bahan habis, modal, cetak, SIPLAH) — honor/jasa dibiarkan kosong, tanggal dan label tetap ada.
+- **Tulisan MATERAI hanya muncul untuk belanja bermaterai di atas Rp 5 juta** — honor tidak pernah bermaterai.
+- **Nama dan alamat toko di kolom "Yang menerima uang" tampil utuh** — tidak terpotong lagi, dengan ukuran huruf dan jarak baris standar.
+- **Performa start-up** — sinkronisasi dinas tidak lagi menahan tampilan data saat aplikasi dibuka / ganti tahun.
+
+### Peningkatan
+
+- **Perjalanan dinas lebih pintar** — butir Nota BBM hanya muncul jika benar-benar membeli BBM; ditambah Undangan, Kwitansi, dan catatan pengesahan tanggal berangkat/tiba.
+- **Tabel BKU ringan** — baris dirender bertahap (120 + muat otomatis saat scroll), jauh lebih lancar di PC spek rendah.
+- **Panel pajak di A2 lebih lapang** dan mudah dibaca.
+
+---
+
 ## [3.0.6] — 13 Oktober 2026
 
 ### Optimasi
