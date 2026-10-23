@@ -4,6 +4,17 @@ Semua perubahan penting pada proyek ini akan didokumentasikan dalam file ini.
 
 ---
 
+## [3.0.8] — 23 Oktober 2026
+
+### Perbaikan
+
+- **Tombol "Excel (Semua Bulan)" dan "PDF (Semua Bulan)" di halaman BKU kini berfungsi normal** — sebelumnya tombol ini tidak merespons sama sekali saat diklik.
+- **Angka penerimaan dan pengeluaran pada Register Penutupan Kas serta Berita Acara Pemeriksaan Kas sekarang sama persis dengan tampilan BKU di ARKAS** — pajak yang dipungut dan disetorkan kini ikut terhitung, sehingga tidak ada lagi selisih angka dengan ARKAS.
+- **Laporan tutup kas kini hanya menghitung transaksi bulan yang dipilih** — sesuai periode yang tertulis di laporannya (mis. "1 Mei s.d. 31 Mei"), tidak lagi tercampur transaksi dari bulan-bulan sebelumnya.
+- **Uang hasil Tarik Tunai tidak lagi membuat angka laporan membengkak** — perpindahan uang dari bank ke kas tunai kini dihitung satu kali saja, bukan dihitung ganda sebagai penerimaan.
+
+---
+
 ## [3.0.7] — 21 Oktober 2026
 
 ### Fitur Baru
