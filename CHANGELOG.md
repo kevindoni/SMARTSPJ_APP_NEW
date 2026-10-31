@@ -4,6 +4,29 @@ Semua perubahan penting pada proyek ini akan didokumentasikan dalam file ini.
 
 ---
 
+## [3.0.9] — 31 Oktober 2026
+
+### Fitur Baru
+
+- **Menu "Hutang Pajak"** — daftar pajak yang dipotong dan belum disetorkan, dikelompokkan per bulan. Pelunasan dicatat lewat transaksi Setor Pajak di BKU.
+- **Input Pajak Manual** — catat pajak yang tidak tercatat di ARKAS (Saldo Awal Tahun, Pajak Terlewat, Setor Pajak, Transaksi Manual) — lengkap dengan penjelasan tiap jenis.
+- **Kini terintegrasi dengan SIPLAH Toko Ladang** — login otomatis lewat SSO belajar.id, kode keamanan (2FA) diminta langsung di aplikasi.
+- **Jendela pembayaran lisensi yang tidak sengaja tertutup dapat dibuka lagi** — tautan pembayaran tersimpan dan tetap berlaku 24 jam.
+
+### Perbaikan
+
+- **Pajak yang dipotong dari belanja kini ikut terhitung di saldo laporan** — pajak yang sudah dipungut tetapi belum disetorkan tidak lagi "hilang" dari saldo BA Rekons & REKAP; saldo buku kini sama dengan rekening riil, dan begitu disetorkan saldo otomatis berkurang.
+- **Realisasi Belanja kini menunjukkan rapel secara akurat** — perbandingan realisasi terhadap pagu kini memakai target s.d. bulan sebelumnya, sehingga status "Terbayar (Rapel)" tampil tepat.
+- **Gabung Transaksi BKU Pajak kini menampilkan saldo awal pajak per jenis** — rincian pajak bulan sebelumnya ikut terbawa, bukan digabung satu angka.
+- **Pengaman input pajak manual** — salah memilih jenis pajak tidak akan tersimpan, lengkap dengan penjelasan dan tombol perbaikan cepat.
+- **Saldo awal pajak tidak tercatat dobel lagi** di BKU Pajak.
+- **Kolom PJK HTG di BA Rekons kini mengikuti pajak daerah per bulannya** — penandaan bulan lunas berdasarkan bukti setor (SSPD), bukan sekadar teks.
+- **Kolom "Saldo Biaya Adm. Bank & Bunga Bank" kini tampil di REKAP SALDO BULANAN** — sesuai formulir BA Rekons.
+- **Export BKU Pajak (PDF & Excel) kini sama persis dengan tampilan layar** — kolom pajak lengkap hingga PPh 4 dan Pajak Daerah.
+- **SIPLAH: permintaan kode keamanan (2FA) lebih jelas dan stabil** — tampil dengan penjelasan, tombol ✕, dan tidak lagi mengganggu saat ditutup.
+
+---
+
 ## [3.0.8] — 23 Oktober 2026
 
 ### Perbaikan
