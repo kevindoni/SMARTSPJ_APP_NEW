@@ -73,6 +73,7 @@ databasesimulasi
 # Landing page build artifacts
 landing/.vercel/
 landing
+uploadserver
 
 #criptography keys
 smartspj-crypto-key.txt
@@ -93,6 +94,9 @@ release-notes-*.md
 .kilocode/
 .playwright-mcp/
 .mimosa
+.vscode
+.v2c
+.video_agent
 docs
 HERMES_INSTRUCTIONS.md
 bug_report_verified.md
