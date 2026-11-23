@@ -1,5 +1,19 @@
 # Changelog
 
+## [3.2.1] — 23 November 2026
+
+### Fitur Baru
+- **PAGU ARKAS otomatis terdeteksi** untuk tahun yang kertas kerjanya sudah diaktivasi — tidak lagi bertanda "pagu sementara"; pensil pagu hanya tampil untuk pagu manual
+- **Kartu ringkasan RKAS tampil juga untuk tahun draft** — realisasi Rp 0 sampai tahun berjalan, layout lengkap seperti tahun resmi
+- **Katalog Standar Harga terbaru** — 15.155 item (SSH/HSPK/ASB/SBU) terintegrasi di pencarian Standar Harga & form tambah item RKAS, dengan badge SSH 2027
+- **Fallback referensi kegiatan/rekening** — tahun baru yang belum punya referensi otomatis memakai tahun terakhir
+- **Peringatan "perubahan belum disimpan"** saat menutup/reload aplikasi, pindah tahun, atau pindah versi
+
+### Perbaikan
+- **Saldo tunai Register Penutupan Kas & BKU** — dihitung dari kumulatif kas tunai resmi (bukan heuristik uraian), akurat di Register & kartu BKU
+- **Peringatan duplikat no. bukti** — tidak lagi salah tandai nota multi-item (deteksi per nota/id_kas_nota, satu nota = satu penggunaan)
+- **Daftar barang form tambah item** — memuat seluruh item kode rekening (sebelumnya maksimal 200); pencarian aktif setelah 3 huruf
+
 ## [3.2.0] — 23 November 2026
 
 ### Fitur Baru
