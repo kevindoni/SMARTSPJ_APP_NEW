@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.2.3] — 24 November 2026
+
+### Perbaikan
+- **Kegagalan memuat RKAS kini tampil di layar** dengan pesan yang jelas + tombol Coba Lagi (tidak lagi senyap) — agar penyebab halaman kosong langsung terlihat
+
 ## [3.2.2] — 24 November 2026
 
 ### Perbaikan
