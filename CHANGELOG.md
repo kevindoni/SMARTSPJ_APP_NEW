@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.2.5] — 24 November 2026
+
+### Perbaikan
+- **Log diagnostik loader dicatat di dua lokasi** (data aplikasi + folder instalasi) agar kegagalan muat aplikasi terpasang selalu bisa didiagnosis
+- **Pembacaan database menunggu & mencoba ulang** bila aplikasi ARKAS sedang membuka database — halaman RKAS/BKU tidak lagi kosong saat keduanya terbuka bersamaan
+
 ## [3.2.4] — 24 November 2026
 
 ### Perbaikan
