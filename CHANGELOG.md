@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.2.4] — 24 November 2026
+
+### Perbaikan
+- **Log diagnostik loader** — registrasi handler proses utama kini dicatat ke file (loader-log.txt) agar penyebab halaman gagal muat bisa didiagnosis
+
 ## [3.2.3] — 24 November 2026
 
 ### Perbaikan
