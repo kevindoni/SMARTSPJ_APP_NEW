@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.2.2] — 24 November 2026
+
+### Perbaikan
+- **Pembacaan database menunggu & mencoba ulang** bila aplikasi ARKAS sedang membuka database — halaman RKAS/BKU tidak lagi kosong saat keduanya terbuka bersamaan
+- Termasuk seluruh perbaikan & fitur 3.2.1 (PAGU ARKAS terdeteksi, kartu ringkasan tahun draft, SSH 2027, proteksi draft, saldo tunai akurat, duplikat nota multi-item, daftar barang lengkap)
+
 ## [3.2.1] — 23 November 2026
 
 ### Fitur Baru
