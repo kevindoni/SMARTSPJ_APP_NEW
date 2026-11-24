@@ -3,6 +3,11 @@
 ## [3.2.4] — 24 November 2026
 
 ### Perbaikan
+- **Cek update kini via feed publik tanpa kredensial** — updater tidak lagi gagal diam-diam karena konfigurasi lama; aplikasi beta/stabil sama-sama akan menerima rilis terbaru
+
+## [3.2.4] — 24 November 2026
+
+### Perbaikan
 - **Log diagnostik loader** — registrasi handler proses utama kini dicatat ke file (loader-log.txt) agar penyebab halaman gagal muat bisa didiagnosis
 
 ## [3.2.3] — 24 November 2026
