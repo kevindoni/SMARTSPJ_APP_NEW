@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.2.6] — 24 November 2026
+
+### Perbaikan
+- **Draft RKAS tidak lagi tampak kosong setelah pindah tahun** — pindah tahun kembali ke versi Awal; sebelumnya versi terpilih dari tahun sebelumnya (mis. Pergeseran 5) tetap terbawa sehingga draft tahun tujuan (mis. 2027) tampak kosong padahal datanya ada
+
 ## [3.2.5] — 24 November 2026
 
 ### Perbaikan
